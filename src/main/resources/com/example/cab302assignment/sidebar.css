@@ -1,0 +1,29 @@
+.sidebar-nav-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0 16 0 16;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-effect: none;
+    -fx-cursor: hand;
+}
+
+.sidebar-nav-button:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.sidebar-nav-button:hover {
+    -fx-background-color: #D7E3ED;
+    -fx-border-color: transparent transparent transparent #27548A;
+}
+
+.sidebar-nav-button.sidebar-nav-button-selected {
+    -fx-background-color: #D7E3ED;
+    -fx-border-color: transparent transparent transparent #27548A;
+}
