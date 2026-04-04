@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="10.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.cab302assignment.SignUpController">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+    </padding>
+
+    <Label text="Create Account" styleClass="heading"/>
+
+    <Label text="Full Name" styleClass="form-label"/>
+    <TextField fx:id="fullNameField" promptText="Enter your full name">
+        <tooltip><Tooltip text="Your first and last name"/></tooltip>
+    </TextField>
+
+    <Label text="Email Address" styleClass="form-label"/>
+    <TextField fx:id="emailField" promptText="Enter your email address">
+        <tooltip><Tooltip text="Must be a valid, unique email address"/></tooltip>
+    </TextField>
+
+    <Label text="Password" styleClass="form-label"/>
+    <PasswordField fx:id="passwordField" promptText="Enter a password">
+        <tooltip><Tooltip text="At least 8 characters, with uppercase, lowercase and a digit"/></tooltip>
+    </PasswordField>
+
+    <Label text="Confirm Password" styleClass="form-label"/>
+    <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password">
+        <tooltip><Tooltip text="Must match the password above"/></tooltip>
+    </PasswordField>
+
+    <Label fx:id="errorLabel" styleClass="error" wrapText="true"/>
+    <Label fx:id="successLabel" styleClass="success" wrapText="true"/>
+
+    <Button fx:id="signUpButton" text="Sign Up" onAction="#onSignUp" maxWidth="Infinity" disable="true"/>
+
+    <Hyperlink text="Already have an account? Sign in" onAction="#onGoToSignIn"/>
+</VBox>
