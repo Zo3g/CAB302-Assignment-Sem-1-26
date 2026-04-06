@@ -1,3 +1,98 @@
 .root {
     -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
 }
+
+/* For main view titles - set control type to Label for spacial properties to apply*/
+.h1 {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 32;
+    -fx-font-weight: normal;
+    -fx-padding: 20 0 20 0;
+    -fx-text-fill: #27548A
+}
+
+.h2 {
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    -fx-font-size: 26;
+    -fx-font-weight: normal;
+}
+
+.h3 {
+    -fx-font-family: "Urbanist", "Segoe UI", sans-serif;
+    -fx-font-size: 24;
+    -fx-font-weight: 300;
+    -fx-text-fill: #00000099
+}
+
+.h4 {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 24;
+    -fx-font-weight: normal;
+    -fx-text-fill: #27548A
+}
+
+.h5 {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 20;
+    -fx-font-weight: normal;
+}
+
+.p {
+    -fx-font-size: 14;
+    -fx-font-weight: normal;
+}
+
+.btn-primary {
+    -fx-background-color: #FFCA76;
+    -fx-text-fill: #27548A;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-secondary {
+    -fx-background-color: #D7E3ED;
+    -fx-text-fill: #27548A;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+/* Action Button (icon only) */
+.btn-action {
+    -fx-background-color: transparent;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+}
+
+.btn-action:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+    -fx-background-radius: 6;
+}
+
+.btn-action:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+}
+
+.text-area {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 8;
+    -fx-font-size: 14;
+}
+
+/* Inner content area (important for rounded corners) */
+.text-area .content {
+    -fx-background-radius: 10;
+}
+.text-area .prompt-text {
+    -fx-fill: #27548A;   /* your color */
+    -fx-font-size: 15;   /* slightly larger */
+}
+
+.background-secondary {
+    -fx-background-color: #D7E3ED;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 20;
+}
