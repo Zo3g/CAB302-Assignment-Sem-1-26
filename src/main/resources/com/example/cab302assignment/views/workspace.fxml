@@ -69,6 +69,10 @@
                 </AnchorPane>
             </HBox>
 
+            <VBox>
+                <Label fx:id="errorMessage" style="-fx-text-fill: red;"/>
+            </VBox>
+
             <!-- Bottom section -->
             <VBox fx:id="resultContainer" styleClass="background-secondary" spacing="10" >
                 <Label text="Risk Level and Analysis" styleClass="h4"/>

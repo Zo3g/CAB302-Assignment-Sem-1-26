@@ -28,6 +28,7 @@ public class WorkspaceController {
     @FXML private VBox resultContainer;
     @FXML private HBox promptContainer;
     @FXML private ScrollPane root;
+    @FXML private Label errorMessage;
 
     private Gauge riskGauge;
 
@@ -49,6 +50,11 @@ public class WorkspaceController {
     @FXML
     private void onScan() {
         String prompt = inputArea.getText();
+
+        if (!validatePrompt(prompt)) {
+            return; // Stop processing if validation fails
+        }
+
         String sanitized = sanitizePrompt(prompt);
         outputArea.setText(sanitized);
         fetchInsights(prompt);
@@ -68,6 +74,22 @@ public class WorkspaceController {
     @FXML
     private void onClear() {
         inputArea.setText("");
+    }
+
+    private boolean validatePrompt(String prompt) {
+        if (prompt == null || prompt.trim().isEmpty()) {
+            errorMessage.setText("Prompt cannot be empty. Please enter a valid prompt.");
+            return false;
+        }
+
+        if (prompt.length() > 10) {
+            errorMessage.setText("Prompt is too long. Maximum allowed characters: 10,000.");
+            return false;
+        }
+
+        // Clear previous error if valid
+        errorMessage.setText("");
+        return true;
     }
 
     private String sanitizePrompt(String prompt) {
