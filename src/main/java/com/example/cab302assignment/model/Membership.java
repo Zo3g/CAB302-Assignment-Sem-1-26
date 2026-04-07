@@ -2,19 +2,26 @@ package com.example.cab302assignment.model;
 
 import java.time.LocalDateTime;
 
-public class OrganisationMembership {
+public class Membership {
     private int userId;
     private int organisationId;
     private MemberRole memberRole;
     private boolean active;
     private LocalDateTime joinedAt;
 
-    public OrganisationMembership(int userId, int organisationId, MemberRole memberRole, boolean active) {
+    public Membership(int userId, int organisationId, MemberRole memberRole, boolean active) {
         this.userId = userId;
         this.organisationId = organisationId;
         this.memberRole = memberRole;
         this.active = active;
-        this.joinedAt = LocalDateTime.now();
+    }
+
+    public Membership(int userId, int organisationId, MemberRole memberRole, boolean active, LocalDateTime joinedAt) {
+        this.userId = userId;
+        this.organisationId = organisationId;
+        this.memberRole = memberRole;
+        this.active = active;
+        this.joinedAt = joinedAt;
     }
 
     public int getUserId() { return userId; }

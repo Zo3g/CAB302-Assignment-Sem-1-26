@@ -13,6 +13,12 @@ public class Organisation {
         this.createdAt = LocalDateTime.now();
     }
 
+    public Organisation(int id, String name, LocalDateTime createdAt) {
+        this.id = id;
+        this.name = name;
+        this.createdAt = createdAt;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
