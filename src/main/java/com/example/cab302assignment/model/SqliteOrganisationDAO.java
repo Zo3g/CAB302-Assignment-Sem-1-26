@@ -66,8 +66,8 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
             if (resultSet.next()) {
                 return mapOrg(resultSet);
             }
-        } catch (SQLException ex) {
-            System.err.println(ex);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
