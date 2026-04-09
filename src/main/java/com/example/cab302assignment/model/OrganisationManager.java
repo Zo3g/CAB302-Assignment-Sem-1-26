@@ -6,15 +6,15 @@ public class OrganisationManager {
 
     private OrganisationDAO organisationDAO;
     private MembershipDAO membershipDAO;
-    private UserDAO userDAO;
+//    private UserDAO userDAO;
 
-    public OrganisationManager(OrganisationDAO organisationDAO, MembershipDAO membershipDAO, UserDAO userDAO) {
+    public OrganisationManager(OrganisationDAO organisationDAO, MembershipDAO membershipDAO) {
         this.organisationDAO = organisationDAO;
         this.membershipDAO = membershipDAO;
-        this.userDAO = userDAO;
+//        this.userDAO = userDAO;
     }
 
-    // Todo: searchMember(s)
+    // Todo: searchMember(s) exact email (for privacy)
     // Profile search bar: get userDAO.getUserById or Email => display user info
     // + membershipDAO.getMembership => display active and maybe joinedAt
 
@@ -51,7 +51,11 @@ public class OrganisationManager {
         membershipDAO.updateMemberRole(userId, orgId, newRole);
     }
 
-    // Todo: getMembership (active and inactive ones)
+    // To be used in searchMember(s) <- getMembership (active and inactive ones)
+    public Membership getMembership(int managerId, int userId, int orgId){
+        checkManagerPermission(managerId, orgId);
+        return membershipDAO.getMembership(userId, orgId);
+    }
 
     public List<Membership> getAllMembers(int managerId, int orgId){
         checkManagerPermission(managerId, orgId);
