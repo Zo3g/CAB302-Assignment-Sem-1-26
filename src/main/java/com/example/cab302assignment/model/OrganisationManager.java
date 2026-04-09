@@ -14,9 +14,32 @@ public class OrganisationManager {
 //        this.userDAO = userDAO;
     }
 
-    // Todo: searchMember(s) exact email (for privacy)
-    // Profile search bar: get userDAO.getUserById or Email => display user info
-    // + membershipDAO.getMembership => display active and maybe joinedAt
+    // searchMember (exact email for privacy)
+    // Profile searchField: get userDAO.getUserByEmail + membershipDAO.getMembership
+    // => display mapped memberInfo => determine management buttons and checkBox
+    public MemberInfo searchMember(int managerId, int orgId, String email) {
+        checkManagerPermission(managerId, orgId);
+
+        if (email == null || email.isEmpty()) return null;
+
+        User user = userDAO.getUserByEmail(email);
+        // User not exists
+        if (user == null) {
+            return new MemberInfo(0, "", email, MemberStatus.NOT_FOUND);
+        }
+
+        Membership membership = membershipDAO.getMembership(user.getId(), orgId);
+        // User not a member yet => Add user button enable
+        if (membership == null) {
+            return new MemberInfo(user.getId(), user.getName(), user.getEmail, MemberStatus.NOT_A_MEMBER);
+        }
+        // User is an active member => Remove user button enable
+        if (membership.isActive()) {
+            return new MemberInfo(user.getId(), user.getName(), user.getEmail, MemberStatus.ACTIVE);
+        }
+        // deactivated user? Manager active?
+        reture null;
+    }
 
     // create organisation and set creator's role as Manager
     public void createOrganisation(String name, int userId) {
