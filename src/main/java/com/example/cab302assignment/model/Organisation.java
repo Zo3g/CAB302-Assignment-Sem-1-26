@@ -9,8 +9,10 @@ public class Organisation {
     // Create rulesetList later?
 
     public Organisation(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         this.name = name;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Organisation(int id, String name, LocalDateTime createdAt) {
