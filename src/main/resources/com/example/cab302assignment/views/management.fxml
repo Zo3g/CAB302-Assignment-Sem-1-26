@@ -39,40 +39,60 @@
                   <Font size="22.0" />
                </font>
             </Text>
-            <TextField layoutX="184.0" layoutY="261.0" prefHeight="53.0" prefWidth="471.0" style="-fx-background-color: #d7e3ed; -fx-background-radius: 15; -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);" promptText="Please enter user's email:">
+            <TextField fx:id="emailSearchField" layoutX="184.0" layoutY="261.0" prefHeight="53.0" prefWidth="471.0" promptText="Please enter user's email:" style="-fx-background-color: #d7e3ed; -fx-background-radius: 15; -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);">
                <font>
                   <Font size="22.0" />
                </font></TextField>
-            <Text fill="#28568acc" layoutX="199.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User ID:" wrappingWidth="130.84063720703125">
+            <Text fill="#28568acc" layoutX="209.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User ID:" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fill="#28568acc" layoutX="199.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="130.84063720703125">
+            <Text fill="#28568acc" layoutX="209.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fill="#28568acc" layoutX="200.0" layoutY="510.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" wrappingWidth="130.84063720703125">
+            <Text fill="#28568acc" layoutX="210.0" layoutY="510.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fill="#28568acc" layoutX="200.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User status:" wrappingWidth="130.84063720703125">
+            <Text fill="#28568acc" layoutX="210.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User status:" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <CheckBox alignment="TOP_LEFT" disable="true" layoutX="224.0" layoutY="661.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="398.0" text="Confirm. Note: this action cannot be undone." textFill="#00000099" textOverrun="CLIP" wrapText="true">
+            <Text fx:id="userIdText" fill="#183b4ecc" layoutX="378.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="12345678" wrappingWidth="130.84063720703125">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <Text fx:id="nameText" fill="#183b4ecc" layoutX="378.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="First Last" wrappingWidth="130.84063720703125">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <Text fx:id="emailText" fill="#183b4ecc" layoutX="378.0" layoutY="510.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MyEmail@example.com" wrappingWidth="264.84063720703125">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <Text fx:id="activeText" fill="#183b4ecc" layoutX="378.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="130.84063720703125">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <CheckBox fx:id="confirmCheckbox" alignment="TOP_LEFT" layoutX="224.0" layoutY="661.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="398.0" text="Confirm. Note: this action cannot be undone." textFill="#00000099" textOverrun="CLIP" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>
             </CheckBox>
-            <Button disable="true" layoutX="214.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="408.0" style="-fx-background-color: #FFCA76; -fx-background-radius: 15; -fx-border-radius: 15;" text="Remove user from Organisation" textFill="#183b4e" wrapText="true">
+            <Button fx:id="removeButton" layoutX="214.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="408.0" style="-fx-background-color: #FF928A; -fx-background-radius: 15; -fx-border-radius: 15;" text="Remove user from Organisation" textFill="#183b4e" wrapText="true">
                <font>
                   <Font size="26.0" />
                </font></Button>
-            <Button disable="true" layoutX="442.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="181.0" style="-fx-background-color: #FF928A; -fx-background-radius: 15; -fx-border-radius: 15;" text="Add User" textFill="#183b4e" wrapText="true">
+            <Button fx:id="addButton" disable="true" layoutX="441.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="181.0" style="-fx-background-color: #FFCA76; -fx-background-radius: 15; -fx-border-radius: 15;" text="Add User" textFill="#183b4e" visible="false" wrapText="true">
                <font>
                   <Font size="26.0" />
                </font>
