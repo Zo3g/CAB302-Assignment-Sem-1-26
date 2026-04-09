@@ -39,7 +39,7 @@
                   <Font size="22.0" />
                </font>
             </Text>
-            <TextField fx:id="emailSearchField" layoutX="184.0" layoutY="261.0" prefHeight="53.0" prefWidth="471.0" promptText="Please enter user's email:" style="-fx-background-color: #d7e3ed; -fx-background-radius: 15; -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);">
+            <TextField fx:id="searchTextField" layoutX="184.0" layoutY="261.0" prefHeight="53.0" prefWidth="471.0" promptText="Please enter user's email:" style="-fx-background-color: #d7e3ed; -fx-background-radius: 15; -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);">
                <font>
                   <Font size="22.0" />
                </font></TextField>
@@ -78,7 +78,7 @@
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fx:id="activeText" fill="#183b4ecc" layoutX="378.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="130.84063720703125">
+            <Text fx:id="statusText" fill="#183b4ecc" layoutX="378.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>

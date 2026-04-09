@@ -23,7 +23,7 @@ public class OrganisationManager {
         if (email == null || email.isEmpty()) return null;
 
         User user = userDAO.getUserByEmail(email);
-        // User not exists
+        // User not exists => error message
         if (user == null) {
             return new MemberInfo(0, "", email, MemberStatus.NOT_FOUND);
         }
