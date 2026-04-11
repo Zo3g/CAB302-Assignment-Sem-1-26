@@ -1,5 +1,6 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.RedactionEngine;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
@@ -10,9 +11,6 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.Section;
 import javafx.scene.paint.Color;
-
-
-
 
 public class WorkspaceController {
     @FXML private TextArea inputArea;
@@ -31,6 +29,8 @@ public class WorkspaceController {
     @FXML private Label errorMessage;
 
     private Gauge riskGauge;
+
+    private RedactionEngine redactionEngine = new RedactionEngine();
 
     @FXML
     public void initialize() {
@@ -87,18 +87,15 @@ public class WorkspaceController {
             return false;
         }
 
-        // Clear previous error if valid
         errorMessage.setText("");
         return true;
     }
 
     private String sanitizePrompt(String prompt) {
-        return prompt.trim();
+        return redactionEngine.redactPrompt(prompt);
     }
 
     private void fetchInsights(String prompt) {
-        String text = prompt;
-
         String col1 = """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id risus lobortis, finibus nulla in, sodales eros. Curabitur urna enim, sagittis ornare mauris ac, viverra commodo justo. Vivamus laoreet sapien non risus aliquet porttitor. Etiam tempus ultricies consectetur. Nam sit amet pharetra justo. Vestibulum ut ornare nulla. Integer et lorem eleifend, auctor sem nec, fringilla lorem. Vestibulum nisl arcu, consequat quis tellus vitae, pulvinar dignissim purus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel leo non turpis fermentum laoreet eget ut tortor. Sed sollicitudin arcu justo, eu tempor ante blandit non. In hac habitasse platea dictumst. Duis vulputate quam fermentum quam accumsan eleifend. Proin nunc orci, gravida sit amet laoreet id, tempor in nibh. In vel neque et ipsum pretium posuere quis at leo.""";
 
@@ -115,32 +112,29 @@ public class WorkspaceController {
     }
 
     private void buildRiskGauge() {
-            riskGauge = GaugeBuilder.create()
-                    .minValue(0)
-                    .maxValue(100)
-                    .title("Risk Score")
-                    .animated(true)
-                    .animationDuration(1600)
-                    // Use a supported "arch"/dashboard skin
-                    .skinType(Gauge.SkinType.DASHBOARD)
-                    // Display the numeric value above
-                    .valueVisible(true)
-                    // Set section ranges with rainbow colors
-                    .sections(
-                            new Section(0, 20, Color.LIMEGREEN),
-                            new Section(20, 40, Color.GREENYELLOW),
-                            new Section(40, 60, Color.GOLD),
-                            new Section(60, 80, Color.ORANGE),
-                            new Section(80, 100, Color.RED)
-                    )
-                    .sectionsVisible(true)
-                    .build();
+        riskGauge = GaugeBuilder.create()
+                .minValue(0)
+                .maxValue(100)
+                .title("Risk Score")
+                .animated(true)
+                .animationDuration(1600)
+                .skinType(Gauge.SkinType.DASHBOARD)
+                .valueVisible(true)
+                .sections(
+                        new Section(0, 20, Color.LIMEGREEN),
+                        new Section(20, 40, Color.GREENYELLOW),
+                        new Section(40, 60, Color.GOLD),
+                        new Section(60, 80, Color.ORANGE),
+                        new Section(80, 100, Color.RED)
+                )
+                .sectionsVisible(true)
+                .build();
 
-            gaugePane.getChildren().add(riskGauge);
-            AnchorPane.setTopAnchor(riskGauge, 0.0);
-            AnchorPane.setBottomAnchor(riskGauge, 0.0);
-            AnchorPane.setLeftAnchor(riskGauge, 0.0);
-            AnchorPane.setRightAnchor(riskGauge, 0.0);
+        gaugePane.getChildren().add(riskGauge);
+        AnchorPane.setTopAnchor(riskGauge, 0.0);
+        AnchorPane.setBottomAnchor(riskGauge, 0.0);
+        AnchorPane.setLeftAnchor(riskGauge, 0.0);
+        AnchorPane.setRightAnchor(riskGauge, 0.0);
     }
 }
 
