@@ -82,7 +82,7 @@ public class WorkspaceController {
             return false;
         }
 
-        if (prompt.length() > 10) {
+        if (prompt.length() > 10000) {
             errorMessage.setText("Prompt is too long. Maximum allowed characters: 10,000.");
             return false;
         }
