@@ -1,0 +1,100 @@
+.root {
+    -fx-background-color: #F5EEDC;
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+}
+
+.auth-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(39, 84, 138, 0.12), 16, 0, 0, 4);
+    -fx-padding: 32 36 32 36;
+}
+
+.auth-heading {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 28;
+    -fx-text-fill: #27548A;
+    -fx-padding: 4 0 0 0;
+}
+
+.auth-subtitle {
+    -fx-font-size: 13;
+    -fx-text-fill: #00000099;
+    -fx-padding: 0 0 8 0;
+}
+
+.form-label {
+    -fx-font-size: 13;
+    -fx-text-fill: #27548A;
+    -fx-font-weight: bold;
+}
+
+.text-field, .password-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #27548A;
+    -fx-prompt-text-fill: #9AA7B4;
+    -fx-border-color: #D7E3ED;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 14;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #27548A;
+    -fx-effect: dropshadow(gaussian, rgba(39, 84, 138, 0.18), 6, 0, 0, 0);
+}
+
+.error {
+    -fx-text-fill: #C0392B;
+    -fx-font-size: 12;
+    -fx-wrap-text: true;
+}
+
+.success {
+    -fx-text-fill: #2E7D5B;
+    -fx-font-size: 12;
+    -fx-wrap-text: true;
+}
+
+.btn-primary {
+    -fx-background-color: #FFCA76;
+    -fx-text-fill: #27548A;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-padding: 10 18 10 18;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #F5B955;
+}
+
+.btn-primary:disabled {
+    -fx-background-color: #E6E1D3;
+    -fx-text-fill: #9AA7B4;
+    -fx-cursor: default;
+}
+
+.hyperlink {
+    -fx-text-fill: #27548A;
+    -fx-font-size: 12;
+    -fx-border-color: transparent;
+    -fx-underline: false;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #FFCA76;
+    -fx-underline: true;
+}
+
+.tooltip {
+    -fx-background-color: #27548A;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 11;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+}
