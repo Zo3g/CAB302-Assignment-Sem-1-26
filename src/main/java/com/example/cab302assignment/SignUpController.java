@@ -61,6 +61,7 @@ public class SignUpController {
         userDAO.addUser(user);
 
         successLabel.setText("Account created successfully! Redirecting to sign in...");
+        signUpButton.disableProperty().unbind();
         signUpButton.setDisable(true);
 
         new Thread(() -> {
