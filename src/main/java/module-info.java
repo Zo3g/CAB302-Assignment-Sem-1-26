@@ -3,6 +3,7 @@ module com.example.cab302assignment {
     requires javafx.fxml;
     requires java.logging;
     requires java.sql;
+    requires eu.hansolo.medusa;
 
 
     opens com.example.cab302assignment to javafx.fxml;
