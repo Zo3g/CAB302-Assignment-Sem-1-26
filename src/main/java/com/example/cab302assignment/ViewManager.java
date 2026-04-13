@@ -19,7 +19,7 @@ public class ViewManager {
                 ViewManager.class.getResource("/com/example/cab302assignment/" + fxmlFile)
             );
             Scene scene = new Scene(loader.load(), 440, 640);
-            String stylesheet = ViewManager.class.getResource("/com/example/cab302assignment/stylesheet.css").toExternalForm();
+            String stylesheet = ViewManager.class.getResource("/com/example/cab302assignment/login-styles.css").toExternalForm();
             String globalCss = ViewManager.class.getResource("/com/example/cab302assignment/global.css").toExternalForm();
             scene.getStylesheets().addAll(globalCss, stylesheet);
 
