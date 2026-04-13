@@ -21,9 +21,13 @@ public class ManagementController
 
     private OrganisationManager organisationManager;
 
-    // Change DAOs
-    public  ManagementController() {
-        organisationManager = new OrganisationManager(new OrganisationDAO(), new MembershipDAO(), new UserDAO());
+    public ManagementController() {
+        organisationManager = new OrganisationManager(new SqliteOrganisationDAO(), new SqliteMembershipDAO(), new SqliteUserDAO());
+    }
+
+    // for mock test
+    public ManagementController(OrganisationManager organisationManager) {
+        this.organisationManager = organisationManager;
     }
 
     private MemberInfo searchedUserInfo;
@@ -33,7 +37,7 @@ public class ManagementController
         return SessionManager.getCurrentUser().getId();
     }
 
-    // Todo: CURRENT_ORG_ID in SessionManager?
+    // Logged in manager's org's ID
     private int getCurrentOrgId() {
         return SessionManager.getCurrentOrgId();
     }
@@ -45,7 +49,7 @@ public class ManagementController
         String email = searchTextField.getText();
         if (email == null || email.isBlank()) return;
 
-        MemberInfo memberInfo = organisationManager.searchMember(getCurrentUserId(), CURRENT_ORG_ID, email);
+        MemberInfo memberInfo = organisationManager.searchMember(getCurrentUserId(), getCurrentOrgId(), email);
         searchedUserInfo = memberInfo;
 
         if (memberInfo == null) return;
@@ -106,14 +110,14 @@ public class ManagementController
     @FXML
     private void onRemove() {
         if (searchedUserInfo == null) return;
-        organisationManager.removeMember(getCurrentUserId(), searchedUserInfo.getUserId(), CURRENT_ORG_ID);
+        organisationManager.removeMember(getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId());
         syncUser();
     }
 
     @FXML
     private void onAdd() {
         if (searchedUserInfo == null) return;
-        organisationManager.addMember(getCurrentUserId(), searchedUserInfo.getUserId(), CURRENT_ORG_ID);
+        organisationManager.addMember(getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId());
         syncUser();
     }
 }
