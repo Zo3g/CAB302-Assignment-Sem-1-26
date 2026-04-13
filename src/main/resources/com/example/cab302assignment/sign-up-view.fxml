@@ -21,7 +21,7 @@
     <VBox alignment="CENTER" spacing="8" styleClass="auth-card" maxWidth="360">
         <ImageView fitWidth="150" preserveRatio="true">
             <image>
-                <Image url="@/assets/images/guardia_logo.png"/>
+                <Image url="@../../../assets/images/guardia_logo.png"/>
             </image>
         </ImageView>
 
