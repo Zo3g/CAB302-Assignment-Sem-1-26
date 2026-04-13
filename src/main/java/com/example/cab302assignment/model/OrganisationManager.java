@@ -31,14 +31,14 @@ public class OrganisationManager {
         Membership membership = membershipDAO.getMembership(user.getId(), orgId);
         // User not a member yet => Add user button enable
         if (membership == null) {
-            return new MemberInfo(user.getId(), user.getName(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
+            return new MemberInfo(user.getId(), user.getFullName(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
         }
         // User is an active member => Remove user button enable
         if (membership.isActive()) {
-            return new MemberInfo(user.getId(), user.getName(), user.getEmail(), MemberStatus.ACTIVE);
+            return new MemberInfo(user.getId(), user.getFullName(), user.getEmail(), MemberStatus.ACTIVE);
         }
         // deactivated user? Manager active?
-        reture null;
+        return null;
     }
 
     // create organisation and set creator's role as Manager
