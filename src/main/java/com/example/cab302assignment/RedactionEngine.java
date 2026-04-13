@@ -8,7 +8,7 @@ public class RedactionEngine {
     // Patterns enum for every type of sensitive data.
     private enum SensitiveDataType {
         ADDRESS("(?i)\\b\\d+(?:/\\d+)?[a-zA-Z]?\\s+[a-z]+(?:\\s+[a-z]+)*\\s+(?:Alley|Ally|Arcade|Arc|Avenue|Ave|Boulevard|Bvd|Bypass|Bypa|Circuit|Cct|Close|Cl|Corner|Crn|Court|Ct|Crescent|Cres|Cul-de-sac|Cds|Drive|Dr|Esplanade|Esp|Green|Grn|Grove|Gr|Highway|Hwy|Junction|Jnc|Lane|Link|Mews|Parade|Pde|Place|Pl|Ridge|Rdge|Road|Rd|Square|Sq|Street|St|Terrace|Tce)\\b", "[REDACTED ADDRESS]"),
-        BSB_ACCOUNT("(?i)(?<!\\d)(\\d{3}[\\s\\-]?\\d{3})(?:[\\s\\-]|\\s+acc(?:ount)?[:\\s-]*)+(\\d{6,10})(?!\\d)", "[REDACTED BANKING]"),
+        BSB_ACCOUNT("(?i)(?<!\\d)(\\d{3}[\\s\\-]?\\d{3})(?:[\\s\\-]|\\s+acc(?:ount)?[:\\s-]*)+((?:\\d[\\s\\-]?){6,10})(?!\\d)", "[REDACTED BANKING]"),
         CREDIT_CARD("(?<!\\d)(?:4\\d{3}|5[1-5]\\d{2}|3[47]\\d{1})[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{3,4}(?!\\d)", "[REDACTED CREDIT CARD]"),
         EMAIL("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", "[REDACTED EMAIL]"),
         IPV4_ADDRESS("(?<!\\d)(?:\\d{1,3}\\.){3}\\d{1,3}(?!\\d)", "[REDACTED IPv4 ADDRESS]"),
