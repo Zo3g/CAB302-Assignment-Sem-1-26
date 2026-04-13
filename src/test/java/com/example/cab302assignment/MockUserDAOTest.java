@@ -1,5 +1,8 @@
 package com.example.cab302assignment;
 
+import com.example.cab302assignment.model.MockUserDAO;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

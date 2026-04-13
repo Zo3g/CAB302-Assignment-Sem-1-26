@@ -1,5 +1,9 @@
 package com.example.cab302assignment;
 
+import com.example.cab302assignment.model.MockUserDAO;
+import com.example.cab302assignment.model.PasswordUtil;
+import com.example.cab302assignment.model.SessionManager;
+import com.example.cab302assignment.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,6 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.RedactionEngine;
+import com.example.cab302assignment.model.RedactionEngine;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;

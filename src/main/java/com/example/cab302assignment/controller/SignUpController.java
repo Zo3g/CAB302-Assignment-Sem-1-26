@@ -1,5 +1,6 @@
-package com.example.cab302assignment;
+package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.model.*;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

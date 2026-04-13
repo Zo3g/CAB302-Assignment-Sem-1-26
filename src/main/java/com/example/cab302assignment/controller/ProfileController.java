@@ -1,10 +1,10 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.SessionManager;
-import com.example.cab302assignment.SqliteUserDAO;
-import com.example.cab302assignment.User;
-import com.example.cab302assignment.UserDAO;
-import com.example.cab302assignment.ViewManager;
+import com.example.cab302assignment.model.SessionManager;
+import com.example.cab302assignment.model.SqliteUserDAO;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.UserDAO;
+import com.example.cab302assignment.model.ViewManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
