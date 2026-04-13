@@ -36,7 +36,7 @@ public class SignInController {
 
         String email = emailField.getText().trim();
         String password = passwordField.getText();
-
+        //CRUD READ
         User user = userDAO.getUserByEmail(email);
         if (user == null || !PasswordUtil.verifyPassword(password, user.getPasswordHash())) {
             errorLabel.setText("Incorrect combination of email and password.");

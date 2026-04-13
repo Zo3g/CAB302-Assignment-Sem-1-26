@@ -26,6 +26,7 @@ public class ProfileController {
 
     @FXML
     protected void onUpdateProfile() {
+        //CRUD UPDATE
         // TODO: validate inputs, update SessionManager user, call userDAO.updateUser(...)
         if (statusLabel != null) {
             statusLabel.setText("Update not implemented yet.");
@@ -34,6 +35,7 @@ public class ProfileController {
 
     @FXML
     protected void onDeleteAccount() {
+        //CRUD DELETE
         // TODO: confirm with user, call userDAO.deleteUser(currentUser.getId()),
         //       SessionManager.logout(), and return to sign-in view
         if (statusLabel != null) {

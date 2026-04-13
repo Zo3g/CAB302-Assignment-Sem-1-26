@@ -58,6 +58,7 @@ public class SignUpController {
 
         String hashedPassword = PasswordUtil.hashPassword(password);
         User user = new User(email, fullName, hashedPassword);
+        //CRUD CREATE
         userDAO.addUser(user);
 
         successLabel.setText("Account created successfully! Redirecting to sign in...");
