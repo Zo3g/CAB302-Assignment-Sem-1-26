@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.example.cab302assignment.SignInController">
+           fx:controller="com.example.cab302assignment.controller.SignInController">
     <padding>
         <Insets bottom="24" left="24" right="24" top="24"/>
     </padding>

@@ -1,4 +1,4 @@
-package com.example.cab302assignment;
+package com.example.cab302assignment.model;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

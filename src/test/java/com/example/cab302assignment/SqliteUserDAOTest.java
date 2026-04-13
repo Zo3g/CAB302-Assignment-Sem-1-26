@@ -1,5 +1,7 @@
 package com.example.cab302assignment;
 
+import com.example.cab302assignment.model.SqliteUserDAO;
+import com.example.cab302assignment.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

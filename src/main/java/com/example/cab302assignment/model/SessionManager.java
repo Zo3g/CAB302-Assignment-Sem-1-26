@@ -1,4 +1,4 @@
-package com.example.cab302assignment;
+package com.example.cab302assignment.model;
 
 public class SessionManager {
     private static User currentUser = null;
