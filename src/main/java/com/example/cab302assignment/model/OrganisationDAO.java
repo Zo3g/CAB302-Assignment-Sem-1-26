@@ -5,6 +5,6 @@ public interface OrganisationDAO {
     public void addOrganisation(Organisation organisation);
     public void updateOrganisation(Organisation organisation);
     public void deleteOrganisation(int orgId);
-    public Organisation getOrganisationById(int OrgId);
+    public Organisation getOrganisationById(int orgId);
     // GetAllOrg?
 }

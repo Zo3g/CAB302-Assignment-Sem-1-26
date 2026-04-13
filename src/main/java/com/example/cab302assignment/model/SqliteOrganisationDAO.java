@@ -57,11 +57,11 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
     }
 
     @Override
-    public Organisation getOrganisationById(int OrgId) {
+    public Organisation getOrganisationById(int orgId) {
         try {
             PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM organisations WHERE id = ?");
-            statement.setInt(1, OrgId);
+            statement.setInt(1, orgId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return mapOrg(resultSet);

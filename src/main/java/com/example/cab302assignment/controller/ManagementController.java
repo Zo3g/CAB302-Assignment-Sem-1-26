@@ -43,6 +43,8 @@ public class ManagementController
         clearOutput();
 
         String email = searchTextField.getText();
+        if (email == null || email.isBlank()) return;
+
         MemberInfo memberInfo = organisationManager.searchMember(getCurrentUserId(), CURRENT_ORG_ID, email);
         searchedUserInfo = memberInfo;
 
