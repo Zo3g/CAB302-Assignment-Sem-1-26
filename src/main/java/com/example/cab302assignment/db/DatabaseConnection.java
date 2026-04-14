@@ -1,8 +1,9 @@
-package com.example.cab302assignment.model;
+package com.example.cab302assignment.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseConnection {
     private static Connection instance = null;
@@ -11,6 +12,9 @@ public class DatabaseConnection {
         String url = "jdbc:sqlite:database.db";
         try {
             instance = DriverManager.getConnection(url);
+            try (Statement stmt = instance.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON");
+            }
         } catch (SQLException sqlEx) {
             System.err.println(sqlEx);
         }
