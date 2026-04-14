@@ -57,7 +57,6 @@ public class ManagementController
         // state machine for different member status handling
         switch (memberInfo.getMemberStatus()) {
             case NOT_FOUND -> {
-//                displayMemberInfo(memberInfo);
                 statusText.setText("User not found");
             }
             case NOT_A_MEMBER -> {
@@ -70,6 +69,11 @@ public class ManagementController
                 statusText.setText("Active");
                 confirmCheckBox.setVisible(true);
                 removeButton.setVisible(true);
+            }
+            case DEACTIVATED -> {
+                displayMemberInfo(memberInfo);
+                statusText.setText("Deactivated");
+                addButton.setVisible(true);
             }
             default -> clearOutput();
         }
