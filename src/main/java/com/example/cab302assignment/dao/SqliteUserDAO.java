@@ -1,4 +1,7 @@
-package com.example.cab302assignment.model;
+package com.example.cab302assignment.dao;
+
+import com.example.cab302assignment.db.DatabaseConnection;
+import com.example.cab302assignment.model.User;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -7,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqliteUserDAO implements UserDAO {
-    private Connection connection;
+    private static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final Connection connection;
 
     public SqliteUserDAO() {
-        connection = DatabaseConnection.getInstance();
+        this.connection = DatabaseConnection.getInstance();
     }
 
     public SqliteUserDAO(Connection connection) {
@@ -21,16 +25,15 @@ public class SqliteUserDAO implements UserDAO {
     public void addUser(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO users (email, fullName, passwordHash) VALUES (?, ?, ?)"
+                "INSERT INTO users (email, passwordHash) VALUES (?, ?)"
             );
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getFullName());
-            stmt.setString(3, user.getPasswordHash());
+            stmt.setString(2, user.getPasswordHash());
             stmt.execute();
 
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
-                user.setId(keys.getInt(1));
+                user.setUserId(keys.getInt(1));
             }
         } catch (SQLException ex) {
             System.err.println(ex);
@@ -40,14 +43,10 @@ public class SqliteUserDAO implements UserDAO {
     @Override
     public User getUserById(int id) {
         try {
-            PreparedStatement stmt = connection.prepareStatement(
-                "SELECT * FROM users WHERE id = ?"
-            );
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE userId = ?");
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapUser(rs);
-            }
+            if (rs.next()) return mapUser(rs);
         } catch (SQLException ex) {
             System.err.println(ex);
         }
@@ -57,14 +56,10 @@ public class SqliteUserDAO implements UserDAO {
     @Override
     public User getUserByEmail(String email) {
         try {
-            PreparedStatement stmt = connection.prepareStatement(
-                "SELECT * FROM users WHERE email = ?"
-            );
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM users WHERE email = ?");
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapUser(rs);
-            }
+            if (rs.next()) return mapUser(rs);
         } catch (SQLException ex) {
             System.err.println(ex);
         }
@@ -77,9 +72,7 @@ public class SqliteUserDAO implements UserDAO {
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
-            while (rs.next()) {
-                users.add(mapUser(rs));
-            }
+            while (rs.next()) users.add(mapUser(rs));
         } catch (SQLException ex) {
             System.err.println(ex);
         }
@@ -90,12 +83,11 @@ public class SqliteUserDAO implements UserDAO {
     public void updateUser(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "UPDATE users SET email = ?, fullName = ?, passwordHash = ? WHERE id = ?"
+                "UPDATE users SET email = ?, passwordHash = ? WHERE userId = ?"
             );
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getFullName());
-            stmt.setString(3, user.getPasswordHash());
-            stmt.setInt(4, user.getId());
+            stmt.setString(2, user.getPasswordHash());
+            stmt.setInt(3, user.getUserId());
             stmt.execute();
         } catch (SQLException ex) {
             System.err.println(ex);
@@ -105,9 +97,7 @@ public class SqliteUserDAO implements UserDAO {
     @Override
     public void deleteUser(int id) {
         try {
-            PreparedStatement stmt = connection.prepareStatement(
-                "DELETE FROM users WHERE id = ?"
-            );
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM users WHERE userId = ?");
             stmt.setInt(1, id);
             stmt.execute();
         } catch (SQLException ex) {
@@ -117,16 +107,7 @@ public class SqliteUserDAO implements UserDAO {
 
     private User mapUser(ResultSet rs) throws SQLException {
         String createdAtStr = rs.getString("createdAt");
-        LocalDateTime createdAt = null;
-        if (createdAtStr != null) {
-            createdAt = LocalDateTime.parse(createdAtStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        }
-        return new User(
-            rs.getInt("id"),
-            rs.getString("email"),
-            rs.getString("fullName"),
-            rs.getString("passwordHash"),
-            createdAt
-        );
+        LocalDateTime createdAt = createdAtStr == null ? null : LocalDateTime.parse(createdAtStr, DT);
+        return new User(rs.getInt("userId"), rs.getString("email"), rs.getString("passwordHash"), createdAt);
     }
 }

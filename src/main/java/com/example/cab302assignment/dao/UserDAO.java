@@ -1,4 +1,6 @@
-package com.example.cab302assignment.model;
+package com.example.cab302assignment.dao;
+
+import com.example.cab302assignment.model.User;
 
 import java.util.List;
 
