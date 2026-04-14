@@ -1,5 +1,7 @@
-package com.example.cab302assignment.model;
+package com.example.cab302assignment;
 
+import com.example.cab302assignment.model.DatabaseInitialiser;
+import com.example.cab302assignment.model.ViewManager;
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
