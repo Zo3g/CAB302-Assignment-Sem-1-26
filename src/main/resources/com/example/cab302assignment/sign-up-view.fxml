@@ -28,6 +28,11 @@
         <Label text="Create your account" styleClass="auth-heading"/>
         <Label text="Join Guardia to safeguard your prompts" styleClass="auth-subtitle"/>
 
+        <Label text="Name" styleClass="form-label"/>
+        <TextField fx:id="nameField" promptText="Jane Doe">
+            <tooltip><Tooltip text="Your name"/></tooltip>
+        </TextField>
+
         <Label text="Email Address" styleClass="form-label"/>
         <TextField fx:id="emailField" promptText="you@example.com">
             <tooltip><Tooltip text="Must be a valid, unique email address"/></tooltip>

@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import java.util.Optional;
 
 public class ProfileController {
+    @FXML private TextField nameField;
     @FXML private TextField emailField;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
@@ -26,8 +27,9 @@ public class ProfileController {
     @FXML
     public void initialize() {
         User user = SessionManager.getCurrentUser();
-        if (user != null && emailField != null) {
-            emailField.setText(user.getEmail());
+        if (user != null) {
+            if (nameField != null) nameField.setText(user.getName());
+            if (emailField != null) emailField.setText(user.getEmail());
         }
     }
 
@@ -40,10 +42,15 @@ public class ProfileController {
             return;
         }
 
+        String name = nameField != null ? nameField.getText() : null;
         String email = emailField != null ? emailField.getText() : null;
         String newPassword = newPasswordField != null ? newPasswordField.getText() : "";
         String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText() : "";
 
+        if (name == null || name.isBlank()) {
+            setStatus("Name is required.");
+            return;
+        }
         if (email == null || email.isBlank()) {
             setStatus("Email is required.");
             return;
@@ -53,6 +60,7 @@ public class ProfileController {
             return;
         }
 
+        user.setName(name.trim());
         user.setEmail(email.trim());
 
         if (newPassword != null && !newPassword.isEmpty()) {

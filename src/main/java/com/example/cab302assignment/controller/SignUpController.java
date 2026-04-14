@@ -13,6 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class SignUpController {
+    @FXML private TextField nameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
@@ -32,7 +33,8 @@ public class SignUpController {
 
     @FXML
     public void initialize() {
-        BooleanBinding anyFieldEmpty = emailField.textProperty().isEmpty()
+        BooleanBinding anyFieldEmpty = nameField.textProperty().isEmpty()
+            .or(emailField.textProperty().isEmpty())
             .or(passwordField.textProperty().isEmpty())
             .or(confirmPasswordField.textProperty().isEmpty());
         signUpButton.disableProperty().bind(anyFieldEmpty);
@@ -43,11 +45,12 @@ public class SignUpController {
         errorLabel.setText("");
         successLabel.setText("");
 
+        String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        String error = validate(email, password, confirmPassword);
+        String error = validate(name, email, password, confirmPassword);
         if (error != null) {
             errorLabel.setText(error);
             return;
@@ -59,7 +62,7 @@ public class SignUpController {
         }
 
         String hashedPassword = PasswordUtil.hashPassword(password);
-        User user = new User(email, hashedPassword);
+        User user = new User(email, name, hashedPassword);
         //CRUD CREATE
         userDAO.addUser(user);
 
@@ -80,7 +83,10 @@ public class SignUpController {
         ViewManager.switchView("sign-in-view.fxml", "Sign In");
     }
 
-    public static String validate(String email, String password, String confirmPassword) {
+    public static String validate(String name, String email, String password, String confirmPassword) {
+        if (name.isEmpty()) {
+            return "Name is required.";
+        }
         if (email.isEmpty()) {
             return "Email address is required.";
         }

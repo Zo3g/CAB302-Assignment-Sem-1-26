@@ -17,6 +17,7 @@ public class DatabaseInitialiser {
                 "CREATE TABLE IF NOT EXISTS users ("
                 + "userId INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "email VARCHAR NOT NULL UNIQUE, "
+                + "name VARCHAR NOT NULL, "
                 + "passwordHash VARCHAR NOT NULL, "
                 + "createdAt DATETIME DEFAULT CURRENT_TIMESTAMP"
                 + ")"

@@ -9,20 +9,23 @@ import java.util.List;
 public class User {
     private int userId;
     private String email;
+    private String name;
     private String passwordHash;
     private LocalDateTime createdAt;
 
     public User() {
     }
 
-    public User(String email, String passwordHash) {
+    public User(String email, String name, String passwordHash) {
         this.email = email;
+        this.name = name;
         this.passwordHash = passwordHash;
     }
 
-    public User(int userId, String email, String passwordHash, LocalDateTime createdAt) {
+    public User(int userId, String email, String name, String passwordHash, LocalDateTime createdAt) {
         this.userId = userId;
         this.email = email;
+        this.name = name;
         this.passwordHash = passwordHash;
         this.createdAt = createdAt;
     }
@@ -32,6 +35,9 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }

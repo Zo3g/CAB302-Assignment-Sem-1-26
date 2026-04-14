@@ -100,7 +100,7 @@ public class ManagementController {
 
     private void displayMemberInfo(MemberInfo memberInfo) {
         userIdText.setText(String.valueOf(memberInfo.getUserId()));
-        nameText.setText(memberInfo.getEmail());
+        nameText.setText(memberInfo.getName());
         emailText.setText(memberInfo.getEmail());
     }
 

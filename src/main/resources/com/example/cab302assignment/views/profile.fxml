@@ -17,6 +17,9 @@
 
     <Label text="Profile" styleClass="h1"/>
 
+    <Label text="Name"/>
+    <TextField fx:id="nameField"/>
+
     <Label text="Email Address"/>
     <TextField fx:id="emailField"/>
 

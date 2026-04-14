@@ -25,10 +25,11 @@ public class SqliteUserDAO implements UserDAO {
     public void addUser(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO users (email, passwordHash) VALUES (?, ?)"
+                "INSERT INTO users (email, name, passwordHash) VALUES (?, ?, ?)"
             );
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(2, user.getName());
+            stmt.setString(3, user.getPasswordHash());
             stmt.execute();
 
             ResultSet keys = stmt.getGeneratedKeys();
@@ -83,11 +84,12 @@ public class SqliteUserDAO implements UserDAO {
     public void updateUser(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "UPDATE users SET email = ?, passwordHash = ? WHERE userId = ?"
+                "UPDATE users SET email = ?, name = ?, passwordHash = ? WHERE userId = ?"
             );
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getPasswordHash());
-            stmt.setInt(3, user.getUserId());
+            stmt.setString(2, user.getName());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setInt(4, user.getUserId());
             stmt.execute();
         } catch (SQLException ex) {
             System.err.println(ex);
@@ -108,6 +110,6 @@ public class SqliteUserDAO implements UserDAO {
     private User mapUser(ResultSet rs) throws SQLException {
         String createdAtStr = rs.getString("createdAt");
         LocalDateTime createdAt = createdAtStr == null ? null : LocalDateTime.parse(createdAtStr, DT);
-        return new User(rs.getInt("userId"), rs.getString("email"), rs.getString("passwordHash"), createdAt);
+        return new User(rs.getInt("userId"), rs.getString("email"), rs.getString("name"), rs.getString("passwordHash"), createdAt);
     }
 }

@@ -35,17 +35,17 @@ public class OrganisationManager {
 
         User user = userDAO.getUserByEmail(email);
         if (user == null) {
-            return new MemberInfo(0, email, MemberStatus.NOT_FOUND);
+            return new MemberInfo(0, "", email, MemberStatus.NOT_FOUND);
         }
 
         OrganisationMembership membership = membershipDAO.getMembership(user.getUserId(), orgId);
         if (membership == null) {
-            return new MemberInfo(user.getUserId(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
+            return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
         }
         if (membership.isActive()) {
-            return new MemberInfo(user.getUserId(), user.getEmail(), MemberStatus.ACTIVE);
+            return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.ACTIVE);
         }
-        return new MemberInfo(user.getUserId(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
+        return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
     }
 
     public void createOrganisation(String name, int creatorUserId) {

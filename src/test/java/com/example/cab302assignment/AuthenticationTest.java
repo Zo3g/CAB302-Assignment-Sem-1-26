@@ -16,7 +16,7 @@ class AuthenticationTest {
     void setUp() {
         userDAO = new MockUserDAO();
         String hash = PasswordUtil.hashPassword("Password1");
-        userDAO.addUser(new User("alice@test.com", hash));
+        userDAO.addUser(new User("alice@test.com", "Alice", hash));
     }
 
     @Test
@@ -41,7 +41,7 @@ class AuthenticationTest {
     @Test
     void testSignUpThenSignIn() {
         String hash = PasswordUtil.hashPassword("NewPass123");
-        userDAO.addUser(new User("bob@test.com", hash));
+        userDAO.addUser(new User("bob@test.com", "Bob", hash));
 
         User retrieved = userDAO.getUserByEmail("bob@test.com");
         assertNotNull(retrieved);
@@ -51,7 +51,7 @@ class AuthenticationTest {
     @Test
     void testDuplicateEmailPrevented() {
         String hash = PasswordUtil.hashPassword("Other123");
-        userDAO.addUser(new User("alice@test.com", hash));
+        userDAO.addUser(new User("alice@test.com", "Alice", hash));
         assertEquals(1, userDAO.getAllUsers().size());
     }
 

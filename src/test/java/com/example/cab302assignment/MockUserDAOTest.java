@@ -20,7 +20,7 @@ class MockUserDAOTest {
 
     @Test
     void testAddAndGetById() {
-        User user = new User("test@example.com", "hashedpw");
+        User user = new User("test@example.com", "Test", "hashedpw");
         userDAO.addUser(user);
         User retrieved = userDAO.getUserById(user.getUserId());
         assertNotNull(retrieved);
@@ -29,7 +29,7 @@ class MockUserDAOTest {
 
     @Test
     void testGetByEmail() {
-        userDAO.addUser(new User("alice@example.com", "hashedpw"));
+        userDAO.addUser(new User("alice@example.com", "Alice", "hashedpw"));
         User retrieved = userDAO.getUserByEmail("alice@example.com");
         assertNotNull(retrieved);
         assertEquals("alice@example.com", retrieved.getEmail());
@@ -47,15 +47,15 @@ class MockUserDAOTest {
 
     @Test
     void testGetAllUsers() {
-        userDAO.addUser(new User("a@test.com", "hash1"));
-        userDAO.addUser(new User("b@test.com", "hash2"));
+        userDAO.addUser(new User("a@test.com", "A", "hash1"));
+        userDAO.addUser(new User("b@test.com", "B", "hash2"));
         List<User> users = userDAO.getAllUsers();
         assertEquals(2, users.size());
     }
 
     @Test
     void testUpdateUser() {
-        User user = new User("old@test.com", "oldhash");
+        User user = new User("old@test.com", "Old", "oldhash");
         userDAO.addUser(user);
         user.setEmail("new@test.com");
         userDAO.updateUser(user);
@@ -65,7 +65,7 @@ class MockUserDAOTest {
 
     @Test
     void testDeleteUser() {
-        User user = new User("del@test.com", "hash");
+        User user = new User("del@test.com", "Del", "hash");
         userDAO.addUser(user);
         int id = user.getUserId();
         userDAO.deleteUser(id);
@@ -74,8 +74,8 @@ class MockUserDAOTest {
 
     @Test
     void testAutoIncrementIds() {
-        User user1 = new User("a@test.com", "hash");
-        User user2 = new User("b@test.com", "hash");
+        User user1 = new User("a@test.com", "A", "hash");
+        User user2 = new User("b@test.com", "B", "hash");
         userDAO.addUser(user1);
         userDAO.addUser(user2);
         assertEquals(1, user1.getUserId());
