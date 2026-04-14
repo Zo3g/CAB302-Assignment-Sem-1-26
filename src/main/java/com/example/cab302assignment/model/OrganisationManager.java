@@ -37,8 +37,10 @@ public class OrganisationManager {
         if (membership.isActive()) {
             return new MemberInfo(user.getId(), user.getFullName(), user.getEmail(), MemberStatus.ACTIVE);
         }
-        // deactivated user? Manager active?
-        return null;
+        // User's membership is deactivated => Add/Activate button enable
+        else {
+            return new MemberInfo(user.getId(), user.getFullName(), user.getEmail(), MemberStatus.DEACTIVATED);
+        }
     }
 
     // create organisation and set creator's role as Manager
