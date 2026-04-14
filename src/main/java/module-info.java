@@ -5,10 +5,15 @@ module com.example.cab302assignment {
     requires java.sql;
     requires eu.hansolo.medusa;
 
-    opens com.example.cab302assignment to javafx.fxml;
-    exports com.example.cab302assignment;
+    exports com.example.cab302assignment.app;
     exports com.example.cab302assignment.controller;
-    opens com.example.cab302assignment.controller to javafx.fxml;
     exports com.example.cab302assignment.model;
+    exports com.example.cab302assignment.model.enums;
+    exports com.example.cab302assignment.dao;
+    exports com.example.cab302assignment.service;
+    exports com.example.cab302assignment.db;
+
+    opens com.example.cab302assignment.app to javafx.fxml;
+    opens com.example.cab302assignment.controller to javafx.fxml;
     opens com.example.cab302assignment.model to javafx.fxml;
 }
