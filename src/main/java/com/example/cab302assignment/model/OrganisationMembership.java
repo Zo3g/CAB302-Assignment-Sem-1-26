@@ -1,24 +1,22 @@
 package com.example.cab302assignment.model;
 
+import com.example.cab302assignment.model.enums.MemberRole;
+
 import java.time.LocalDateTime;
 
-public class Membership {
+public class OrganisationMembership {
     private int userId;
-    private int organisationId;
+    private int orgId;
     private MemberRole memberRole;
     private boolean active;
     private LocalDateTime joinedAt;
 
-    public Membership(int userId, int organisationId, MemberRole memberRole, boolean active) {
-        this.userId = userId;
-        this.organisationId = organisationId;
-        this.memberRole = memberRole;
-        this.active = active;
+    public OrganisationMembership() {
     }
 
-    public Membership(int userId, int organisationId, MemberRole memberRole, boolean active, LocalDateTime joinedAt) {
+    public OrganisationMembership(int userId, int orgId, MemberRole memberRole, boolean active, LocalDateTime joinedAt) {
         this.userId = userId;
-        this.organisationId = organisationId;
+        this.orgId = orgId;
         this.memberRole = memberRole;
         this.active = active;
         this.joinedAt = joinedAt;
@@ -27,8 +25,8 @@ public class Membership {
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 
-    public int getOrganisationId() { return organisationId; }
-    public void setOrganisationId(int organisationId) { this.organisationId = organisationId; }
+    public int getOrgId() { return orgId; }
+    public void setOrgId(int orgId) { this.orgId = orgId; }
 
     public MemberRole getMemberRole() { return memberRole; }
     public void setMemberRole(MemberRole memberRole) { this.memberRole = memberRole; }
