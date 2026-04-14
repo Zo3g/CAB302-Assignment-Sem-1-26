@@ -1,4 +1,4 @@
-package com.example.cab302assignment;
+package com.example.cab302assignment.app;
 
 import javafx.application.Application;
 

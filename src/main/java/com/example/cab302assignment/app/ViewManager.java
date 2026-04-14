@@ -1,4 +1,4 @@
-package com.example.cab302assignment.model;
+package com.example.cab302assignment.app;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
