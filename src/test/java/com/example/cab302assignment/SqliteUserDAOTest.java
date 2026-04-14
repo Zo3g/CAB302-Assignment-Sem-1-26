@@ -1,15 +1,17 @@
 package com.example.cab302assignment;
 
-import com.example.cab302assignment.model.SqliteUserDAO;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.db.DatabaseInitialiser;
 import com.example.cab302assignment.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqliteUserDAOTest {
@@ -19,16 +21,7 @@ class SqliteUserDAOTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite::memory:");
-        Statement stmt = connection.createStatement();
-        stmt.execute(
-            "CREATE TABLE IF NOT EXISTS users ("
-            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + "email VARCHAR NOT NULL UNIQUE, "
-            + "fullName VARCHAR NOT NULL, "
-            + "passwordHash VARCHAR NOT NULL, "
-            + "createdAt DATETIME DEFAULT CURRENT_TIMESTAMP"
-            + ")"
-        );
+        DatabaseInitialiser.createTables(connection);
         userDAO = new SqliteUserDAO(connection);
     }
 
@@ -39,21 +32,20 @@ class SqliteUserDAOTest {
 
     @Test
     void testAddAndGetById() {
-        User user = new User("test@example.com", "Test User", "hashedpw");
+        User user = new User("test@example.com", "hashedpw");
         userDAO.addUser(user);
-        assertTrue(user.getId() > 0);
-        User retrieved = userDAO.getUserById(user.getId());
+        assertTrue(user.getUserId() > 0);
+        User retrieved = userDAO.getUserById(user.getUserId());
         assertNotNull(retrieved);
         assertEquals("test@example.com", retrieved.getEmail());
-        assertEquals("Test User", retrieved.getFullName());
     }
 
     @Test
     void testGetByEmail() {
-        userDAO.addUser(new User("alice@example.com", "Alice", "hashedpw"));
+        userDAO.addUser(new User("alice@example.com", "hashedpw"));
         User retrieved = userDAO.getUserByEmail("alice@example.com");
         assertNotNull(retrieved);
-        assertEquals("Alice", retrieved.getFullName());
+        assertEquals("alice@example.com", retrieved.getEmail());
     }
 
     @Test
@@ -68,37 +60,37 @@ class SqliteUserDAOTest {
 
     @Test
     void testGetAllUsers() {
-        userDAO.addUser(new User("a@test.com", "A", "hash1"));
-        userDAO.addUser(new User("b@test.com", "B", "hash2"));
+        userDAO.addUser(new User("a@test.com", "hash1"));
+        userDAO.addUser(new User("b@test.com", "hash2"));
         List<User> users = userDAO.getAllUsers();
         assertEquals(2, users.size());
     }
 
     @Test
     void testUpdateUser() {
-        User user = new User("old@test.com", "Old Name", "oldhash");
+        User user = new User("old@test.com", "oldhash");
         userDAO.addUser(user);
-        user.setFullName("New Name");
         user.setEmail("new@test.com");
+        user.setPasswordHash("newhash");
         userDAO.updateUser(user);
-        User updated = userDAO.getUserById(user.getId());
-        assertEquals("New Name", updated.getFullName());
+        User updated = userDAO.getUserById(user.getUserId());
         assertEquals("new@test.com", updated.getEmail());
+        assertEquals("newhash", updated.getPasswordHash());
     }
 
     @Test
     void testDeleteUser() {
-        User user = new User("del@test.com", "Delete Me", "hash");
+        User user = new User("del@test.com", "hash");
         userDAO.addUser(user);
-        int id = user.getId();
+        int id = user.getUserId();
         userDAO.deleteUser(id);
         assertNull(userDAO.getUserById(id));
     }
 
     @Test
     void testDuplicateEmailRejected() {
-        userDAO.addUser(new User("dup@test.com", "First", "hash"));
-        User duplicate = new User("dup@test.com", "Second", "hash");
+        userDAO.addUser(new User("dup@test.com", "hash"));
+        User duplicate = new User("dup@test.com", "hash");
         userDAO.addUser(duplicate);
         List<User> users = userDAO.getAllUsers();
         assertEquals(1, users.size());

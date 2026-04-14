@@ -1,11 +1,13 @@
 package com.example.cab302assignment;
 
-import com.example.cab302assignment.model.MockUserDAO;
+import com.example.cab302assignment.dao.MockUserDAO;
+import com.example.cab302assignment.dao.UserDAO;
 import com.example.cab302assignment.model.User;
-import com.example.cab302assignment.model.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MockUserDAOTest {
@@ -18,21 +20,19 @@ class MockUserDAOTest {
 
     @Test
     void testAddAndGetById() {
-        User user = new User("test@example.com", "Test User", "hashedpw");
+        User user = new User("test@example.com", "hashedpw");
         userDAO.addUser(user);
-        User retrieved = userDAO.getUserById(user.getId());
+        User retrieved = userDAO.getUserById(user.getUserId());
         assertNotNull(retrieved);
         assertEquals("test@example.com", retrieved.getEmail());
-        assertEquals("Test User", retrieved.getFullName());
     }
 
     @Test
     void testGetByEmail() {
-        User user = new User("alice@example.com", "Alice", "hashedpw");
-        userDAO.addUser(user);
+        userDAO.addUser(new User("alice@example.com", "hashedpw"));
         User retrieved = userDAO.getUserByEmail("alice@example.com");
         assertNotNull(retrieved);
-        assertEquals("Alice", retrieved.getFullName());
+        assertEquals("alice@example.com", retrieved.getEmail());
     }
 
     @Test
@@ -47,40 +47,38 @@ class MockUserDAOTest {
 
     @Test
     void testGetAllUsers() {
-        userDAO.addUser(new User("a@test.com", "A", "hash1"));
-        userDAO.addUser(new User("b@test.com", "B", "hash2"));
+        userDAO.addUser(new User("a@test.com", "hash1"));
+        userDAO.addUser(new User("b@test.com", "hash2"));
         List<User> users = userDAO.getAllUsers();
         assertEquals(2, users.size());
     }
 
     @Test
     void testUpdateUser() {
-        User user = new User("old@test.com", "Old Name", "oldhash");
+        User user = new User("old@test.com", "oldhash");
         userDAO.addUser(user);
-        user.setFullName("New Name");
         user.setEmail("new@test.com");
         userDAO.updateUser(user);
-        User updated = userDAO.getUserById(user.getId());
-        assertEquals("New Name", updated.getFullName());
+        User updated = userDAO.getUserById(user.getUserId());
         assertEquals("new@test.com", updated.getEmail());
     }
 
     @Test
     void testDeleteUser() {
-        User user = new User("del@test.com", "Delete Me", "hash");
+        User user = new User("del@test.com", "hash");
         userDAO.addUser(user);
-        int id = user.getId();
+        int id = user.getUserId();
         userDAO.deleteUser(id);
         assertNull(userDAO.getUserById(id));
     }
 
     @Test
     void testAutoIncrementIds() {
-        User user1 = new User("a@test.com", "A", "hash");
-        User user2 = new User("b@test.com", "B", "hash");
+        User user1 = new User("a@test.com", "hash");
+        User user2 = new User("b@test.com", "hash");
         userDAO.addUser(user1);
         userDAO.addUser(user2);
-        assertEquals(1, user1.getId());
-        assertEquals(2, user2.getId());
+        assertEquals(1, user1.getUserId());
+        assertEquals(2, user2.getUserId());
     }
 }

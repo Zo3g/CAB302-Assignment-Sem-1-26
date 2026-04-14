@@ -1,7 +1,8 @@
 package com.example.cab302assignment;
 
-import com.example.cab302assignment.model.PasswordUtil;
+import com.example.cab302assignment.service.PasswordUtil;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PasswordUtilTest {
