@@ -18,17 +18,18 @@ public class ViewManager {
             FXMLLoader loader = new FXMLLoader(
                 ViewManager.class.getResource("/com/example/cab302assignment/" + fxmlFile)
             );
-            Scene scene = new Scene(loader.load(), 440, 640);
+            Scene scene = new Scene(loader.load(), 1280, 800);
             String stylesheet = ViewManager.class.getResource("/com/example/cab302assignment/login-styles.css").toExternalForm();
             String globalCss = ViewManager.class.getResource("/com/example/cab302assignment/global.css").toExternalForm();
             scene.getStylesheets().addAll(globalCss, stylesheet);
 
             primaryStage.setFullScreen(false);
             primaryStage.setMaximized(false);
-            primaryStage.setResizable(false);
+            primaryStage.setResizable(true);
+            primaryStage.setMinWidth(960);
+            primaryStage.setMinHeight(600);
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
-            primaryStage.sizeToScene();
             primaryStage.centerOnScreen();
             primaryStage.show();
         } catch (IOException e) {
