@@ -15,6 +15,7 @@ public class ManagementController
     @FXML private Text nameText;
     @FXML private Text emailText;
     @FXML private Text statusText;
+    @FXML private Text warningText;
     @FXML private CheckBox confirmCheckBox;
     @FXML private Button removeButton;
     @FXML private Button addButton;
@@ -53,6 +54,7 @@ public class ManagementController
         searchedUserInfo = memberInfo;
 
         if (memberInfo == null) return;
+        boolean isSelf = searchedUserInfo.getUserId() == getCurrentUserId();
 
         // state machine for different member status handling
         switch (memberInfo.getMemberStatus()) {
@@ -67,13 +69,23 @@ public class ManagementController
             case ACTIVE -> {
                 displayMemberInfo(memberInfo);
                 statusText.setText("Active");
-                confirmCheckBox.setVisible(true);
-                removeButton.setVisible(true);
+                if (isSelf) {
+                    warningText.setText("You cannot modify your own membership.");
+                    warningText.setVisible(true);
+                } else {
+                    confirmCheckBox.setVisible(true);
+                    removeButton.setVisible(true);
+                }
             }
             case DEACTIVATED -> {
                 displayMemberInfo(memberInfo);
                 statusText.setText("Deactivated");
-                addButton.setVisible(true);
+                if (isSelf) {
+                    warningText.setText("You cannot modify your own membership.");
+                    warningText.setVisible(true);
+                } else {
+                    addButton.setVisible(true);
+                }
             }
             default -> clearOutput();
         }
@@ -84,6 +96,7 @@ public class ManagementController
         nameText.setText("");
         emailText.setText("");
         statusText.setText("");
+        warningText.setVisible(false);
 
         confirmCheckBox.setSelected(false);
         confirmCheckBox.setVisible(false);
