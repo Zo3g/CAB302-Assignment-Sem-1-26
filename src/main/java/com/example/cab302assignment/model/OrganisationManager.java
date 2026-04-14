@@ -57,6 +57,7 @@ public class OrganisationManager {
 
         // if the user is already a member but not active
         Membership user = membershipDAO.getMembership(userId, orgId);
+        if (managerId == userId) { throw new RuntimeException("Cannot activate membership yourself!"); }
         if (user != null){
             if (!user.isActive()) {
                 membershipDAO.activateMember(userId, orgId);
@@ -68,6 +69,7 @@ public class OrganisationManager {
     }
 
     public void removeMember(int managerId, int userId, int orgId){
+        if (managerId == userId) { throw new RuntimeException("Cannot activate membership yourself!"); }
         checkManagerPermission(managerId, orgId);
         membershipDAO.deactivateMember(userId, orgId);
     }
