@@ -1,6 +1,7 @@
 package com.example.cab302assignment.app;
 
 import com.example.cab302assignment.db.DatabaseInitialiser;
+import com.example.cab302assignment.db.DebugSeeder;
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -18,6 +19,7 @@ public class GuardiaApplication extends Application {
         }
 
         DatabaseInitialiser.createTables();
+        DebugSeeder.seed();
         ViewManager.setPrimaryStage(stage);
         ViewManager.switchView("sign-in-view.fxml", "Sign In");
     }
