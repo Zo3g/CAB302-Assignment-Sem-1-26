@@ -1,6 +1,11 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.*;
+import com.example.cab302assignment.app.ViewManager;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.dao.UserDAO;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.service.PasswordUtil;
+import com.example.cab302assignment.service.SessionManager;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

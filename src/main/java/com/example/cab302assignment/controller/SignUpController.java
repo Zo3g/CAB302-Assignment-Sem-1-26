@@ -1,6 +1,10 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.*;
+import com.example.cab302assignment.app.ViewManager;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.dao.UserDAO;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.service.PasswordUtil;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,7 +13,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class SignUpController {
-    @FXML private TextField fullNameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
@@ -29,8 +32,7 @@ public class SignUpController {
 
     @FXML
     public void initialize() {
-        BooleanBinding anyFieldEmpty = fullNameField.textProperty().isEmpty()
-            .or(emailField.textProperty().isEmpty())
+        BooleanBinding anyFieldEmpty = emailField.textProperty().isEmpty()
             .or(passwordField.textProperty().isEmpty())
             .or(confirmPasswordField.textProperty().isEmpty());
         signUpButton.disableProperty().bind(anyFieldEmpty);
@@ -41,12 +43,11 @@ public class SignUpController {
         errorLabel.setText("");
         successLabel.setText("");
 
-        String fullName = fullNameField.getText().trim();
         String email = emailField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        String error = validate(fullName, email, password, confirmPassword);
+        String error = validate(email, password, confirmPassword);
         if (error != null) {
             errorLabel.setText(error);
             return;
@@ -58,7 +59,7 @@ public class SignUpController {
         }
 
         String hashedPassword = PasswordUtil.hashPassword(password);
-        User user = new User(email, fullName, hashedPassword);
+        User user = new User(email, hashedPassword);
         //CRUD CREATE
         userDAO.addUser(user);
 
@@ -79,10 +80,7 @@ public class SignUpController {
         ViewManager.switchView("sign-in-view.fxml", "Sign In");
     }
 
-    public static String validate(String fullName, String email, String password, String confirmPassword) {
-        if (fullName.isEmpty()) {
-            return "Full name is required.";
-        }
+    public static String validate(String email, String password, String confirmPassword) {
         if (email.isEmpty()) {
             return "Email address is required.";
         }
