@@ -1,6 +1,14 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.*;
+import com.example.cab302assignment.app.ViewManager;
+import com.example.cab302assignment.dao.OrganisationMembershipDAO;
+import com.example.cab302assignment.dao.SqliteOrganisationMembershipDAO;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.dao.UserDAO;
+import com.example.cab302assignment.model.OrganisationMembership;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.service.PasswordUtil;
+import com.example.cab302assignment.service.SessionManager;
 import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -15,13 +23,19 @@ public class SignInController {
     @FXML private Button signInButton;
 
     private final UserDAO userDAO;
+    private final OrganisationMembershipDAO membershipDAO;
 
     public SignInController() {
-        this.userDAO = new SqliteUserDAO();
+        this(new SqliteUserDAO(), new SqliteOrganisationMembershipDAO());
     }
 
     public SignInController(UserDAO userDAO) {
+        this(userDAO, new SqliteOrganisationMembershipDAO());
+    }
+
+    public SignInController(UserDAO userDAO, OrganisationMembershipDAO membershipDAO) {
         this.userDAO = userDAO;
+        this.membershipDAO = membershipDAO;
     }
 
     @FXML
@@ -45,7 +59,15 @@ public class SignInController {
         }
 
         SessionManager.setCurrentUser(user);
+        SessionManager.setCurrentOrgId(resolveActiveOrgId(user.getUserId()));
         ViewManager.switchToWorkspace();
+    }
+
+    private int resolveActiveOrgId(int userId) {
+        for (OrganisationMembership m : membershipDAO.getMembershipsForUser(userId)) {
+            if (m.isActive()) return m.getOrgId();
+        }
+        return 0;
     }
 
     @FXML

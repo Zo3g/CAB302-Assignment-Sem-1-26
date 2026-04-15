@@ -27,3 +27,18 @@
     -fx-background-color: #D7E3ED;
     -fx-border-color: transparent transparent transparent #27548A;
 }
+
+.sidebar-account {
+    -fx-background-color: transparent;
+}
+
+.sidebar-account-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #183B4E;
+}
+
+.sidebar-account-email {
+    -fx-font-size: 11px;
+    -fx-text-fill: #27548A;
+}

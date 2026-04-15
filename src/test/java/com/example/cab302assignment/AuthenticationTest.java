@@ -1,11 +1,12 @@
 package com.example.cab302assignment;
 
-import com.example.cab302assignment.model.MockUserDAO;
-import com.example.cab302assignment.model.PasswordUtil;
-import com.example.cab302assignment.model.SessionManager;
+import com.example.cab302assignment.dao.MockUserDAO;
 import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.service.PasswordUtil;
+import com.example.cab302assignment.service.SessionManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthenticationTest {
@@ -15,8 +16,7 @@ class AuthenticationTest {
     void setUp() {
         userDAO = new MockUserDAO();
         String hash = PasswordUtil.hashPassword("Password1");
-        User user = new User("alice@test.com", "Alice", hash);
-        userDAO.addUser(user);
+        userDAO.addUser(new User("alice@test.com", "Alice", hash));
     }
 
     @Test
@@ -35,15 +35,13 @@ class AuthenticationTest {
 
     @Test
     void testNonexistentUser() {
-        User user = userDAO.getUserByEmail("nobody@test.com");
-        assertNull(user);
+        assertNull(userDAO.getUserByEmail("nobody@test.com"));
     }
 
     @Test
     void testSignUpThenSignIn() {
         String hash = PasswordUtil.hashPassword("NewPass123");
-        User newUser = new User("bob@test.com", "Bob", hash);
-        userDAO.addUser(newUser);
+        userDAO.addUser(new User("bob@test.com", "Bob", hash));
 
         User retrieved = userDAO.getUserByEmail("bob@test.com");
         assertNotNull(retrieved);
@@ -53,9 +51,8 @@ class AuthenticationTest {
     @Test
     void testDuplicateEmailPrevented() {
         String hash = PasswordUtil.hashPassword("Other123");
-        User duplicate = new User("alice@test.com", "Alice2", hash);
-        userDAO.addUser(duplicate);
-        assertEquals(2, userDAO.getAllUsers().size());
+        userDAO.addUser(new User("alice@test.com", "Alice", hash));
+        assertEquals(1, userDAO.getAllUsers().size());
     }
 
     @Test
@@ -63,7 +60,7 @@ class AuthenticationTest {
         User user = userDAO.getUserByEmail("alice@test.com");
         SessionManager.setCurrentUser(user);
         assertTrue(SessionManager.isLoggedIn());
-        assertEquals("Alice", SessionManager.getCurrentUser().getFullName());
+        assertEquals("alice@test.com", SessionManager.getCurrentUser().getEmail());
 
         SessionManager.logout();
         assertFalse(SessionManager.isLoggedIn());

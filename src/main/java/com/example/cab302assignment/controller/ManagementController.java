@@ -1,15 +1,18 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.*;
-import javafx.event.ActionEvent;
+import com.example.cab302assignment.dao.SqliteOrganisationDAO;
+import com.example.cab302assignment.dao.SqliteOrganisationMembershipDAO;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.model.MemberInfo;
+import com.example.cab302assignment.service.OrganisationManager;
+import com.example.cab302assignment.service.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-public class ManagementController
-{
+public class ManagementController {
     @FXML private TextField searchTextField;
     @FXML private Text userIdText;
     @FXML private Text nameText;
@@ -19,47 +22,54 @@ public class ManagementController
     @FXML private Button removeButton;
     @FXML private Button addButton;
 
-    private OrganisationManager organisationManager;
+    private final OrganisationManager organisationManager;
+    private MemberInfo searchedUserInfo;
 
     public ManagementController() {
-        organisationManager = new OrganisationManager(new SqliteOrganisationDAO(), new SqliteMembershipDAO(), new SqliteUserDAO());
+        this.organisationManager = new OrganisationManager(
+            new SqliteOrganisationDAO(),
+            new SqliteOrganisationMembershipDAO(),
+            new SqliteUserDAO()
+        );
     }
 
-    // for mock test
     public ManagementController(OrganisationManager organisationManager) {
         this.organisationManager = organisationManager;
     }
 
-    private MemberInfo searchedUserInfo;
-
-    // Logged in manager's ID
     private int getCurrentUserId() {
-        return SessionManager.getCurrentUser().getId();
+        return SessionManager.getCurrentUser().getUserId();
     }
 
-    // Logged in manager's org's ID
     private int getCurrentOrgId() {
         return SessionManager.getCurrentOrgId();
     }
 
+    @FXML
+    public void initialize() {
+        clearOutput();
+        searchTextField.textProperty().addListener((obs, oldV, newV) -> syncUser());
+    }
+
     private void syncUser() {
-        // clear output
         clearOutput();
 
         String email = searchTextField.getText();
         if (email == null || email.isBlank()) return;
 
-        MemberInfo memberInfo = organisationManager.searchMember(getCurrentUserId(), getCurrentOrgId(), email);
+        MemberInfo memberInfo;
+        try {
+            memberInfo = organisationManager.searchMember(getCurrentUserId(), getCurrentOrgId(), email);
+        } catch (RuntimeException ex) {
+            statusText.setText("Permission denied");
+            return;
+        }
         searchedUserInfo = memberInfo;
 
         if (memberInfo == null) return;
 
-        // state machine for different member status handling
         switch (memberInfo.getMemberStatus()) {
-            case NOT_FOUND -> {
-//                displayMemberInfo(memberInfo);
-                statusText.setText("User not found");
-            }
+            case NOT_FOUND -> statusText.setText("User not found");
             case NOT_A_MEMBER -> {
                 displayMemberInfo(memberInfo);
                 statusText.setText("Not a member");
@@ -94,17 +104,9 @@ public class ManagementController
         emailText.setText(memberInfo.getEmail());
     }
 
-    public void initialize() {
-        syncUser();
-
-        // call syncUser when the search text field changes
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> syncUser());
-    }
-
     @FXML
     private void onCheckboxClicked() {
-        boolean accepted = confirmCheckBox.isSelected();
-        removeButton.setDisable(!accepted);
+        removeButton.setDisable(!confirmCheckBox.isSelected());
     }
 
     @FXML

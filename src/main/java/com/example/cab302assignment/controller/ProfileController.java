@@ -1,21 +1,25 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.SessionManager;
-import com.example.cab302assignment.model.SqliteUserDAO;
+import com.example.cab302assignment.app.ViewManager;
+import com.example.cab302assignment.dao.SqliteUserDAO;
+import com.example.cab302assignment.dao.UserDAO;
 import com.example.cab302assignment.model.User;
-import com.example.cab302assignment.model.UserDAO;
-import com.example.cab302assignment.model.ViewManager;
+import com.example.cab302assignment.service.PasswordUtil;
+import com.example.cab302assignment.service.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.util.Optional;
 
 public class ProfileController {
-    @FXML private TextField fullNameField;
+    @FXML private TextField nameField;
     @FXML private TextField emailField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
     @FXML private Label statusLabel;
 
     private final UserDAO userDAO = new SqliteUserDAO();
@@ -24,7 +28,7 @@ public class ProfileController {
     public void initialize() {
         User user = SessionManager.getCurrentUser();
         if (user != null) {
-            if (fullNameField != null) fullNameField.setText(user.getFullName());
+            if (nameField != null) nameField.setText(user.getName());
             if (emailField != null) emailField.setText(user.getEmail());
         }
     }
@@ -38,20 +42,47 @@ public class ProfileController {
             return;
         }
 
-        String fullName = fullNameField != null ? fullNameField.getText() : null;
+        String name = nameField != null ? nameField.getText() : null;
         String email = emailField != null ? emailField.getText() : null;
+        String newPassword = newPasswordField != null ? newPasswordField.getText() : "";
+        String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText() : "";
 
-        if (fullName == null || fullName.isBlank() || email == null || email.isBlank()) {
-            setStatus("Full name and email are required.");
+        if (name == null || name.isBlank()) {
+            setStatus("Name is required.");
+            return;
+        }
+        if (email == null || email.isBlank()) {
+            setStatus("Email is required.");
+            return;
+        }
+        if (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            setStatus("Please enter a valid email address.");
             return;
         }
 
-        user.setFullName(fullName.trim());
+        user.setName(name.trim());
         user.setEmail(email.trim());
+
+        if (newPassword != null && !newPassword.isEmpty()) {
+            if (newPassword.length() < 8
+                || !newPassword.matches(".*[A-Z].*")
+                || !newPassword.matches(".*[a-z].*")
+                || !newPassword.matches(".*\\d.*")) {
+                setStatus("Password must be 8+ chars with upper, lower, and a digit.");
+                return;
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                setStatus("Passwords do not match.");
+                return;
+            }
+            user.setPasswordHash(PasswordUtil.hashPassword(newPassword));
+        }
 
         try {
             userDAO.updateUser(user);
             SessionManager.setCurrentUser(user);
+            if (newPasswordField != null) newPasswordField.clear();
+            if (confirmPasswordField != null) confirmPasswordField.clear();
             setStatus("Profile updated successfully.");
         } catch (Exception ex) {
             setStatus("Failed to update profile: " + ex.getMessage());
@@ -77,7 +108,7 @@ public class ProfileController {
         }
 
         try {
-            userDAO.deleteUser(user.getId());
+            userDAO.deleteUser(user.getUserId());
             SessionManager.logout();
             ViewManager.switchView("sign-in-view.fxml", "Sign In");
         } catch (Exception ex) {
