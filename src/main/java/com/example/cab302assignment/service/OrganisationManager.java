@@ -44,8 +44,9 @@ public class OrganisationManager {
         }
         if (membership.isActive()) {
             return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.ACTIVE);
+        } else {
+            return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.DEACTIVATED);
         }
-        return new MemberInfo(user.getUserId(), user.getName(), user.getEmail(), MemberStatus.NOT_A_MEMBER);
     }
 
     public void createOrganisation(String name, int creatorUserId) {

@@ -81,6 +81,11 @@ public class ManagementController {
                 confirmCheckBox.setVisible(true);
                 removeButton.setVisible(true);
             }
+            case DEACTIVATED -> {
+                displayMemberInfo(memberInfo);
+                statusText.setText("Deactivated");
+                addButton.setVisible(true);
+            }
             default -> clearOutput();
         }
     }
