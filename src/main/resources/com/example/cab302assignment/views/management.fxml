@@ -58,17 +58,17 @@
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fill="#28568acc" layoutX="210.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User status:" wrappingWidth="130.84063720703125">
+            <Text fill="#28568acc" layoutX="210.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Member status:" wrappingWidth="130.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fx:id="userIdText" fill="#183b4ecc" layoutX="378.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="12345678" wrappingWidth="130.84063720703125">
+            <Text fx:id="userIdText" fill="#183b4ecc" layoutX="376.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="12345678" wrappingWidth="257.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fx:id="nameText" fill="#183b4ecc" layoutX="378.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="First Last" wrappingWidth="130.84063720703125">
+            <Text fx:id="nameText" fill="#183b4ecc" layoutX="378.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="First Last" wrappingWidth="257.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
@@ -78,28 +78,30 @@
                   <Font size="25.0" />
                </font>
             </Text>
-            <Text fx:id="statusText" fill="#183b4ecc" layoutX="378.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="130.84063720703125">
+            <Text fx:id="statusText" fill="#183b4ecc" layoutX="376.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="264.84063720703125">
                <font>
                   <Font size="25.0" />
                </font>
             </Text>
-            <CheckBox fx:id="confirmCheckBox" alignment="TOP_LEFT" layoutX="224.0" layoutY="661.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="398.0" text="Confirm. Note: this action cannot be undone." textFill="#00000099" textOverrun="CLIP" wrapText="true"
-                      onAction="#onCheckboxClicked">
+            <CheckBox fx:id="confirmCheckBox" alignment="TOP_LEFT" layoutX="224.0" layoutY="661.0" mnemonicParsing="false" onAction="#onCheckboxClicked" prefHeight="21.0" prefWidth="398.0" text="Confirm. Note: this action cannot be undone." textFill="#00000099" textOverrun="CLIP" visible="false" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>
             </CheckBox>
-            <Button fx:id="removeButton" disable="true" layoutX="214.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="408.0" style="-fx-background-color: #FF928A; -fx-background-radius: 15; -fx-border-radius: 15;" text="Remove user from Organisation" textFill="#183b4e" wrapText="true"
-                    onAction="#onRemove">
+            <Button fx:id="removeButton" disable="true" layoutX="214.0" layoutY="693.0" mnemonicParsing="false" onAction="#onRemove" prefHeight="57.0" prefWidth="408.0" style="-fx-background-color: #FF928A; -fx-background-radius: 15; -fx-border-radius: 15;" text="Remove user from Organisation" textFill="#183b4e" visible="false" wrapText="true">
                <font>
                   <Font size="26.0" />
                </font></Button>
-            <Button fx:id="addButton" layoutX="441.0" layoutY="693.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="181.0" style="-fx-background-color: #FFCA76; -fx-background-radius: 15; -fx-border-radius: 15;" text="Add User" textFill="#183b4e" wrapText="true"
-                    onAction="#onAdd">
+            <Button fx:id="addButton" layoutX="441.0" layoutY="693.0" mnemonicParsing="false" onAction="#onAdd" prefHeight="57.0" prefWidth="181.0" style="-fx-background-color: #FFCA76; -fx-background-radius: 15; -fx-border-radius: 15;" text="Add User" textFill="#183b4e" visible="false" wrapText="true">
                <font>
                   <Font size="26.0" />
                </font>
             </Button>
+            <Text fx:id="warningText" fill="#ff948c" layoutX="182.0" layoutY="719.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You cannot modify your own membership." wrappingWidth="483.84063720703125">
+               <font>
+                  <Font size="27.0" />
+               </font>
+            </Text>
          </children>
       </AnchorPane>
    </children>
