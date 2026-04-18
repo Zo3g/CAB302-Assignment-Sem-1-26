@@ -1,108 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="982.0" prefWidth="1240.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.ManagementController">
-   <children>
-      <Pane layoutX="806.0" layoutY="1.0" prefHeight="985.0" prefWidth="435.0">
-         <children>
-            <Rectangle arcHeight="50.0" arcWidth="50.0" fill="#D7E3ED" height="679.0" layoutX="-1.0" layoutY="164.0" stroke="WHITE" strokeType="INSIDE" width="500.0" />
-         </children>
-      </Pane>
-      <AnchorPane layoutX="1.0" layoutY="-1.0" prefHeight="983.0" prefWidth="841.0">
-         <children>
-            <Rectangle arcHeight="50.0" arcWidth="50.0" fill="WHITE" height="674.0" layoutX="88.0" layoutY="166.0" stroke="WHITE" strokeType="INSIDE" width="668.0">
-               <effect>
-                  <DropShadow height="31.0" offsetX="7.0" offsetY="5.0" radius="15.0" width="31.0">
-                     <color>
-                        <Color opacity="0.20000000298023224" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Rectangle>
-            <Text fill="#27548a" layoutX="143.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Organisation Management">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Text>
-            <Text fill="#28568acc" layoutX="195.0" layoutY="253.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add or remove user from Organisation:" wrappingWidth="366.86199951171875">
-               <font>
-                  <Font size="22.0" />
-               </font>
-            </Text>
-            <TextField fx:id="searchTextField" layoutX="184.0" layoutY="261.0" prefHeight="53.0" prefWidth="471.0" promptText="Please enter user's email:" style="-fx-background-color: #d7e3ed; -fx-background-radius: 15; -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);">
-               <font>
-                  <Font size="22.0" />
-               </font></TextField>
-            <Text fill="#28568acc" layoutX="209.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User ID:" wrappingWidth="130.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fill="#28568acc" layoutX="209.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="130.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fill="#28568acc" layoutX="210.0" layoutY="510.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" wrappingWidth="130.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fill="#28568acc" layoutX="210.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Member status:" wrappingWidth="130.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fx:id="userIdText" fill="#183b4ecc" layoutX="376.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="12345678" wrappingWidth="257.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fx:id="nameText" fill="#183b4ecc" layoutX="378.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="First Last" wrappingWidth="257.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fx:id="emailText" fill="#183b4ecc" layoutX="378.0" layoutY="510.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MyEmail@example.com" wrappingWidth="264.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <Text fx:id="statusText" fill="#183b4ecc" layoutX="376.0" layoutY="571.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active" wrappingWidth="264.84063720703125">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
-            <CheckBox fx:id="confirmCheckBox" alignment="TOP_LEFT" layoutX="224.0" layoutY="661.0" mnemonicParsing="false" onAction="#onCheckboxClicked" prefHeight="21.0" prefWidth="398.0" text="Confirm. Note: this action cannot be undone." textFill="#00000099" textOverrun="CLIP" visible="false" wrapText="true">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </CheckBox>
-            <Button fx:id="removeButton" disable="true" layoutX="214.0" layoutY="693.0" mnemonicParsing="false" onAction="#onRemove" prefHeight="57.0" prefWidth="408.0" style="-fx-background-color: #FF928A; -fx-background-radius: 15; -fx-border-radius: 15;" text="Remove user from Organisation" textFill="#183b4e" visible="false" wrapText="true">
-               <font>
-                  <Font size="26.0" />
-               </font></Button>
-            <Button fx:id="addButton" layoutX="441.0" layoutY="693.0" mnemonicParsing="false" onAction="#onAdd" prefHeight="57.0" prefWidth="181.0" style="-fx-background-color: #FFCA76; -fx-background-radius: 15; -fx-border-radius: 15;" text="Add User" textFill="#183b4e" visible="false" wrapText="true">
-               <font>
-                  <Font size="26.0" />
-               </font>
-            </Button>
-            <Text fx:id="warningText" fill="#ff948c" layoutX="182.0" layoutY="719.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You cannot modify your own membership." wrappingWidth="483.84063720703125">
-               <font>
-                  <Font size="27.0" />
-               </font>
-            </Text>
-         </children>
-      </AnchorPane>
-   </children>
-</Pane>
+<BorderPane style="-fx-background-color: #ffffff;"
+            stylesheets="@../global.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.cab302assignment.controller.ManagementController">
+   <center>
+      <ScrollPane fitToHeight="false" fitToWidth="true">
+         <content>
+            <!-- Outer padding wrapper -->
+            <VBox alignment="TOP_CENTER" spacing="0">
+               <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
+                  <Label prefWidth="1170" styleClass="h1" text="Organisation Management" />
+
+                  <!-- Body -->
+                  <HBox alignment="CENTER" maxWidth="1170" prefWidth="1170" spacing="20">
+                     <VBox.margin><Insets top="10" /></VBox.margin>
+
+                     <!-- Left - Membership management card -->
+                     <VBox prefHeight="690.0" prefWidth="670" spacing="40.0" HBox.hgrow="NEVER"
+                           style="-fx-background-color: white; -fx-background-radius: 25;
+                           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 5, 5);" >
+                        <padding><Insets bottom="28.0" left="60.0" right="60.0" top="80.0" /></padding>
+
+                        <!-- Search section -->
+                        <VBox spacing="8">
+                           <Label styleClass="h4" text="Add or remove user from Organisation:" />
+                           <TextField fx:id="searchTextField" onAction="#onSearch"
+                                      prefHeight="55.0" prefWidth="450.0"
+                                      promptText="Please enter user's email:"
+                                      style="-fx-background-color: #d7e3ed; -fx-background-radius: 15;
+                                      -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);
+                                      -fx-font-size: 22px; -fx-padding: 0 0 0 20;">
+                           </TextField>
+                        <padding>
+                           <Insets left="20.0" right="20.0" />
+                        </padding>
+                        </VBox>
+
+                        <!-- User info grid -->
+                        <GridPane alignment="CENTER" hgap="16" vgap="14">
+                           <columnConstraints>
+                              <ColumnConstraints minWidth="100.0" percentWidth="38.0" />
+                              <ColumnConstraints minWidth="120.0" percentWidth="62.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="36" />
+                              <RowConstraints minHeight="36" />
+                              <RowConstraints minHeight="36" />
+                              <RowConstraints minHeight="36" />
+                           </rowConstraints>
+
+                           <Label styleClass="h4" text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                           <Text fx:id="userIdText" fill="#183b4ecc" styleClass="h4"
+                                 text="12345678" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                           <Label styleClass="h4" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                           <Text fx:id="nameText" fill="#183b4ecc" styleClass="h4"
+                                 text="First Last" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                           <Label styleClass="h4" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                           <Text fx:id="emailText" fill="#183b4ecc" styleClass="h4"
+                                 text="MyEmail@example.com" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                           <Label styleClass="h4" text="Member status:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                           <Text fx:id="statusText" fill="#183b4ecc" styleClass="h4"
+                                 text="Active" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <padding>
+                           <Insets bottom="20.0" left="40.0" right="10.0" top="0.0" />
+                        </padding>
+                        </GridPane>
+
+                        <!-- Confirm checkbox and action buttons (hidden until search result) -->
+                        <StackPane alignment="CENTER">
+                           <padding><Insets bottom="10" top="10" /></padding>
+                           <VBox fx:id="removeGroup" alignment="CENTER"
+                                 managed="false" spacing="10" visible="false" StackPane.alignment="CENTER">
+                              <CheckBox fx:id="confirmCheckBox" onAction="#onCheckboxClicked"
+                                        prefHeight="21.0" prefWidth="398.0" styleClass="h4"
+                                        text="Confirm. Note: this action cannot be undone."
+                                        textFill="#00000099" wrapText="true" style="-fx-font-size: 16px; -fx-padding: 0 0 0 15;">
+                              </CheckBox>
+                              <Button fx:id="removeButton" disable="true" onAction="#onRemove"
+                                      prefHeight="57.0" prefWidth="408.0"
+                                      style="-fx-background-color: #FF928A; -fx-font-size: 26px;
+                                      -fx-background-radius: 15; -fx-border-radius: 15;"
+                                      text="Remove user from Organisation" textFill="#183b4e" wrapText="true">
+                              </Button>
+                           </VBox>
+                           <Button fx:id="addButton" managed="false" onAction="#onAdd"
+                                   prefHeight="57.0" prefWidth="300.0"
+                                   style="-fx-background-color: #FFCA76; -fx-font-size: 26px;
+                                   -fx-background-radius: 15; -fx-border-radius: 15;"
+                                   text="Add / Activate user" textFill="#183b4e" visible="false"
+                                   wrapText="true" StackPane.alignment="BOTTOM_CENTER">
+                           </Button>
+                           <Text fx:id="warningText" fill="#ff948c" managed="false"
+                                 text="You cannot modify your own membership."
+                                 style="-fx-font-size: 27px;"
+                                 visible="false" StackPane.alignment="CENTER">
+                           </Text>
+                        </StackPane>
+                     <HBox.margin>
+                        <Insets right="15.0" />
+                     </HBox.margin>
+                     </VBox>
+
+                     <!-- Right panel -->
+                     <VBox prefHeight="690.0" prefWidth="480" spacing="20"
+                           style="-fx-background-color: #d7e3ed; -fx-background-radius: 25;" HBox.hgrow="NEVER">
+                        <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
+
+                        <Region VBox.vgrow="ALWAYS" />
+                     </VBox>
+                  </HBox>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

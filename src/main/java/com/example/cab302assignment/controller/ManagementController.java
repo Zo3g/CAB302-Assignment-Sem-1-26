@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class ManagementController {
@@ -22,6 +23,7 @@ public class ManagementController {
     @FXML private CheckBox confirmCheckBox;
     @FXML private Button removeButton;
     @FXML private Button addButton;
+    @FXML private VBox removeGroup;
 
     private final OrganisationManager organisationManager;
     private MemberInfo searchedUserInfo;
@@ -48,8 +50,7 @@ public class ManagementController {
 
     @FXML
     public void initialize() {
-        clearOutput();
-        searchTextField.textProperty().addListener((obs, oldV, newV) -> syncUser());
+        syncUser();
     }
 
     private void syncUser() {
@@ -76,6 +77,7 @@ public class ManagementController {
                 displayMemberInfo(memberInfo);
                 statusText.setText("Not a member");
                 addButton.setVisible(true);
+                addButton.setManaged(true);
             }
             case ACTIVE -> {
                 displayMemberInfo(memberInfo);
@@ -83,9 +85,10 @@ public class ManagementController {
                 if (isSelf) {
                     warningText.setText("You cannot modify your own membership.");
                     warningText.setVisible(true);
+                    warningText.setManaged(true);
                 } else {
-                    confirmCheckBox.setVisible(true);
-                    removeButton.setVisible(true);
+                    removeGroup.setVisible(true);
+                    removeGroup.setManaged(true);
                 }
             }
             case DEACTIVATED -> {
@@ -94,8 +97,10 @@ public class ManagementController {
                 if (isSelf) {
                     warningText.setText("You cannot modify your own membership.");
                     warningText.setVisible(true);
+                    warningText.setManaged(true);
                 } else {
                     addButton.setVisible(true);
+                    addButton.setManaged(true);
                 }
             }
             default -> clearOutput();
@@ -107,12 +112,14 @@ public class ManagementController {
         nameText.setText("");
         emailText.setText("");
         statusText.setText("");
-        warningText.setVisible(false);
         confirmCheckBox.setSelected(false);
-        confirmCheckBox.setVisible(false);
         removeButton.setDisable(true);
-        removeButton.setVisible(false);
+        removeGroup.setVisible(false);
+        removeGroup.setManaged(false);
         addButton.setVisible(false);
+        addButton.setManaged(false);
+        warningText.setVisible(false);
+        warningText.setManaged(false);
     }
 
     private void displayMemberInfo(MemberInfo memberInfo) {
@@ -120,6 +127,9 @@ public class ManagementController {
         nameText.setText(memberInfo.getName());
         emailText.setText(memberInfo.getEmail());
     }
+
+    @FXML
+    private void onSearch() { syncUser(); }
 
     @FXML
     private void onCheckboxClicked() {
