@@ -33,7 +33,7 @@ public class OrganisationManager {
 
         if (email == null || email.isEmpty()) return null;
 
-        User user = userDAO.getUserByEmail(email);
+        User user = userDAO.getUserByEmail(email.toLowerCase());
         if (user == null) {
             return new MemberInfo(0, "", email, MemberStatus.NOT_FOUND);
         }
