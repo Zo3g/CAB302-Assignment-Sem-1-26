@@ -1,10 +1,16 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.text.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import eu.hansolo.medusa.Gauge;
@@ -15,8 +21,8 @@ import javafx.scene.paint.Color;
 public class WorkspaceController {
     @FXML private TextArea inputArea;
     @FXML private TextArea outputArea;
-    @FXML private Text insightCol1;
-    @FXML private Text insightCol2;
+    @FXML private TextFlow insightCol1;
+    @FXML private TextFlow insightCol2;
     @FXML private Button scanButton;
     @FXML private Button copyButton;
     @FXML private Button clearButton;
@@ -32,18 +38,27 @@ public class WorkspaceController {
 
     private RedactionEngine redactionEngine = new RedactionEngine();
 
+    private GeminiService geminiService;
+
     @FXML
     public void initialize() {
         promptContainer.minHeightProperty().bind(root.heightProperty().multiply(0.5));
         resultContainer.maxHeightProperty().bind(root.heightProperty().multiply(0.3));
         gaugePane.maxWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
-        insightCol1.wrappingWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
-        insightCol2.wrappingWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
+        insightCol1.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
+        insightCol2.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
 
-        insightCol1.setText("Guardia is here to help you remain compliant and protect your sensitive data. Enter your generative AI prompt to scan for risks and generate useful insights.");
-        insightCol2.setText("Enter your generative AI prompt to scan for risks and generate useful insights.");
+        setTextFlowContent(insightCol1, "Guardia is here to help you remain compliant and protect your sensitive data. Enter your generative AI prompt to scan for risks and generate useful insights.");
+        setTextFlowContent(insightCol2, "Enter your generative AI prompt to scan for risks and generate useful insights.");
 
         buildRiskGauge();
+
+        // Initialize Gemini service
+        try{
+            geminiService = new GeminiService();
+        } catch(IllegalStateException e){
+            System.out.println("Gemini unavailable");
+        }
 
     }
 
@@ -55,9 +70,50 @@ public class WorkspaceController {
             return; // Stop processing if validation fails
         }
 
+        if (geminiService == null) {
+            errorMessage.setText("AI service unavailable — check your GEMINI_API_KEY.");
+            return;
+        }
+
         String sanitized = sanitizePrompt(prompt);
         outputArea.setText(sanitized);
-        fetchInsights(prompt);
+
+        // Show loading state
+        scanButton.setDisable(true);
+        scanButton.setText("Analysing...");
+        setTextFlowContent(insightCol1, "Waiting for AI analysis...");
+        setTextFlowContent(insightCol2, "");
+
+        Task<String> analysisTask = new Task<>() {
+            @Override
+            protected String call() {
+                System.out.println("Calling AI service...");
+                return geminiService.analysePromptRisk(sanitized);
+            }
+        };
+
+        analysisTask.setOnSucceeded(workerStateEvent -> {
+            String analysis = analysisTask.getValue();
+            parseAndDisplayAnalysis(analysis);
+            scanButton.setDisable(false);
+            scanButton.setText("Scan");
+        });
+
+        analysisTask.setOnFailed(workerStateEvent -> {
+            Throwable ex = analysisTask.getException();
+            System.err.println("AI analysis failed: " + ex.getMessage());
+            ex.printStackTrace();
+            setTextFlowContent(insightCol1, "Analysis failed: " + ex.getMessage());
+            scanButton.setDisable(false);
+            scanButton.setText("Scan");
+        });
+
+        // Start the task on a background thread
+        Thread thread = new Thread(analysisTask);
+        thread.setDaemon(true);
+        thread.start();
+
+        //fetchInsights(prompt);
         double risk = calculateRisk(prompt);
         riskGauge.setValue(risk);
 
@@ -95,15 +151,89 @@ public class WorkspaceController {
         return redactionEngine.redactPrompt(prompt);
     }
 
-    private void fetchInsights(String prompt) {
-        String col1 = """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id risus lobortis, finibus nulla in, sodales eros. Curabitur urna enim, sagittis ornare mauris ac, viverra commodo justo. Vivamus laoreet sapien non risus aliquet porttitor. Etiam tempus ultricies consectetur. Nam sit amet pharetra justo. Vestibulum ut ornare nulla. Integer et lorem eleifend, auctor sem nec, fringilla lorem. Vestibulum nisl arcu, consequat quis tellus vitae, pulvinar dignissim purus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel leo non turpis fermentum laoreet eget ut tortor. Sed sollicitudin arcu justo, eu tempor ante blandit non. In hac habitasse platea dictumst. Duis vulputate quam fermentum quam accumsan eleifend. Proin nunc orci, gravida sit amet laoreet id, tempor in nibh. In vel neque et ipsum pretium posuere quis at leo.""";
+    /**
+     * Splits the AI response into Risk and Suggestion sections,
+     * then renders each into the corresponding TextFlow column.
+     */
+    private void parseAndDisplayAnalysis(String analysis) {
+        if (analysis == null || analysis.isBlank()) {
+            setTextFlowContent(insightCol1, "No analysis available.");
+            setTextFlowContent(insightCol2, "");
+            return;
+        }
 
-        String col2 = """
-                Suspendisse pellentesque tellus metus, sed ornare dui facilisis at. Nam consectetur felis sed augue pretium ultrices. Aenean rhoncus purus mauris, porta elementum sem placerat vitae. Pellentesque luctus mollis eros ut iaculis. Etiam suscipit lorem nec metus auctor aliquet. Sed commodo dapibus velit. Proin sit amet iaculis nisi. Nam ac lacinia est. Nulla porttitor, nisi eget pharetra ultrices, turpis tortor placerat ligula, vel efficitur nunc eros id diam. Mauris a convallis dolor. Donec sollicitudin eget diam in dignissim. In ex quam, rhoncus vitae commodo a, pharetra eget lorem.""";
+        // Split on "Suggestion:" (case-insensitive) to separate the two sections
+        String[] parts = analysis.split("(?i)Effect:", 2);
 
-        insightCol1.setText(col1);
-        insightCol2.setText(col2);
+        String riskSection = parts[0].trim();
+        String effectSection = parts.length > 1 ? parts[1].trim() : "";
+
+        // Remove the leading "Risk:" header if present
+        riskSection = riskSection.replaceFirst("(?i)^Risk:\\s*", "").trim();
+
+        renderMarkdownBold(insightCol1, "Risk", riskSection);
+        renderMarkdownBold(insightCol2, "Effect", effectSection);
+    }
+
+    /**
+     * Renders text with **bold** markdown markers into a TextFlow.
+     * Adds a bold title header, then parses **...**  segments as bold Text nodes.
+     */
+    private void renderMarkdownBold(TextFlow textFlow, String title, String content) {
+        textFlow.getChildren().clear();
+
+        // Add a bold title line
+        Text titleText = new Text(title + ":\n");
+        titleText.setFont(Font.font("System", FontWeight.BOLD, 14));
+        textFlow.getChildren().add(titleText);
+
+        if (content == null || content.isBlank()) {
+            return;
+        }
+
+        // Replace markdown bullet markers (* ) with actual bullet points (•)
+        //content = content.replaceAll("(?m)^\\* ", "• ");
+        content = content.replaceAll("(?m)^\\*\\s", "• ");
+
+        // Regex to match **bold** segments
+        Pattern boldPattern = Pattern.compile("\\*\\*(.+?)\\*\\*");
+        Matcher matcher = boldPattern.matcher(content);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            // Add the plain text before this bold match
+            if (matcher.start() > lastEnd) {
+                String plainChunk = content.substring(lastEnd, matcher.start());
+                Text plainText = new Text(plainChunk);
+                plainText.setFont(Font.font("System", FontWeight.NORMAL, 12));
+                textFlow.getChildren().add(plainText);
+            }
+
+            // Add the bold text (without the ** markers)
+            Text boldText = new Text(matcher.group(1));
+            boldText.setFont(Font.font("System", FontWeight.BOLD, 12));
+            textFlow.getChildren().add(boldText);
+
+            lastEnd = matcher.end();
+        }
+
+        // Add any remaining plain text after the last bold match
+        if (lastEnd < content.length()) {
+            String remaining = content.substring(lastEnd);
+            Text remainingText = new Text(remaining);
+            remainingText.setFont(Font.font("System", FontWeight.NORMAL, 12));
+            textFlow.getChildren().add(remainingText);
+        }
+    }
+
+    /**
+     * Simple helper to set plain text content on a TextFlow.
+     */
+    private void setTextFlowContent(TextFlow textFlow, String content) {
+        textFlow.getChildren().clear();
+        Text text = new Text(content);
+        text.setFont(Font.font("System", FontWeight.NORMAL, 12));
+        textFlow.getChildren().add(text);
     }
 
     private double calculateRisk(String prompt) {
