@@ -152,7 +152,7 @@ public class WorkspaceController {
     }
 
     /**
-     * Splits the AI response into Risk and Suggestion sections,
+     * Splits the AI response into Risk and Effect sections,
      * then renders each into the corresponding TextFlow column.
      */
     private void parseAndDisplayAnalysis(String analysis) {
@@ -162,7 +162,7 @@ public class WorkspaceController {
             return;
         }
 
-        // Split on "Suggestion:" (case-insensitive) to separate the two sections
+        // Split on "Effect:" (case-insensitive) to separate the two sections
         String[] parts = analysis.split("(?i)Effect:", 2);
 
         String riskSection = parts[0].trim();
@@ -192,7 +192,6 @@ public class WorkspaceController {
         }
 
         // Replace markdown bullet markers (* ) with actual bullet points (•)
-        //content = content.replaceAll("(?m)^\\* ", "• ");
         content = content.replaceAll("(?m)^\\*\\s", "• ");
 
         // Regex to match **bold** segments
