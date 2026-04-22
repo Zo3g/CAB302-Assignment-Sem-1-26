@@ -6,6 +6,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/21.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -83,11 +84,11 @@
                     <!-- Two columns of insights -->
                     <HBox spacing="10" HBox.hgrow="ALWAYS">
                         <VBox fx:id="insightPane1" spacing="5" HBox.hgrow="ALWAYS">
-                            <Text fx:id="insightCol1"/>
+                            <TextFlow fx:id="insightCol1" />
                         </VBox>
 
                         <VBox fx:id="insightPane2" spacing="5" HBox.hgrow="ALWAYS">
-                            <Text fx:id="insightCol2"/>
+                            <TextFlow fx:id="insightCol2" />
                         </VBox>
                     </HBox>
                 </HBox>

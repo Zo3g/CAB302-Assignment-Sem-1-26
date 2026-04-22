@@ -4,6 +4,8 @@ module com.example.cab302assignment {
     requires java.logging;
     requires java.sql;
     requires eu.hansolo.medusa;
+    requires com.google.genai;
+    requires io.github.cdimascio.dotenv.java;
 
     exports com.example.cab302assignment.app;
     exports com.example.cab302assignment.controller;
