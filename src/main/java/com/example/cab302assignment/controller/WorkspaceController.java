@@ -30,11 +30,21 @@ public class WorkspaceController {
     @FXML private VBox insightPane1;
     @FXML private VBox insightPane2;
     @FXML private VBox resultContainer;
+    @FXML private Label riskCategory;
     @FXML private HBox promptContainer;
     @FXML private ScrollPane root;
     @FXML private Label errorMessage;
 
     private Gauge riskGauge;
+
+    enum RiskLevel {
+        NO_RISK,
+        LOW_RISK,
+        MEDIUM_RISK,
+        HIGH_RISK,
+        CRITICAL_RISK
+    }
+
 
     private RedactionEngine redactionEngine = new RedactionEngine();
 
@@ -234,8 +244,9 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private double calculateRisk(String prompt) {
-        double risk = Math.random() * 100;
+    private RiskLevel calculateRisk(String prompt) {
+
+        RiskLevel risk = RiskLevel.MEDIUM_RISK; // Placeholder - update LLM model here
         return risk;
     }
 
@@ -264,6 +275,26 @@ public class WorkspaceController {
         AnchorPane.setLeftAnchor(riskGauge, 0.0);
         AnchorPane.setRightAnchor(riskGauge, 0.0);
     }
+    private int riskToDouble(RiskLevel risk) {
+        return switch (risk) {
+            case NO_RISK -> 10;
+            case LOW_RISK -> 30;
+            case MEDIUM_RISK -> 50;
+            case HIGH_RISK -> 70;
+            case CRITICAL_RISK -> 100;
+        };
+    }
+
+    private String riskToString(RiskLevel risk) {
+        return switch (risk) {
+            case NO_RISK -> "No Risk";
+            case LOW_RISK -> "Low Risk";
+            case MEDIUM_RISK -> "Medium Risk";
+            case HIGH_RISK -> "High Risk";
+            case CRITICAL_RISK -> "Critical";
+        };
+    }
+
 }
 
 
