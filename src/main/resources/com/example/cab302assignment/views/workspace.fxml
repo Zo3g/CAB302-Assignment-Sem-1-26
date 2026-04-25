@@ -79,10 +79,7 @@
                 <Label text="Risk Level and Analysis" styleClass="h4"/>
                 <HBox HBox.hgrow="ALWAYS">
                     <!-- Gauge -->
-                    <VBox alignment="CENTER">
-                        <AnchorPane fx:id="gaugePane" HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="riskCategory" styleClass="h5"/>
-                    </VBox>
+                    <AnchorPane fx:id="gaugePane" HBox.hgrow="ALWAYS"/>
 
                     <!-- Two columns of insights -->
                     <HBox spacing="10" HBox.hgrow="ALWAYS">
