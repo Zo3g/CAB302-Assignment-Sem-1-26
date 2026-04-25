@@ -36,6 +36,14 @@ public class WorkspaceController {
 
     private Gauge riskGauge;
 
+    enum RiskLevel {
+        NO_RISK,
+        LOW_RISK,
+        MEDIUM_RISK,
+        HIGH_RISK,
+        CRITICAL_RISK
+    }
+
     private RedactionEngine redactionEngine = new RedactionEngine();
 
     private GeminiService geminiService;
@@ -236,8 +244,16 @@ public class WorkspaceController {
     }
 
     private double calculateRisk(String prompt) {
-        double risk = Math.random() * 100;
-        return risk;
+        //Update LLM logic here
+        RiskLevel risk = RiskLevel.NO_RISK;
+
+        return switch (risk) {
+            case NO_RISK -> 0;
+            case LOW_RISK -> 20;
+            case MEDIUM_RISK -> 45;
+            case HIGH_RISK -> 70;
+            case CRITICAL_RISK -> 95;
+        };
     }
 
     private void buildRiskGauge() {
@@ -245,16 +261,17 @@ public class WorkspaceController {
                 .minValue(0)
                 .maxValue(100)
                 .title("Risk Score")
+                .unit("")
                 .animated(true)
                 .animationDuration(1600)
                 .skinType(Gauge.SkinType.DASHBOARD)
                 .valueVisible(true)
                 .sections(
-                        new Section(0, 20, Color.LIMEGREEN),
-                        new Section(20, 40, Color.GREENYELLOW),
-                        new Section(40, 60, Color.GOLD),
-                        new Section(60, 80, Color.ORANGE),
-                        new Section(80, 100, Color.RED)
+                        new Section(0, 0, Color.LIMEGREEN),        // No Risk (special case)
+                        new Section(1, 25, Color.GREEN),          // Low Risk
+                        new Section(25, 50, Color.YELLOW),        // Medium Risk
+                        new Section(50, 75, Color.ORANGE),        // High Risk
+                        new Section(75, 100, Color.RED)
                 )
                 .sectionsVisible(true)
                 .build();
