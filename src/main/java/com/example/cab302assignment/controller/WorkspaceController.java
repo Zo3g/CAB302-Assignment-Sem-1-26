@@ -113,10 +113,9 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        //fetchInsights(prompt);
-        double risk = calculateRisk(prompt);
-        riskGauge.setValue(risk);
-
+        RiskLevel risk = calculateRisk(prompt);
+        riskGauge.setValue(riskToDouble(risk));
+        riskCategory.setText(riskToString(risk));
     }
 
     @FXML
