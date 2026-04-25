@@ -30,20 +30,11 @@ public class WorkspaceController {
     @FXML private VBox insightPane1;
     @FXML private VBox insightPane2;
     @FXML private VBox resultContainer;
-    @FXML private Label riskCategory;
     @FXML private HBox promptContainer;
     @FXML private ScrollPane root;
     @FXML private Label errorMessage;
 
     private Gauge riskGauge;
-
-    enum RiskLevel {
-        NO_RISK,
-        LOW_RISK,
-        MEDIUM_RISK,
-        HIGH_RISK,
-        CRITICAL_RISK
-    }
 
     private RedactionEngine redactionEngine = new RedactionEngine();
 
@@ -81,10 +72,6 @@ public class WorkspaceController {
 
         String sanitized = sanitizePrompt(prompt);
         outputArea.setText(sanitized);
-
-        RiskLevel risk = calculateRisk(prompt);
-        riskGauge.setValue(riskToDouble(risk));
-        riskCategory.setText(riskToString(risk));
 
         // Show loading state
         scanButton.setDisable(true);
@@ -126,8 +113,10 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        //double risk = calculateRisk(prompt);
-        //riskGauge.setValue(risk);
+        //fetchInsights(prompt);
+        double risk = calculateRisk(prompt);
+        riskGauge.setValue(risk);
+
     }
 
     @FXML
@@ -246,9 +235,8 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private RiskLevel calculateRisk(String prompt) {
-
-        RiskLevel risk = RiskLevel.MEDIUM_RISK; // Placeholder - update LLM model here
+    private double calculateRisk(String prompt) {
+        double risk = Math.random() * 100;
         return risk;
     }
 
@@ -257,17 +245,16 @@ public class WorkspaceController {
                 .minValue(0)
                 .maxValue(100)
                 .title("Risk Score")
-                .unit("")
                 .animated(true)
                 .animationDuration(1600)
-                .skinType(Gauge.SkinType.INDICATOR)
-                //.valueVisible(true)
+                .skinType(Gauge.SkinType.DASHBOARD)
+                .valueVisible(true)
                 .sections(
-                        new Section(0, 20, "one", Color.LIMEGREEN),        // No Risk (special case)
-                        new Section(20, 40, "two",  Color.GREEN),          // Low Risk
-                        new Section(40, 60, "three", Color.YELLOW),        // Medium Risk
-                        new Section(60, 80, "four",  Color.ORANGE),        // High Risk
-                        new Section(80, 100, "five", Color.RED)           // Critical
+                        new Section(0, 20, Color.LIMEGREEN),
+                        new Section(20, 40, Color.GREENYELLOW),
+                        new Section(40, 60, Color.GOLD),
+                        new Section(60, 80, Color.ORANGE),
+                        new Section(80, 100, Color.RED)
                 )
                 .sectionsVisible(true)
                 .build();
@@ -277,26 +264,6 @@ public class WorkspaceController {
         AnchorPane.setBottomAnchor(riskGauge, 0.0);
         AnchorPane.setLeftAnchor(riskGauge, 0.0);
         AnchorPane.setRightAnchor(riskGauge, 0.0);
-    }
-
-    private int riskToDouble(RiskLevel risk) {
-        return switch (risk) {
-            case NO_RISK -> 10;
-            case LOW_RISK -> 30;
-            case MEDIUM_RISK -> 50;
-            case HIGH_RISK -> 70;
-            case CRITICAL_RISK -> 100;
-        };
-    }
-
-    private String riskToString(RiskLevel risk) {
-        return switch (risk) {
-            case NO_RISK -> "No Risk";
-            case LOW_RISK -> "Low Risk";
-            case MEDIUM_RISK -> "Medium Risk";
-            case HIGH_RISK -> "High Risk";
-            case CRITICAL_RISK -> "Critical";
-        };
     }
 }
 
