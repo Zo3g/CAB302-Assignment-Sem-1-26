@@ -78,11 +78,6 @@ public class WorkspaceController {
             return; // Stop processing if validation fails
         }
 
-        if (geminiService == null) {
-            errorMessage.setText("AI service unavailable — check your GEMINI_API_KEY.");
-            return;
-        }
-
         String sanitized = sanitizePrompt(prompt);
         outputArea.setText(sanitized);
 
@@ -91,6 +86,11 @@ public class WorkspaceController {
         scanButton.setText("Analysing...");
         setTextFlowContent(insightCol1, "Waiting for AI analysis...");
         setTextFlowContent(insightCol2, "");
+
+        if (geminiService == null) {
+            errorMessage.setText("Artificial intelligence service unavailable — check your GEMINI_API_KEY. Please try again later for insights.");
+            return;
+        }
 
         Task<String> analysisTask = new Task<>() {
             @Override
