@@ -82,10 +82,6 @@ public class WorkspaceController {
         String sanitized = sanitizePrompt(prompt);
         outputArea.setText(sanitized);
 
-        RiskLevel risk = calculateRisk(prompt);
-        riskGauge.setValue(riskToDouble(risk));
-        riskCategory.setText(riskToString(risk));
-
         // Show loading state
         scanButton.setDisable(true);
         scanButton.setText("Analysing...");
@@ -126,8 +122,9 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        //double risk = calculateRisk(prompt);
-        //riskGauge.setValue(risk);
+        RiskLevel risk = calculateRisk(prompt);
+        riskGauge.setValue(riskToDouble(risk));
+        riskCategory.setText(riskToString(risk));
     }
 
     @FXML
