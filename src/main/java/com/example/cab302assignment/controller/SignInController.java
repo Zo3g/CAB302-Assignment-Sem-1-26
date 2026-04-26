@@ -59,6 +59,7 @@ public class SignInController {
         }
 
         SessionManager.setCurrentUser(user);
+        SessionManager.setCurrentUserId(user.getUserId());
         SessionManager.setCurrentOrgId(resolveActiveOrgId(user.getUserId()));
         ViewManager.switchToWorkspace();
     }

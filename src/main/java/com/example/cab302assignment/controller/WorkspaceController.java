@@ -1,12 +1,16 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
+import com.example.cab302assignment.service.PromptService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.text.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,6 +21,8 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.Section;
 import javafx.scene.paint.Color;
+
+
 
 public class WorkspaceController {
     @FXML private TextArea inputArea;
@@ -49,6 +55,7 @@ public class WorkspaceController {
     private RedactionEngine redactionEngine = new RedactionEngine();
 
     private GeminiService geminiService;
+    private PromptService promptService;
 
     @FXML
     public void initialize() {
@@ -70,24 +77,33 @@ public class WorkspaceController {
             System.out.println("Gemini unavailable");
         }
 
+        // Initialize Prompt service
+        try{
+            promptService = new PromptService();
+        } catch(IllegalStateException e){
+            System.out.println("Prompt service unavailable");
+        }
     }
 
     @FXML
     private void onScan() {
-        String prompt = inputArea.getText();
+        String promptInput = inputArea.getText();
 
-        if (!validatePrompt(prompt)) {
+        if (!validatePrompt(promptInput)) {
             return; // Stop processing if validation fails
         }
 
-        String sanitized = sanitizePrompt(prompt);
-        outputArea.setText(sanitized);
+        RedactionResult redactionResult = sanitizePrompt(promptInput);
+        String promptSanitized = redactionResult.getRedactedText();
+        outputArea.setText(promptSanitized);
 
         // Show loading state
         scanButton.setDisable(true);
         scanButton.setText("Analysing...");
         setTextFlowContent(insightCol1, "Waiting for AI analysis...");
         setTextFlowContent(insightCol2, "");
+
+        promptService.savePromptAndResult(redactionResult);
 
         if (geminiService == null) {
             errorMessage.setText("Artificial intelligence service unavailable — check your GEMINI_API_KEY. Please try again later for insights.");
@@ -98,7 +114,7 @@ public class WorkspaceController {
             @Override
             protected String call() {
                 System.out.println("Calling AI service...");
-                return geminiService.analysePromptRisk(sanitized);
+                return geminiService.analysePromptRisk(promptSanitized);
             }
         };
 
@@ -123,7 +139,7 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        RiskLevel risk = calculateRisk(prompt);
+        RiskLevel risk = calculateRisk(promptSanitized);
         riskGauge.setValue(riskToDouble(risk));
         riskCategory.setText(riskToString(risk));
     }
@@ -156,8 +172,8 @@ public class WorkspaceController {
         return true;
     }
 
-    private String sanitizePrompt(String prompt) {
-        return redactionEngine.redactPrompt(prompt);
+    private RedactionResult sanitizePrompt(String prompt) {
+        return redactionEngine.redact(prompt);
     }
 
     /**
@@ -245,8 +261,7 @@ public class WorkspaceController {
     }
 
     private RiskLevel calculateRisk(String prompt) {
-
-        RiskLevel risk = RiskLevel.MEDIUM_RISK; // Placeholder - update LLM model here
+        RiskLevel risk = RiskLevel.MEDIUM_RISK;
         return risk;
     }
 
