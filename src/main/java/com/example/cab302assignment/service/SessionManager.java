@@ -4,6 +4,7 @@ import com.example.cab302assignment.model.User;
 
 public class SessionManager {
     private static User currentUser = null;
+    private static int currentUserId = 0;
     private static int currentOrgId = 0;
 
     public static void setCurrentUser(User user) {
@@ -14,6 +15,10 @@ public class SessionManager {
         return currentUser;
     }
 
+    public static void setCurrentUserId(int userId) {currentUserId = userId;}
+
+    public static int getCurrentUserId() {return currentUserId;}
+
     public static boolean isLoggedIn() {
         return currentUser != null;
     }
@@ -22,9 +27,7 @@ public class SessionManager {
         currentOrgId = orgId;
     }
 
-    public static int getCurrentOrgId() {
-        return currentOrgId;
-    }
+    public static int getCurrentOrgId() { return currentOrgId; }
 
     public static void logout() {
         currentUser = null;

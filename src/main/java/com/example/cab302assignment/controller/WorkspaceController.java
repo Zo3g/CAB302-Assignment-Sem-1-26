@@ -1,5 +1,6 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import javafx.concurrent.Task;
@@ -7,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.text.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,6 +20,8 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.Section;
 import javafx.scene.paint.Color;
+
+
 
 public class WorkspaceController {
     @FXML private TextArea inputArea;
@@ -74,7 +79,7 @@ public class WorkspaceController {
 
     @FXML
     private void onScan() {
-        String prompt = inputArea.getText();
+        String promptInput = inputArea.getText();
 
         if (!validatePrompt(prompt)) {
             return; // Stop processing if validation fails
@@ -126,6 +131,20 @@ public class WorkspaceController {
         RiskLevel risk = calculateRisk(prompt);
         riskGauge.setValue(riskToDouble(risk));
         riskCategory.setText(riskToString(risk));
+
+        // TO COMPLETE - VALIDATION CODE
+
+        //send to DB
+        int promptId = 1;
+        int orgId = 1;
+        int userId = 1;
+        String redactedText = "redacted prompt here!";
+        LocalDateTime submittedAt = LocalDateTime.now();;
+
+        Prompt prompt = new Prompt(promptId, orgId, userId, redactedText, submittedAt);
+
+        //PromptDAO.addPrompt(prompt);
+
     }
 
     @FXML
@@ -244,9 +263,8 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private RiskLevel calculateRisk(String prompt) {
-
-        RiskLevel risk = RiskLevel.MEDIUM_RISK; // Placeholder - update LLM model here
+    private double calculateRisk(String prompt) {
+        double risk = Math.random() * 100;
         return risk;
     }
 
