@@ -20,8 +20,13 @@ public class RedactionEngine {
         this.activeRuleset = ruleset;
     }
 
-    public Ruleset getActiveRuleset() { return activeRuleset; }
-    public void setActiveRuleset(Ruleset ruleset) { this.activeRuleset = ruleset; }
+    public Ruleset getActiveRuleset() {
+        return activeRuleset;
+    }
+
+    public void setActiveRuleset(Ruleset ruleset) {
+        this.activeRuleset = ruleset;
+    }
 
     public RedactionResult redact(String promptText) {
         Map<SensitiveDataType, Integer> typeCounts = new EnumMap<>(SensitiveDataType.class);
