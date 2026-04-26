@@ -3,6 +3,7 @@ package com.example.cab302assignment.controller;
 import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
+import com.example.cab302assignment.service.PromptService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
@@ -54,6 +55,7 @@ public class WorkspaceController {
     private RedactionEngine redactionEngine = new RedactionEngine();
 
     private GeminiService geminiService;
+    private PromptService promptService;
 
     @FXML
     public void initialize() {
@@ -75,6 +77,12 @@ public class WorkspaceController {
             System.out.println("Gemini unavailable");
         }
 
+        // Initialize Prompt service
+        try{
+            promptService = new PromptService();
+        } catch(IllegalStateException e){
+            System.out.println("Prompt service unavailable");
+        }
     }
 
     @FXML
@@ -95,6 +103,8 @@ public class WorkspaceController {
         setTextFlowContent(insightCol1, "Waiting for AI analysis...");
         setTextFlowContent(insightCol2, "");
 
+        promptService.savePromptAndResult(redactionResult);
+
         if (geminiService == null) {
             errorMessage.setText("Artificial intelligence service unavailable — check your GEMINI_API_KEY. Please try again later for insights.");
             return;
@@ -104,7 +114,7 @@ public class WorkspaceController {
             @Override
             protected String call() {
                 System.out.println("Calling AI service...");
-                return geminiService.analysePromptRisk(sanitized);
+                return geminiService.analysePromptRisk(promptSanitized);
             }
         };
 
@@ -129,23 +139,9 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        RiskLevel risk = calculateRisk(prompt);
+        RiskLevel risk = calculateRisk(promptSanitized);
         riskGauge.setValue(riskToDouble(risk));
         riskCategory.setText(riskToString(risk));
-
-        // TO COMPLETE - VALIDATION CODE
-
-        //send to DB
-        int promptId = 1;
-        int orgId = 1;
-        int userId = 1;
-        String redactedText = "redacted prompt here!";
-        LocalDateTime submittedAt = LocalDateTime.now();;
-
-        Prompt prompt = new Prompt(promptId, orgId, userId, redactedText, submittedAt);
-
-        //PromptDAO.addPrompt(prompt);
-
     }
 
     @FXML
@@ -264,8 +260,8 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private double calculateRisk(String prompt) {
-        double risk = Math.random() * 100;
+    private RiskLevel calculateRisk(String prompt) {
+        RiskLevel risk = RiskLevel.MEDIUM_RISK;
         return risk;
     }
 
