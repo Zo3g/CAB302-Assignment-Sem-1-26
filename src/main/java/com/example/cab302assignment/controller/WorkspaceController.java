@@ -1,6 +1,6 @@
 package com.example.cab302assignment.controller;
 
-import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import javafx.concurrent.Task;
@@ -81,12 +81,13 @@ public class WorkspaceController {
     private void onScan() {
         String promptInput = inputArea.getText();
 
-        if (!validatePrompt(prompt)) {
+        if (!validatePrompt(promptInput)) {
             return; // Stop processing if validation fails
         }
 
-        String sanitized = sanitizePrompt(prompt);
-        outputArea.setText(sanitized);
+        RedactionResult redactionResult = sanitizePrompt(promptInput);
+        String promptSanitized = redactionResult.getRedactedText();
+        outputArea.setText(promptSanitized);
 
         // Show loading state
         scanButton.setDisable(true);
@@ -175,8 +176,8 @@ public class WorkspaceController {
         return true;
     }
 
-    private String sanitizePrompt(String prompt) {
-        return redactionEngine.redactPrompt(prompt);
+    private RedactionResult sanitizePrompt(String prompt) {
+        return redactionEngine.redact(prompt);
     }
 
     /**
