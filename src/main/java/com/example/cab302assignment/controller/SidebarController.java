@@ -1,15 +1,17 @@
 package com.example.cab302assignment.controller;
 
 import com.example.cab302assignment.app.ViewManager;
+import com.example.cab302assignment.dao.OrganisationMembershipDAO;
+import com.example.cab302assignment.dao.SqliteOrganisationMembershipDAO;
+import com.example.cab302assignment.model.OrganisationMembership;
 import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.enums.MemberRole;
 import com.example.cab302assignment.service.SessionManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -20,8 +22,8 @@ import java.util.logging.Logger;
 public class SidebarController {
     private static final String SELECTED_STYLE_CLASS = "sidebar-nav-button-selected";
 
+    private final OrganisationMembershipDAO membershipDAO;
     @FXML private BorderPane borderPane;
-    @FXML private AnchorPane anchorPane;
     @FXML private Button managerDashboardButton;
     @FXML private Button workspaceButton;
     @FXML private Button profileButton;
@@ -29,11 +31,30 @@ public class SidebarController {
     @FXML private Label accountNameLabel;
     @FXML private Label accountEmailLabel;
 
+    public SidebarController(){
+        this(new SqliteOrganisationMembershipDAO());
+    }
+
+    public SidebarController(OrganisationMembershipDAO membershipDAO) {
+        this.membershipDAO = membershipDAO;
+    }
+
     @FXML
     private void initialize() {
         refreshAccountInfo();
-        setActiveButton(managerDashboardButton);
-        loadPage("manager-dashboard");
+
+        // Check if user is manager
+        boolean isManager = isCurrentUserManagerForOrg();
+        setManagerNav(isManager);
+
+        if(isManager){
+            setActiveButton(managerDashboardButton);
+            loadPage("manager-dashboard");
+        } else {
+            setActiveButton(workspaceButton);
+            loadPage("workspace");
+        }
+
     }
 
     private void refreshAccountInfo() {
@@ -48,31 +69,41 @@ public class SidebarController {
     }
 
     @FXML
-    private void managerDashboard(ActionEvent event) {
+    private void managerDashboard() {
+        if(!isCurrentUserManagerForOrg()){
+            setActiveButton(workspaceButton);
+            loadPage("workspace");
+            return;
+        }
         setActiveButton(managerDashboardButton);
         loadPage("manager-dashboard");
     }
 
     @FXML
-    private void workspace(ActionEvent event) {
+    private void workspace() {
         setActiveButton(workspaceButton);
         loadPage("workspace");
     }
 
     @FXML
-    private void profile(ActionEvent event) {
+    private void profile() {
         setActiveButton(profileButton);
         loadPage("profile");
     }
 
     @FXML
-    private void management(ActionEvent event) {
+    private void management() {
+        if (!isCurrentUserManagerForOrg()) {
+            setActiveButton(workspaceButton);
+            loadPage("workspace");
+            return;
+        }
         setActiveButton(managementButton);
         loadPage("management");
     }
 
     @FXML
-    private void onLogout(ActionEvent event) {
+    private void onLogout() {
         SessionManager.logout();
         ViewManager.switchView("sign-in-view.fxml", "Sign In");
     }
@@ -96,6 +127,35 @@ public class SidebarController {
         if (button != null) {
             button.getStyleClass().remove(SELECTED_STYLE_CLASS);
         }
+    }
+
+    // Private helper method to set manager navigation visibility
+    private void setManagerNav(boolean visible){
+        if (managerDashboardButton != null) {
+            managerDashboardButton.setVisible(visible);
+            managerDashboardButton.setManaged(visible);
+        }
+        if (managementButton != null) {
+            managementButton.setVisible(visible);
+            managementButton.setManaged(visible);
+        }
+    }
+
+    // Private helper method to check if current user a manager in an organization
+    private boolean isCurrentUserManagerForOrg(){
+        User user = SessionManager.getCurrentUser();
+        int userId = user.getUserId();
+
+        int orgId = SessionManager.getCurrentOrgId();
+        if(orgId < 0){
+            return false;
+        }
+
+        // Check for membership
+        OrganisationMembership membership = membershipDAO.getMembership(userId, orgId);
+        return membership != null
+                && membership.isActive()
+                && membership.getMemberRole() == MemberRole.MANAGER;
     }
 
     private void loadPage(String page) {
