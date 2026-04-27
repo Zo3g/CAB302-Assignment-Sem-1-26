@@ -35,4 +35,7 @@
     </HBox>
 
     <Label fx:id="statusLabel"/>
+
+    <Button fx:id="leaveOrgButton" text="Leave Organisation" onAction="#onLeaveOrganisation"
+            visible="false" styleClass="btn-secondary"/>
 </VBox>
