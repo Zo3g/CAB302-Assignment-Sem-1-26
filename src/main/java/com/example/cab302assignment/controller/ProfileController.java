@@ -1,9 +1,11 @@
 package com.example.cab302assignment.controller;
 
 import com.example.cab302assignment.app.ViewManager;
-import com.example.cab302assignment.dao.SqliteUserDAO;
-import com.example.cab302assignment.dao.UserDAO;
+import com.example.cab302assignment.dao.*;
+import com.example.cab302assignment.model.OrganisationMembership;
 import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.enums.MemberRole;
+import com.example.cab302assignment.service.OrganisationManager;
 import com.example.cab302assignment.service.PasswordUtil;
 import com.example.cab302assignment.service.SessionManager;
 import javafx.fxml.FXML;
@@ -12,6 +14,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
 
 import java.util.Optional;
 
@@ -21,8 +24,16 @@ public class ProfileController {
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label statusLabel;
+    @FXML private Button leaveOrgButton;
 
+    private final OrganisationDAO organisationDAO = new SqliteOrganisationDAO();
+    private final OrganisationMembershipDAO membershipDAO = new SqliteOrganisationMembershipDAO();
     private final UserDAO userDAO = new SqliteUserDAO();
+    private final OrganisationManager organisationManager;
+
+    public ProfileController() {
+        this.organisationManager = new OrganisationManager(this.organisationDAO, this.membershipDAO, this.userDAO);
+    }
 
     @FXML
     public void initialize() {
@@ -30,6 +41,15 @@ public class ProfileController {
         if (user != null) {
             if (nameField != null) nameField.setText(user.getName());
             if (emailField != null) emailField.setText(user.getEmail());
+
+            int currentOrgId = SessionManager.getCurrentOrgId();
+            if (currentOrgId <= 0) {
+                leaveOrgButton.setVisible(false);
+                return;
+            }
+            OrganisationMembership m = membershipDAO.getMembership(user.getUserId(), currentOrgId);
+
+            leaveOrgButton.setVisible(m != null && m.isActive());
         }
     }
 
@@ -119,6 +139,46 @@ public class ProfileController {
     private void setStatus(String message) {
         if (statusLabel != null) {
             statusLabel.setText(message);
+        }
+    }
+
+    @FXML
+    protected void onLeaveOrganisation() {
+        User user = SessionManager.getCurrentUser();
+        if (user == null) return;
+
+        int currentOrgId = SessionManager.getCurrentOrgId();
+        if (currentOrgId <= 0) {
+            setStatus("You are not a member in any organisation.");
+            return;
+        }
+
+        OrganisationMembership m = membershipDAO.getMembership(user.getUserId(), currentOrgId);
+        if (m == null || !m.isActive()) {
+            setStatus("You are not an active member of this organisation.");
+            return;
+        }
+
+        if (m.getMemberRole() == MemberRole.MANAGER) {
+            setStatus("As a Manager, you cannot leave organisation.");
+            return;
+        }
+
+        // Eligible to leave organisation
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+            "Are you sure you want to leave this organisation?",
+            ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        try {
+            organisationManager.leaveOrganisation(m);
+            setStatus("You have left the organisation.");
+            leaveOrgButton.setVisible(false);
+        } catch (Exception ex) {
+            setStatus("Failed to leave organisation: " + ex.getMessage());
         }
     }
 }
