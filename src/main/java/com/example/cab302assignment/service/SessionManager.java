@@ -3,13 +3,14 @@ package com.example.cab302assignment.service;
 import com.example.cab302assignment.model.User;
 
 public class SessionManager {
-    public static final long DEFAULT_INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000L;
+    public static final long DEFAULT_INACTIVITY_TIMEOUT_MS = 1 * 60 * 1000L;
 
     private static User currentUser = null;
     private static int currentUserId = 0;
     private static int currentOrgId = 0;
     private static long lastActivityAt = 0L;
     private static long inactivityTimeoutMs = DEFAULT_INACTIVITY_TIMEOUT_MS;
+    private static boolean timedOut = false;
 
     public static void setCurrentUser(User user) {
         currentUser = user;
@@ -57,6 +58,16 @@ public class SessionManager {
 
     public static void setInactivityTimeoutMs(long timeoutMs) {
         inactivityTimeoutMs = timeoutMs;
+    }
+
+    public static void setTimedOut(boolean value) {
+        timedOut = value;
+    }
+
+    public static boolean consumeTimedOut() {
+        boolean wasTimedOut = timedOut;
+        timedOut = false;
+        return wasTimedOut;
     }
 
     public static boolean isExpired() {

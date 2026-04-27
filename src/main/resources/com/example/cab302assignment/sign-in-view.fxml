@@ -28,6 +28,9 @@
         <Label text="Welcome back" styleClass="auth-heading"/>
         <Label text="Sign in to your Guardia account" styleClass="auth-subtitle"/>
 
+        <Label fx:id="noticeLabel" styleClass="notice" wrapText="true"
+               managed="false" visible="false"/>
+
         <Label text="Email Address" styleClass="form-label"/>
         <TextField fx:id="emailField" promptText="you@example.com">
             <tooltip><Tooltip text="The email you registered with"/></tooltip>

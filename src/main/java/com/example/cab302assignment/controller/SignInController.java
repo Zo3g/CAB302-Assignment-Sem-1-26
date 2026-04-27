@@ -20,6 +20,7 @@ public class SignInController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
+    @FXML private Label noticeLabel;
     @FXML private Button signInButton;
 
     private final UserDAO userDAO;
@@ -43,6 +44,12 @@ public class SignInController {
         BooleanBinding anyFieldEmpty = emailField.textProperty().isEmpty()
             .or(passwordField.textProperty().isEmpty());
         signInButton.disableProperty().bind(anyFieldEmpty);
+
+        if (SessionManager.consumeTimedOut()) {
+            noticeLabel.setText("You've been signed out due to inactivity. Please sign in again.");
+            noticeLabel.setVisible(true);
+            noticeLabel.setManaged(true);
+        }
     }
 
     @FXML

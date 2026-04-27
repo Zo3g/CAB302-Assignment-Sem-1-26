@@ -59,6 +59,7 @@ public final class InactivityMonitor {
             Runnable callback = onExpiry;
             stop();
             SessionManager.logout();
+            SessionManager.setTimedOut(true);
             if (callback != null) {
                 callback.run();
             }
