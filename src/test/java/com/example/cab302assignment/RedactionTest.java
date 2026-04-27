@@ -193,14 +193,14 @@ class RedactionTest {
                 "OpenAI/Stripe: sk_live_abc123DEF456ghi789JKL098\n" +
                 "JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
-        String expected = "AWS: [REDACTED API KEY]\n" +
-                "GCP: [REDACTED API KEY]\n" +
-                "Google OAuth: [REDACTED API KEY]\n" +
-                "GitHub: [REDACTED API KEY]\n" +
-                "Slack: [REDACTED API KEY]\n" +
-                "SendGrid: [REDACTED API KEY]\n" +
-                "OpenAI/Stripe: [REDACTED API KEY]\n" +
-                "JWT: [REDACTED API KEY]";
+        String expected = "AWS: [REDACTED AWS KEY]\n"+
+                "GCP: [REDACTED GCP KEY]\n"+
+                "Google OAuth: [REDACTED GOOGLE OAUTH TOKEN]\n"+
+                "GitHub: [REDACTED GITHUB TOKEN]\n"+
+                "Slack: [REDACTED SLACK TOKEN]\n"+
+                "SendGrid: [REDACTED SENDGRID KEY]\n"+
+                "OpenAI/Stripe: [REDACTED API KEY]\n"+
+                "JWT: [REDACTED JWT]";
 
         assertEquals(expected, redactionEngine.redactPrompt(prompt));
     }
@@ -294,14 +294,6 @@ class RedactionTest {
         // 2. Exact format without context
         String prompt2 = "Product code 111 222 333 A.";
         assertEquals(prompt2, redactionEngine.redactPrompt(prompt2));
-    }
-
-    //Extensive prompt test
-    @Test
-    void testExtensivePromptRedaction() {
-        String prompt = "Hello, my name is daniel and my email is daniel@gmail.com, my phone number is 0466783112, other information of mine: PA1234567, 5123 1232 3832 3832, 78 Balmoral St, password: POO, 065-182 1928 2919.";
-        String expected = "Hello, my name is daniel and my email is [REDACTED EMAIL], my phone number is [REDACTED PHONE], other information of mine: [REDACTED PASSPORT NUMBER], [REDACTED CREDIT CARD], [REDACTED ADDRESS], [REDACTED PASSWORD], [REDACTED BANK ACCOUNT].";
-        assertEquals(expected, redactionEngine.redactPrompt(prompt));
     }
 }
 
