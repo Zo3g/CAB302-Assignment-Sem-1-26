@@ -1,5 +1,6 @@
 package com.example.cab302assignment.app;
 
+import com.example.cab302assignment.service.InactivityMonitor;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,6 +16,7 @@ public class ViewManager {
 
     public static void switchView(String fxmlFile, String title) {
         try {
+            InactivityMonitor.stop();
             FXMLLoader loader = new FXMLLoader(
                 ViewManager.class.getResource("/com/example/cab302assignment/" + fxmlFile)
             );
@@ -54,6 +56,8 @@ public class ViewManager {
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
             primaryStage.show();
+
+            InactivityMonitor.start(scene, () -> switchView("sign-in-view.fxml", "Sign In"));
         } catch (IOException e) {
             System.err.println("Failed to load workspace");
             e.printStackTrace();

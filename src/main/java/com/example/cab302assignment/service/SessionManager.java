@@ -3,12 +3,19 @@ package com.example.cab302assignment.service;
 import com.example.cab302assignment.model.User;
 
 public class SessionManager {
+    public static final long DEFAULT_INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000L;
+
     private static User currentUser = null;
     private static int currentUserId = 0;
     private static int currentOrgId = 0;
+    private static long lastActivityAt = 0L;
+    private static long inactivityTimeoutMs = DEFAULT_INACTIVITY_TIMEOUT_MS;
 
     public static void setCurrentUser(User user) {
         currentUser = user;
+        if (user != null) {
+            recordActivity();
+        }
     }
 
     public static User getCurrentUser() {
@@ -31,6 +38,31 @@ public class SessionManager {
 
     public static void logout() {
         currentUser = null;
+        currentUserId = 0;
         currentOrgId = 0;
+        lastActivityAt = 0L;
+    }
+
+    public static void recordActivity() {
+        lastActivityAt = System.currentTimeMillis();
+    }
+
+    public static long getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    public static long getInactivityTimeoutMs() {
+        return inactivityTimeoutMs;
+    }
+
+    public static void setInactivityTimeoutMs(long timeoutMs) {
+        inactivityTimeoutMs = timeoutMs;
+    }
+
+    public static boolean isExpired() {
+        if (!isLoggedIn() || lastActivityAt == 0L) {
+            return false;
+        }
+        return System.currentTimeMillis() - lastActivityAt >= inactivityTimeoutMs;
     }
 }
