@@ -35,7 +35,7 @@ public class OrganisationManagerTest {
         organisationManager = new OrganisationManager(organisationDAO, membershipDAO, userDAO);
 
         // Data
-        manager = new User(1, "nmanager@test.com", "John Smith", "Tester123", LocalDateTime.now());
+        manager = new User(1, "manager@test.com", "John Smith", "Tester123", LocalDateTime.now());
         user1 = new User(2, "user1@test.com", "Bob James", "Tester123", LocalDateTime.now());
         user2 = new User(3, "user2@test.com", "Alice Wood", "Tester123", LocalDateTime.now());
         org1 = new Organisation(101, "Guardia", LocalDateTime.now());
@@ -155,6 +155,48 @@ public class OrganisationManagerTest {
         organisationManager.removeMember(currentManagerId, user2.getUserId(), currentOrgId);
         OrganisationMembership removedNonMember = membershipDAO.getMembership(user2.getUserId(), currentOrgId);
         assertNull(removedNonMember);
+    }
+
+    @Test
+    public void testRemoveManager() {
+        assertThrows(RuntimeException.class, () -> {
+            organisationManager.removeMember(currentManagerId, manager.getUserId(), currentOrgId);
+        });
+    }
+
+    @Test
+    public void testLeaveOrganisationNullMembership() {
+        assertThrows(RuntimeException.class, () -> {
+            organisationManager.leaveOrganisation(null);
+        });
+    }
+
+    @Test
+    public void testLeaveOrganisationDeactivatedMember() {
+        OrganisationMembership deactivatedMember = new OrganisationMembership(user1.getUserId(), currentOrgId, MemberRole.MEMBER, false, LocalDateTime.now());
+        membershipDAO.addMembership(deactivatedMember);
+        assertThrows(RuntimeException.class, () -> {
+            organisationManager.leaveOrganisation(deactivatedMember);
+        });
+    }
+
+    @Test
+    public void testLeaveOrganisationActiveManager() {
+        OrganisationMembership activeManager = new OrganisationMembership(user1.getUserId(), currentOrgId, MemberRole.MANAGER, true, LocalDateTime.now());
+        membershipDAO.addMembership(activeManager);
+        assertThrows(RuntimeException.class, () -> {
+            organisationManager.leaveOrganisation(activeManager);
+        });
+    }
+
+    @Test
+    public void testLeaveOrganisationActiveMember() {
+        OrganisationMembership activeMember = new OrganisationMembership(user1.getUserId(), currentOrgId, MemberRole.MEMBER, true, LocalDateTime.now());
+        membershipDAO.addMembership(activeMember);
+        organisationManager.leaveOrganisation(activeMember);
+        OrganisationMembership leftMember = membershipDAO.getMembership(user1.getUserId(), currentOrgId);
+        assertNotNull(leftMember);
+        assertFalse(leftMember.isActive()); // deactivated
     }
 
     @Test

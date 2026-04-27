@@ -77,12 +77,26 @@ public class OrganisationManager {
     }
 
     public void removeMember(int managerId, int userId, int orgId) {
+        if (managerId == userId) {
+            throw new RuntimeException("Manager cannot remove their own membership.");
+        }
         checkManagerPermission(managerId, orgId);
         OrganisationMembership m = membershipDAO.getMembership(userId, orgId);
         if (m != null && m.isActive()) {
             m.setActive(false);
             membershipDAO.updateMembership(m);
         }
+    }
+
+    public void leaveOrganisation(OrganisationMembership m) {
+        if (m == null || !m.isActive()) {
+            throw new RuntimeException("User is not an active member of this organisation.");
+        }
+        if (m.getMemberRole() == MemberRole.MANAGER) {
+            throw new RuntimeException("Manager cannot leave organisation.");
+        }
+        m.setActive(false);
+        membershipDAO.updateMembership(m);
     }
 
     public void updateMemberRole(int managerId, int userId, int orgId, MemberRole newRole) {
