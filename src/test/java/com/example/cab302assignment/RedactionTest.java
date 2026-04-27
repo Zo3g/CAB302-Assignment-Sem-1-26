@@ -102,8 +102,8 @@ class RedactionTest {
     @Test
     void testPhoneNumberRedaction() {
         // 1. Mobile numbers used domestically start with 04.
-        String prompt1 = "0483838336, 0434-523-873, 0434 523 873";
-        String expected1 = "[REDACTED PHONE], [REDACTED PHONE], [REDACTED PHONE]";
+        String prompt1 = "0483838336, 0434-523-873, 0434 523 873, 0543838556";
+        String expected1 = "[REDACTED PHONE], [REDACTED PHONE], [REDACTED PHONE], 0543838556";
         String actual1 = redactionEngine.redactPrompt(prompt1);
         assertEquals(expected1, actual1);
 
@@ -135,7 +135,7 @@ class RedactionTest {
     @Test
     void testCreditCardRedaction() {
         // 1. Mastercards start between 51 - 55, or between 2221 - 2720, and are 16 digits long (formatted as 4-4-4).
-        String prompt1 = "5120 1200 2393 3200, 5593 3923 2302 3203, 5323 8658 3848 3939, 2700 2181 2191 2191, 2730 2181 2191 2191, 3120 3282 3292 3202";
+        String prompt1 = "5120-1200-2393-3200, 5593 3923 2302 3203, 5323 8658 3848 3939, 2700 2181 2191 2191, 2730 2181 2191 2191, 3120 3282 3292 3202";
         String expected1 = "[REDACTED CREDIT CARD], [REDACTED CREDIT CARD], [REDACTED CREDIT CARD], [REDACTED CREDIT CARD], 2730 2181 2191 2191, 3120 3282 3292 3202";
         String actual1 = redactionEngine.redactPrompt(prompt1);
         assertEquals(expected1, actual1);
@@ -182,19 +182,25 @@ class RedactionTest {
     }
 
     //API key tests
-    //These will definitely fail because this regex doesn't really work yet.
     @Test
     void testAPIKeys() {
-        // Testing AWS, GCP, GitHub, and Stripe/Generic API keys
         String prompt = "AWS: AKIAIOSFODNN7EXAMPLE\n" +
                 "GCP: AIzaSyB-exampleKey1234567890\n" +
+                "Google OAuth: ya29.a0AfH6SMC1234567890abcdefghijklmnopqrstuvwxyz\n" +
                 "GitHub: ghp_16C7e42F292c6912E7710c838347Ae178B4a\n" +
-                "Stripe: sk_live_abc123DEF456ghi789JKL098";
+                "Slack: xoxb-123456789012-123456789012-abcdefghijklmnopqrstuvwx\n" +
+                "SendGrid: SG.abcdefghijklmnopqrstuvwxyz.1234567890ABCDEFGHIJKL\n" +
+                "OpenAI/Stripe: sk_live_abc123DEF456ghi789JKL098\n" +
+                "JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
         String expected = "AWS: [REDACTED API KEY]\n" +
                 "GCP: [REDACTED API KEY]\n" +
+                "Google OAuth: [REDACTED API KEY]\n" +
                 "GitHub: [REDACTED API KEY]\n" +
-                "Stripe: [REDACTED API KEY]";
+                "Slack: [REDACTED API KEY]\n" +
+                "SendGrid: [REDACTED API KEY]\n" +
+                "OpenAI/Stripe: [REDACTED API KEY]\n" +
+                "JWT: [REDACTED API KEY]";
 
         assertEquals(expected, redactionEngine.redactPrompt(prompt));
     }
@@ -239,7 +245,7 @@ class RedactionTest {
 
         // 3. Should NOT catch generic dates missing the keywords
         String prompt3 = "The project is due on 12/10/2026.";
-        assertEquals(prompt3, redactionEngine.redactPrompt(prompt3)); // Expect no change
+        assertEquals(prompt3, redactionEngine.redactPrompt(prompt3));
     }
 
     //ABN number tests
@@ -287,9 +293,16 @@ class RedactionTest {
 
         // 2. Exact format without context
         String prompt2 = "Product code 111 222 333 A.";
-        assertEquals(prompt2, redactionEngine.redactPrompt(prompt2)); // Expect no change
+        assertEquals(prompt2, redactionEngine.redactPrompt(prompt2));
     }
 
+    //Extensive prompt test
+    @Test
+    void testExtensivePromptRedaction() {
+        String prompt = "Hello, my name is daniel and my email is daniel@gmail.com, my phone number is 0466783112, other information of mine: PA1234567, 5123 1232 3832 3832, 78 Balmoral St, password: POO, 065-182 1928 2919.";
+        String expected = "Hello, my name is daniel and my email is [REDACTED EMAIL], my phone number is [REDACTED PHONE], other information of mine: [REDACTED PASSPORT NUMBER], [REDACTED CREDIT CARD], [REDACTED ADDRESS], [REDACTED PASSWORD], [REDACTED BANK ACCOUNT].";
+        assertEquals(expected, redactionEngine.redactPrompt(prompt));
+    }
 }
 
 

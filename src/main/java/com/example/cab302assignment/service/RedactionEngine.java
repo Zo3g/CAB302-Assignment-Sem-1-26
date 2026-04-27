@@ -20,13 +20,8 @@ public class RedactionEngine {
         this.activeRuleset = ruleset;
     }
 
-    public Ruleset getActiveRuleset() {
-        return activeRuleset;
-    }
-
-    public void setActiveRuleset(Ruleset ruleset) {
-        this.activeRuleset = ruleset;
-    }
+    public Ruleset getActiveRuleset() { return activeRuleset; }
+    public void setActiveRuleset(Ruleset ruleset) { this.activeRuleset = ruleset; }
 
     public RedactionResult redact(String promptText) {
         Map<SensitiveDataType, Integer> typeCounts = new EnumMap<>(SensitiveDataType.class);
@@ -67,7 +62,7 @@ public class RedactionEngine {
                 SensitiveDataType.EMAIL_ADDRESS, true, "[REDACTED EMAIL]"));
 
         rs.addRule(new RedactionRule("Australian Phone Number",
-                "(?<!\\d)(?:\\+?61|0)\\s?(\\s?\\(?[2-478]\\)?\\s?)(?:[\\s-]?\\d){8}(?!\\d)",
+                "(?<!\\d)\\(?(?:\\+?61|0)\\s*\\(?[2-478]\\)?\\s*(?:[\\s-]?\\d){8}(?!\\d)",
                 SensitiveDataType.PHONE_NUMBER, true, "[REDACTED PHONE]"));
 
         rs.addRule(new RedactionRule("Street Address",
@@ -75,23 +70,23 @@ public class RedactionEngine {
                 SensitiveDataType.ADDRESS, true, "[REDACTED ADDRESS]"));
 
         rs.addRule(new RedactionRule("Credit Card",
-                "(?<!\\d)(?:4\\d{3}(?:[\\s\\-]?\\d{4}){3}|(?:5[1-5]\\d{2}|2[2-7]\\d{2})(?:[\\s\\-]?\\d{4}){3}|3[47]\\d{2}[\\s\\-]?\\d{6}[\\s\\-]?\\d{5})(?!\\d)",
+                "(?<!\\d)(?:4\\d{3}(?:[\\s\\-]?\\d{4}){3}|(?:5[1-5]\\d{2}|222[1-9]|22[3-9]\\d|2[3-6]\\d{2}|27[0-1]\\d|2720)(?:[\\s\\-]?\\d{4}){3}|3[47]\\d{2}[\\s\\-]?\\d{6}[\\s\\-]?\\d{5})(?!\\d)",
                 SensitiveDataType.CREDIT_CARD, true, "[REDACTED CREDIT CARD]"));
 
         rs.addRule(new RedactionRule("TFN",
                 "(?i)(?:\\b(?:tfn|tax\\s*file\\s*number|tax\\s*number)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:tfn|tax\\s*file\\s*number|tax\\s*number)\\b)",
                 SensitiveDataType.TFN, true, "[REDACTED TFN]"));
 
-        rs.addRule(new RedactionRule("QLD Driver's License Number",
-                "(?i)(?:\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b)",
+        rs.addRule(new RedactionRule("QLD Driver's Licence Number",
+                "(?i)(?:\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|qld\\s*licen[cs]e)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b)",
                 SensitiveDataType.DRIVERS_LICENCE, true, "[REDACTED DRIVER'S LICENCE]"));
 
-        rs.addRule(new RedactionRule("API Key",
-                "(?i)\\b(?:sk|pk|api[_-]?key)[_-][A-Za-z0-9]{16,}\\b",
+        rs.addRule(new RedactionRule("API Key & JWT",
+                "(?i)\\b(?:eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+|AKIA[A-Z0-9]{16}|AIza[A-Za-z0-9_-]{20,40}|ya29\\.[A-Za-z0-9_-]+|gh[pousr]_[A-Za-z0-9]{32,40}|xox[baprs]-[A-Za-z0-9-]{24,}|SG\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+|(?:sk|pk|rk|api[_-]?key)[_-][A-Za-z0-9_-]{16,})\\b",
                 SensitiveDataType.API_KEY, true, "[REDACTED API KEY]"));
 
         rs.addRule(new RedactionRule("Password Assignment",
-                "(?i)\\b(?:password|passwd|pwd|pass)\\b\\s*[\"']?\\s*(?:[:=]|\\s+is\\s+)\\s*[\"']?\\S+",
+                "(?i)(?<=\\b|_|-)(?:password|passwd|pwd|pass)\\b\\s*(?:[-:=>]+|\\s+is\\s+|\\s+)\\s*(?:[\"'][^\"']+[\"']|[^\\s.,!?]+)",
                 SensitiveDataType.PASSWORD, true, "[REDACTED PASSWORD]"));
 
         rs.addRule(new RedactionRule("IPv4 Address",
