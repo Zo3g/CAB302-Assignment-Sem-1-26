@@ -9,11 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.util.Duration;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public final class InactivityMonitor {
-    private static final Logger LOGGER = Logger.getLogger(InactivityMonitor.class.getName());
     private static final long ACTIVITY_LOG_THROTTLE_MS = 1000L;
 
     private static Scene attachedScene;
@@ -35,8 +31,7 @@ public final class InactivityMonitor {
         attachedScene = scene;
         onExpiry = expiryCallback;
         SessionManager.recordActivity();
-        LOGGER.log(Level.INFO, "Inactivity monitor started (timeout={0}ms)",
-                SessionManager.getInactivityTimeoutMs());
+        System.out.println("[InactivityMonitor] started (timeout=" + SessionManager.getInactivityTimeoutMs() + "ms)");
 
         scene.addEventFilter(MouseEvent.MOUSE_MOVED, MOUSE_HANDLER);
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, MOUSE_HANDLER);
@@ -59,7 +54,7 @@ public final class InactivityMonitor {
             attachedScene.removeEventFilter(KeyEvent.KEY_PRESSED, KEY_HANDLER);
             attachedScene.removeEventFilter(ScrollEvent.SCROLL, SCROLL_HANDLER);
             attachedScene = null;
-            LOGGER.log(Level.INFO, "Inactivity monitor stopped");
+            System.out.println("[InactivityMonitor] stopped");
         }
         onExpiry = null;
         lastLoggedActivityAt = 0L;
@@ -70,14 +65,14 @@ public final class InactivityMonitor {
         long now = System.currentTimeMillis();
         if (now - lastLoggedActivityAt >= ACTIVITY_LOG_THROTTLE_MS) {
             lastLoggedActivityAt = now;
-            LOGGER.log(Level.FINE, "Activity reset inactivity timer (event={0})", eventType);
+            System.out.println("[InactivityMonitor] activity reset timer (event=" + eventType + ")");
         }
     }
 
     private static void checkExpiry() {
         if (SessionManager.isExpired()) {
             long idleMs = System.currentTimeMillis() - SessionManager.getLastActivityAt();
-            LOGGER.log(Level.INFO, "Session timed out after {0}ms of inactivity", idleMs);
+            System.out.println("[InactivityMonitor] session timed out after " + idleMs + "ms of inactivity");
             Runnable callback = onExpiry;
             stop();
             SessionManager.logout();
