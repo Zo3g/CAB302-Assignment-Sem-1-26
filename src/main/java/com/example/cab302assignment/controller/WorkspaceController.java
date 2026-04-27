@@ -126,7 +126,13 @@ public class WorkspaceController {
 
         analysisTask.setOnSucceeded(workerStateEvent -> {
             String analysis = analysisTask.getValue();
-            parseAndDisplayAnalysis(analysis);
+
+            // Parse text and get the contextual score from Gemini
+            RiskLevel contextualRisk = parseAndDisplayAnalysis(analysis);
+
+            // Update gauge
+            riskGauge.setValue(riskToDouble(contextualRisk));
+            riskCategory.setText(riskToString(contextualRisk));
             scanButton.setDisable(false);
             scanButton.setText("Scan");
             hideLoadingOverlay();
@@ -147,9 +153,6 @@ public class WorkspaceController {
         thread.setDaemon(true);
         thread.start();
 
-        RiskLevel risk = calculateRisk(promptSanitized);
-        riskGauge.setValue(riskToDouble(risk));
-        riskCategory.setText(riskToString(risk));
     }
 
     @FXML
@@ -208,24 +211,43 @@ public class WorkspaceController {
      * Splits the AI response into Risk and Effect sections,
      * then renders each into the corresponding TextFlow column.
      */
-    private void parseAndDisplayAnalysis(String analysis) {
+    /**
+     * Splits the AI response into Score, Risk, and Effect sections.
+     * Renders text to the UI and returns the extracted RiskLevel.
+     */
+    private RiskLevel parseAndDisplayAnalysis(String analysis) {
         if (analysis == null || analysis.isBlank()) {
             setTextFlowContent(insightCol1, "No analysis available.");
             setTextFlowContent(insightCol2, "");
-            return;
+            return RiskLevel.MEDIUM_RISK; // Fallback
         }
 
-        // Split on "Effect:" (case-insensitive) to separate the two sections
-        String[] parts = analysis.split("(?i)Effect:", 2);
+        // Default fallback if parsing fails
+        RiskLevel parsedRisk = RiskLevel.MEDIUM_RISK;
 
-        String riskSection = parts[0].trim();
-        String effectSection = parts.length > 1 ? parts[1].trim() : "";
+        try {
+            // Split the score line first
+            String[] firstSplit = analysis.split("(?i)Risk:", 2);
+            String scoreLine = firstSplit[0].replaceFirst("(?i)^Score:\\s*", "").trim();
 
-        // Remove the leading "Risk:" header if present
-        riskSection = riskSection.replaceFirst("(?i)^Risk:\\s*", "").trim();
+            parsedRisk = RiskLevel.valueOf(scoreLine.toUpperCase());
 
-        renderMarkdownBold(insightCol1, "Risk", riskSection);
-        renderMarkdownBold(insightCol2, "Effect", effectSection);
+            // Split the remaining text into Risk and Effect
+            if (firstSplit.length > 1) {
+                String[] secondSplit = firstSplit[1].split("(?i)Effect:", 2);
+                String riskSection = secondSplit[0].trim();
+                String effectSection = secondSplit.length > 1 ? secondSplit[1].trim() : "";
+
+                renderMarkdownBold(insightCol1, "Risk", riskSection);
+                renderMarkdownBold(insightCol2, "Effect", effectSection);
+            }
+        } catch (IllegalArgumentException e) {
+            System.err.println("AI returned an invalid risk enum: " + e.getMessage());
+            // Text rendering fallback if AI breaks the format
+            renderMarkdownBold(insightCol1, "Analysis", analysis);
+        }
+
+        return parsedRisk;
     }
 
     /**
@@ -288,10 +310,6 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private RiskLevel calculateRisk(String prompt) {
-        RiskLevel risk = RiskLevel.MEDIUM_RISK;
-        return risk;
-    }
 
     private void buildRiskGauge() {
         riskGauge = GaugeBuilder.create()
@@ -320,10 +338,10 @@ public class WorkspaceController {
     }
     private int riskToDouble(RiskLevel risk) {
         return switch (risk) {
-            case NO_RISK -> 10;
-            case LOW_RISK -> 30;
+            case NO_RISK -> 0;
+            case LOW_RISK -> 25;
             case MEDIUM_RISK -> 50;
-            case HIGH_RISK -> 70;
+            case HIGH_RISK -> 75;
             case CRITICAL_RISK -> 100;
         };
     }
