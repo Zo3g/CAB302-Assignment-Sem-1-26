@@ -3,7 +3,7 @@ package com.example.cab302assignment.service;
 import com.example.cab302assignment.model.User;
 
 public class SessionManager {
-    public static final long DEFAULT_INACTIVITY_TIMEOUT_MS = 1 * 60 * 1000L;
+    public static final long DEFAULT_INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000L;
 
     private static User currentUser = null;
     private static int currentUserId = 0;
