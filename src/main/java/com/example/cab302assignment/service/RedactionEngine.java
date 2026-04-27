@@ -20,8 +20,12 @@ public class RedactionEngine {
         this.activeRuleset = ruleset;
     }
 
-    public Ruleset getActiveRuleset() { return activeRuleset; }
-    public void setActiveRuleset(Ruleset ruleset) { this.activeRuleset = ruleset; }
+    public Ruleset getActiveRuleset() {
+        return activeRuleset;
+    }
+    public void setActiveRuleset(Ruleset ruleset) {
+        this.activeRuleset = ruleset;
+    }
 
     public RedactionResult redact(String promptText) {
         Map<SensitiveDataType, Integer> typeCounts = new EnumMap<>(SensitiveDataType.class);
@@ -57,36 +61,69 @@ public class RedactionEngine {
 
     public static Ruleset defaultRuleset() {
         Ruleset rs = new Ruleset(0);
+
         rs.addRule(new RedactionRule("Email Address",
                 "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
                 SensitiveDataType.EMAIL_ADDRESS, true, "[REDACTED EMAIL]"));
 
         rs.addRule(new RedactionRule("Australian Phone Number",
-                "(?<!\\d)(?:\\+?61|0)\\s?(\\s?\\(?[2-478]\\)?\\s?)(?:[\\s-]?\\d){8}(?!\\d)",
+                "(?<!\\d)\\(?(?:\\+?61|0)\\s*\\(?[2-478]\\)?\\s*(?:[\\s-]?\\d){8}(?!\\d)",
                 SensitiveDataType.PHONE_NUMBER, true, "[REDACTED PHONE]"));
 
         rs.addRule(new RedactionRule("Street Address",
                 "(?i)\\b\\d+(?:/\\d+)?[a-zA-Z]?\\s+[a-z]+(?:\\s+[a-z]+)*\\s+(?:Alley|Ally|Arcade|Arc|Avenue|Ave|Boulevard|Bvd|Bypass|Bypa|Circuit|Cct|Close|Cl|Corner|Crn|Court|Ct|Crescent|Cres|Cul-de-sac|Cds|Drive|Dr|Esplanade|Esp|Green|Grn|Grove|Gr|Highway|Hwy|Junction|Jnc|Lane|Link|Mews|Parade|Pde|Place|Pl|Ridge|Rdge|Road|Rd|Square|Sq|Street|St|Terrace|Tce)\\b",
                 SensitiveDataType.ADDRESS, true, "[REDACTED ADDRESS]"));
 
-        rs.addRule(new RedactionRule("Credit Card",
-                "(?<!\\d)(?:4\\d{3}(?:[\\s\\-]?\\d{4}){3}|(?:5[1-5]\\d{2}|2[2-7]\\d{2})(?:[\\s\\-]?\\d{4}){3}|3[47]\\d{2}[\\s\\-]?\\d{6}[\\s\\-]?\\d{5})(?!\\d)",
+        rs.addRule(new RedactionRule("Visa & Mastercard card number",
+                "(?<!\\d)(?:4\\d{3}(?:[\\s\\-]?\\d{4}){3}|(?:5[1-5]\\d{2}|222[1-9]|22[3-9]\\d|2[3-6]\\d{2}|27[0-1]\\d|2720)(?:[\\s\\-]?\\d{4}){3})(?!\\d)",
+                SensitiveDataType.CREDIT_CARD, true, "[REDACTED CREDIT CARD]"));
+
+        rs.addRule(new RedactionRule("American Express card number",
+                "(?<!\\d)3[47]\\d{2}[\\s\\-]?\\d{6}[\\s\\-]?\\d{5}(?!\\d)",
                 SensitiveDataType.CREDIT_CARD, true, "[REDACTED CREDIT CARD]"));
 
         rs.addRule(new RedactionRule("TFN",
                 "(?i)(?:\\b(?:tfn|tax\\s*file\\s*number|tax\\s*number)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:tfn|tax\\s*file\\s*number|tax\\s*number)\\b)",
                 SensitiveDataType.TFN, true, "[REDACTED TFN]"));
 
-        rs.addRule(new RedactionRule("QLD Driver's License Number",
-                "(?i)(?:\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b)",
+        rs.addRule(new RedactionRule("QLD Driver's Licence Number",
+                "(?i)(?:\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|qld\\s*licen[cs]e)\\b.{0,30}?(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d)|(?<!\\d)\\d{3}[\\s-]?\\d{3}[\\s-]?\\d{3}(?!\\d).{0,30}?\\b(?:driver[s']?\\s*licen[cs]e|licen[cs]e\\s*num(?:ber)?|licen[cs]e\\s*no\\b|crn|qld\\s*licen[cs]e)\\b)",
                 SensitiveDataType.DRIVERS_LICENCE, true, "[REDACTED DRIVER'S LICENCE]"));
 
-        rs.addRule(new RedactionRule("API Key",
-                "(?i)\\b(?:sk|pk|api[_-]?key)[_-][A-Za-z0-9]{16,}\\b",
-                SensitiveDataType.API_KEY, true, "[REDACTED API KEY]"));
+        rs.addRule(new RedactionRule("AWS Access Key",
+                "\\bAKIA[A-Z0-9]{16}\\b",
+                SensitiveDataType.AWS_KEY, true, "[REDACTED AWS KEY]"));
+
+        rs.addRule(new RedactionRule("Google Cloud (GCP) Key",
+                "\\bAIza[A-Za-z0-9_-]{20,40}\\b",
+                SensitiveDataType.GCP_KEY, true, "[REDACTED GCP KEY]"));
+
+        rs.addRule(new RedactionRule("Google OAuth Token",
+                "\\bya29\\.[A-Za-z0-9_-]+\\b",
+                SensitiveDataType.GOOGLE_OAUTH_KEY, true, "[REDACTED GOOGLE OAUTH TOKEN]"));
+
+        rs.addRule(new RedactionRule("GitHub Token",
+                "(?i)\\bgh[pousr]_[A-Za-z0-9]{32,40}\\b",
+                SensitiveDataType.GITHUB_TOKEN, true, "[REDACTED GITHUB TOKEN]"));
+
+        rs.addRule(new RedactionRule("Slack Token",
+                "(?i)\\bxox[baprs]-[A-Za-z0-9-]{24,}\\b",
+                SensitiveDataType.SLACK_TOKEN, true, "[REDACTED SLACK TOKEN]"));
+
+        rs.addRule(new RedactionRule("SendGrid Key",
+                "\\bSG\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\b",
+                SensitiveDataType.SENDGRID_KEY, true, "[REDACTED SENDGRID KEY]"));
+
+        rs.addRule(new RedactionRule("Generic / Stripe / OpenAI Key",
+                "(?i)\\b(?:sk|pk|rk|api[_-]?key)[_-][A-Za-z0-9_-]{16,}\\b",
+                SensitiveDataType.GENERIC_API_KEY, true, "[REDACTED API KEY]"));
+
+        rs.addRule(new RedactionRule("JSON Web Token (JWT)",
+                "\\beyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\b",
+                SensitiveDataType.JWT, true, "[REDACTED JWT]"));
 
         rs.addRule(new RedactionRule("Password Assignment",
-                "(?i)\\b(?:password|passwd|pwd|pass)\\b\\s*[\"']?\\s*(?:[:=]|\\s+is\\s+)\\s*[\"']?\\S+",
+                "(?i)(?<=\\b|_|-)(?:password|passwd|pwd|pass)\\b\\s*(?:[-:=>]+|\\s+is\\s+|\\s+)\\s*(?:[\"'][^\"']+[\"']|[^\\s.,!?]+)",
                 SensitiveDataType.PASSWORD, true, "[REDACTED PASSWORD]"));
 
         rs.addRule(new RedactionRule("IPv4 Address",
