@@ -46,20 +46,11 @@ public class UserRiskScore {
         }
         double total = 0.0;
         for (RiskAnalysis analysis : history) {
-            total += riskLevelToScore(analysis.getRiskLevel());
+            RiskLevel level = analysis.getRiskLevel();
+            total += level == null ? 0.0 : level.score();
         }
         this.score = total / history.size();
         this.totalPromptsAnalysed = history.size();
         this.lastUpdated = LocalDateTime.now();
-    }
-
-    private static double riskLevelToScore(RiskLevel level) {
-        if (level == null) return 0.0;
-        return switch (level) {
-            case LOW -> 25.0;
-            case MEDIUM -> 50.0;
-            case HIGH -> 75.0;
-            case CRITICAL -> 100.0;
-        };
     }
 }

@@ -94,6 +94,7 @@ public class DatabaseInitialiser {
                 + "analysisId INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "promptId INTEGER NOT NULL UNIQUE, "
                 + "riskLevel VARCHAR NOT NULL, "
+                + "score REAL NOT NULL, "
                 + "summary TEXT, "
                 + "typeCountsJson TEXT, "
                 + "analysedAt DATETIME DEFAULT CURRENT_TIMESTAMP, "
