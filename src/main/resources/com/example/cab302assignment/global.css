@@ -96,3 +96,22 @@
     -fx-border-radius: 10;
     -fx-padding: 20;
 }
+
+.loading-overlay {
+    /* Match the resultContainer (.background-secondary) so the overlay blends in */
+    -fx-background-color: #D7E3ED;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.loading-panel {
+    /* No card; just center the spinner + message */
+    -fx-background-color: transparent;
+    -fx-padding: 18 22 18 22;
+}
+
+.loading-message {
+    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    -fx-font-size: 13;
+    -fx-text-fill: #27548A;
+}
