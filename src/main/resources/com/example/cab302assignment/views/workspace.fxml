@@ -1,50 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.kordamp.ikonli.javafx.*?>
 
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
+<ScrollPane fx:id="root" fitToWidth="true" hbarPolicy="NEVER" stylesheets="@../global.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.WorkspaceController">
 
-<ScrollPane xmlns="http://javafx.com/javafx/21.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:id="root"
-            fitToWidth="true"
-            fx:controller="com.example.cab302assignment.controller.WorkspaceController"
-            stylesheets="@../global.css"
-            hbarPolicy="NEVER">
-
-        <VBox spacing="10" alignment="CENTER">
+        <VBox alignment="CENTER" spacing="10">
             <padding>
-                <Insets top="20" bottom="20" left="20" right="20"/>
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
 
-            <Label text="Workspace" styleClass="h1"/>
+            <Label styleClass="h1" text="Workspace" />
 
             <!-- Top section (left + right) -->
             <HBox fx:id="promptContainer" spacing="10.0">
                 <!-- Left: Text Input + Scan Button -->
                 <AnchorPane HBox.hgrow="ALWAYS">
-                    <TextArea fx:id="inputArea"
-                              promptText="Write a prompt here"
-                              wrapText="true"
-                              AnchorPane.topAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0"
-                              AnchorPane.rightAnchor="0.0"
-                              AnchorPane.bottomAnchor="0.0"/>
-                    <Button fx:id="scanButton"
-                            styleClass="btn-primary"
-                            onAction="#onScan"
-                            text="Scan"
-                            AnchorPane.bottomAnchor="10.0"
-                            AnchorPane.rightAnchor="10.0"/>
-                    <Button fx:id="clearButton"
-                            styleClass="btn-action"
-                            onAction="#onClear"
-                            AnchorPane.topAnchor="5.0"
-                            AnchorPane.rightAnchor="10.0">
+                    <TextArea fx:id="inputArea" promptText="Write a prompt here" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                    <Button fx:id="scanButton" onAction="#onScan" styleClass="btn-primary" text="Scan" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                    <Button fx:id="clearButton" onAction="#onClear" styleClass="btn-action" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                         <graphic>
                             <FontIcon iconLiteral="fth-x" />
                         </graphic>
@@ -53,48 +30,46 @@
 
                 <!-- Right: Output Display + Copy Button -->
                 <AnchorPane HBox.hgrow="ALWAYS">
-                    <TextArea fx:id="outputArea"
-                              editable="false"
-                              promptText="Sanitized prompt will display here"
-                              wrapText="true"
-                              AnchorPane.topAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0"
-                              AnchorPane.rightAnchor="0.0"
-                              AnchorPane.bottomAnchor="0.0"/>
-                    <Button fx:id="copyButton"
-                            styleClass="btn-secondary"
-                            onAction="#onCopy"
-                            text="Copy"
-                            AnchorPane.bottomAnchor="10.0"
-                            AnchorPane.rightAnchor="10.0"/>
+                    <TextArea fx:id="outputArea" editable="false" promptText="Sanitized prompt will display here" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                    <Button fx:id="copyButton" onAction="#onCopy" styleClass="btn-secondary" text="Copy" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
                 </AnchorPane>
             </HBox>
 
             <VBox>
-                <Label fx:id="errorMessage" style="-fx-text-fill: red;"/>
+                <Label fx:id="errorMessage" style="-fx-text-fill: red;" />
             </VBox>
 
             <!-- Bottom section -->
-            <VBox fx:id="resultContainer" styleClass="background-secondary" spacing="10" >
-                <Label text="Risk Level and Analysis" styleClass="h4"/>
-                <HBox HBox.hgrow="ALWAYS">
-                    <!-- Gauge -->
-                    <VBox alignment="CENTER">
-                        <AnchorPane fx:id="gaugePane" HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="riskCategory" styleClass="h5"/>
-                    </VBox>
-
-                    <!-- Two columns of insights -->
-                    <HBox spacing="10" HBox.hgrow="ALWAYS">
-                        <VBox fx:id="insightPane1" spacing="5" HBox.hgrow="ALWAYS">
-                            <TextFlow fx:id="insightCol1" />
+            <StackPane fx:id="resultContainer" styleClass="background-secondary">
+                <VBox spacing="10" StackPane.alignment="TOP_LEFT">
+                    <Label styleClass="h4" text="Risk Level and Analysis" />
+                    <HBox HBox.hgrow="ALWAYS">
+                        <!-- Gauge -->
+                        <VBox alignment="CENTER">
+                            <AnchorPane fx:id="gaugePane" HBox.hgrow="ALWAYS" />
+                            <Label fx:id="riskCategory" styleClass="h5" />
                         </VBox>
 
-                        <VBox fx:id="insightPane2" spacing="5" HBox.hgrow="ALWAYS">
-                            <TextFlow fx:id="insightCol2" />
-                        </VBox>
+                        <!-- Two columns of insights -->
+                        <HBox spacing="10" HBox.hgrow="ALWAYS">
+                            <VBox fx:id="insightPane1" spacing="5" HBox.hgrow="ALWAYS">
+                                <TextFlow fx:id="insightCol1" />
+                            </VBox>
+
+                            <VBox fx:id="insightPane2" spacing="5" HBox.hgrow="ALWAYS">
+                                <TextFlow fx:id="insightCol2" />
+                            </VBox>
+                        </HBox>
                     </HBox>
-                </HBox>
-            </VBox>
+                </VBox>
+
+                <!-- Loading overlay (only covers the results panel) -->
+                <StackPane fx:id="loadingOverlay" managed="false" pickOnBounds="true" styleClass="loading-overlay" visible="false">
+                    <VBox alignment="CENTER" spacing="10" styleClass="loading-panel">
+                        <ProgressIndicator prefHeight="48" prefWidth="48" />
+                        <Label fx:id="loadingOverlayMessage" styleClass="loading-message" text="AI analysis takes up to 30 seconds" />
+                    </VBox>
+                </StackPane>
+            </StackPane>
         </VBox>
 </ScrollPane>

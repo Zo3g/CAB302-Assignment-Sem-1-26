@@ -4,6 +4,7 @@ import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import com.example.cab302assignment.service.PromptService;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.layout.*;
@@ -35,11 +36,13 @@ public class WorkspaceController {
     @FXML private AnchorPane gaugePane;
     @FXML private VBox insightPane1;
     @FXML private VBox insightPane2;
-    @FXML private VBox resultContainer;
+    @FXML private StackPane resultContainer;
     @FXML private Label riskCategory;
     @FXML private HBox promptContainer;
     @FXML private ScrollPane root;
     @FXML private Label errorMessage;
+    @FXML private StackPane loadingOverlay;
+    @FXML private Label loadingOverlayMessage;
 
     private Gauge riskGauge;
 
@@ -100,15 +103,18 @@ public class WorkspaceController {
         // Show loading state
         scanButton.setDisable(true);
         scanButton.setText("Analysing...");
-        setTextFlowContent(insightCol1, "Waiting for AI analysis...");
-        setTextFlowContent(insightCol2, "");
-
+//        setTextFlowContent(insightCol1, "Waiting for AI analysis...");
+//        setTextFlowContent(insightCol2, "");
         promptService.savePromptAndResult(redactionResult);
 
         if (geminiService == null) {
             errorMessage.setText("Artificial intelligence service unavailable — check your GEMINI_API_KEY. Please try again later for insights.");
+            scanButton.setDisable(false);
+            scanButton.setText("Scan");
             return;
         }
+
+        showLoadingOverlay("AI analysis takes up to 15-30 seconds");
 
         Task<String> analysisTask = new Task<>() {
             @Override
@@ -123,6 +129,7 @@ public class WorkspaceController {
             parseAndDisplayAnalysis(analysis);
             scanButton.setDisable(false);
             scanButton.setText("Scan");
+            hideLoadingOverlay();
         });
 
         analysisTask.setOnFailed(workerStateEvent -> {
@@ -132,6 +139,7 @@ public class WorkspaceController {
             setTextFlowContent(insightCol1, "Analysis failed: " + ex.getMessage());
             scanButton.setDisable(false);
             scanButton.setText("Scan");
+            hideLoadingOverlay();
         });
 
         // Start the task on a background thread
@@ -150,11 +158,31 @@ public class WorkspaceController {
         ClipboardContent content = new ClipboardContent();
         content.putString(outputArea.getText());
         clipboard.setContent(content);
+        copyButton.setText("Copied");
     }
 
     @FXML
     private void onClear() {
         inputArea.setText("");
+    }
+
+    private void showLoadingOverlay(String message) {
+        if (loadingOverlay == null) return;
+        Platform.runLater(() -> {
+            if (loadingOverlayMessage != null && message != null) {
+                loadingOverlayMessage.setText(message);
+            }
+            loadingOverlay.setManaged(true);
+            loadingOverlay.setVisible(true);
+        });
+    }
+
+    private void hideLoadingOverlay() {
+        if (loadingOverlay == null) return;
+        Platform.runLater(() -> {
+            loadingOverlay.setVisible(false);
+            loadingOverlay.setManaged(false);
+        });
     }
 
     private boolean validatePrompt(String prompt) {
