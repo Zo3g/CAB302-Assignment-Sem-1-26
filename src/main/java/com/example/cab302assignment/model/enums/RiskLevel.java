@@ -1,6 +1,7 @@
 package com.example.cab302assignment.model.enums;
 
 public enum RiskLevel {
+    NO(0.0),
     LOW(25.0),
     MEDIUM(50.0),
     HIGH(75.0),
