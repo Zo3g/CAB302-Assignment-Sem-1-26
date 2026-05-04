@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<BorderPane fx:id="borderPane" stylesheets="@../sidebar.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.SidebarController">
+<BorderPane fx:id="borderPane" stylesheets="@../sidebar.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.SidebarController">
    <left>
       <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="212.0" style="-fx-background-color: #F5EEDC;" BorderPane.alignment="CENTER">
          <children>
