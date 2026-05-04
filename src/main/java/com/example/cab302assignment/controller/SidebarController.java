@@ -48,8 +48,8 @@ public class SidebarController {
         setManagerNav(isManager);
 
         if(isManager){
-            setActiveButton(managerDashboardButton);
-            loadPage("manager-dashboard");
+            setActiveButton(workspaceButton);
+            loadPage("workspace");
         } else {
             setActiveButton(workspaceButton);
             loadPage("workspace");
