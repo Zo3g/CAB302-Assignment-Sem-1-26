@@ -21,11 +21,12 @@ public class SqliteRiskAnalysisDAO implements RiskAnalysisDAO {
     public void addAnalysis(RiskAnalysis a) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO risk_analyses (promptId, riskLevel, typeCountsJson) VALUES (?, ?, ?)"
+                "INSERT INTO risk_analyses (promptId, riskLevel, score, typeCountsJson) VALUES (?, ?, ?, ?)"
             );
             stmt.setInt(1, a.getPromptId());
             stmt.setString(2, a.getRiskLevel().name());
-            stmt.setString(3, SqliteRedactionResultDAO.serialise(a.getTypeCounts()));
+            stmt.setDouble(3, a.getRiskLevel().score());
+            stmt.setString(4, SqliteRedactionResultDAO.serialise(a.getTypeCounts()));
             stmt.execute();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) a.setAnalysisId(keys.getInt(1));
