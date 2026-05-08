@@ -5,37 +5,52 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
-<VBox alignment="TOP_CENTER" spacing="12" xmlns="http://javafx.com/javafx/21.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.cab302assignment.controller.ProfileController">
+<BorderPane xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.ProfileController">
     <padding>
-        <Insets bottom="24" left="24" right="24" top="24"/>
+        <Insets bottom="24" left="24" right="24" top="24" />
     </padding>
 
-    <Label text="Profile" styleClass="h1"/>
+    <center>
+        <VBox alignment="TOP_CENTER" fillWidth="false" spacing="12">
 
-    <Label text="Name"/>
-    <TextField fx:id="nameField"/>
+    <Label styleClass="h1" text="Profile" />
 
-    <Label text="Email Address"/>
-    <TextField fx:id="emailField"/>
+    <Label text="Name" />
+    <TextField fx:id="nameField" maxWidth="420" prefWidth="420" />
 
-    <Label text="New Password (leave blank to keep current)"/>
-    <PasswordField fx:id="newPasswordField" promptText="At least 8 characters"/>
+    <Label text="Email Address" />
+    <TextField fx:id="emailField" maxWidth="420" prefWidth="420" />
 
-    <Label text="Confirm New Password"/>
-    <PasswordField fx:id="confirmPasswordField" promptText="Re-enter password"/>
+    <Label text="New Password (leave blank to keep current)" />
+    <PasswordField fx:id="newPasswordField" maxWidth="420" prefWidth="420" promptText="At least 8 characters" />
 
-    <HBox spacing="10">
-        <Button text="Update Profile" onAction="#onUpdateProfile" styleClass="btn-primary"/>
-        <Button text="Delete Account" onAction="#onDeleteAccount" styleClass="btn-secondary"/>
+    <Label text="Confirm New Password" />
+    <PasswordField fx:id="confirmPasswordField" maxWidth="420" prefWidth="420" promptText="Re-enter password" />
+
+    <HBox alignment="CENTER" maxWidth="420" prefWidth="420" spacing="10">
+        <Button onAction="#onUpdateProfile" styleClass="btn-primary" text="Update Profile" />
+        <Button onAction="#onDeleteAccount" styleClass="btn-secondary" text="Delete Account" />
     </HBox>
 
-    <Label fx:id="statusLabel"/>
+    <Label fx:id="statusLabel" />
 
-    <Button fx:id="leaveOrgButton" text="Leave Organisation" onAction="#onLeaveOrganisation"
-            visible="false" styleClass="btn-secondary"/>
-</VBox>
+    <Button fx:id="leaveOrgButton" maxWidth="420" onAction="#onLeaveOrganisation" prefWidth="420" styleClass="btn-secondary" text="Leave Organisation" visible="false" />
+        </VBox>
+    </center>
+   <right>
+      <VBox alignment="BOTTOM_CENTER" prefHeight="295.0" prefWidth="189.0" spacing="12" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="User risk score:" />
+            <Circle fill="#d7e3ed" radius="52.0" stroke="WHITE" strokeType="INSIDE">
+               <VBox.margin>
+                  <Insets bottom="30.0" />
+               </VBox.margin></Circle>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>
