@@ -4,10 +4,12 @@ import com.example.cab302assignment.app.ViewManager;
 import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.OrganisationMembership;
 import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.model.enums.MemberRole;
 import com.example.cab302assignment.service.OrganisationManager;
 import com.example.cab302assignment.service.PasswordUtil;
 import com.example.cab302assignment.service.SessionManager;
+import com.example.cab302assignment.model.RiskAnalysis;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -16,6 +18,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ProfileController {
@@ -25,10 +28,13 @@ public class ProfileController {
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label statusLabel;
     @FXML private Button leaveOrgButton;
+    @FXML private Label userScore;
 
     private final OrganisationDAO organisationDAO = new SqliteOrganisationDAO();
     private final OrganisationMembershipDAO membershipDAO = new SqliteOrganisationMembershipDAO();
     private final UserDAO userDAO = new SqliteUserDAO();
+    private final RiskAnalysisDAO riskAnalysisDAO = new SqliteRiskAnalysisDAO();
+    private final UserRiskScoreDAO userRiskScoreDAO = new SqliteUserRiskScoreDAO();
     private final OrganisationManager organisationManager;
 
     public ProfileController() {
@@ -42,6 +48,9 @@ public class ProfileController {
             if (nameField != null) nameField.setText(user.getName());
             if (emailField != null) emailField.setText(user.getEmail());
 
+            // Fetch and display user risk score
+            displayUserRiskScore(user.getUserId());
+
             int currentOrgId = SessionManager.getCurrentOrgId();
             if (currentOrgId <= 0) {
                 leaveOrgButton.setVisible(false);
@@ -50,6 +59,40 @@ public class ProfileController {
             OrganisationMembership m = membershipDAO.getMembership(user.getUserId(), currentOrgId);
 
             leaveOrgButton.setVisible(m != null && m.isActive());
+        }
+    }
+
+    private void displayUserRiskScore(int userId) {
+        List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(userId);
+
+        UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(userId);
+        if (riskScore == null) {
+            riskScore = new UserRiskScore();
+            riskScore.setUserId(userId);
+        }
+
+        riskScore.recalculate(analyses);
+        saveUserRiskScore(riskScore);
+        
+        if (analyses == null || analyses.isEmpty()) {
+            if (userScore != null) userScore.setText("No data");
+            return;
+        }
+
+        if (userScore != null) {
+            userScore.setText(String.format("%.2f", riskScore.getScore()));
+        }
+    }
+
+    private void saveUserRiskScore(UserRiskScore score) {
+        try {
+            if (score.getScoreId() > 0) {
+                userRiskScoreDAO.updateScore(score);
+            } else {
+                userRiskScoreDAO.addScore(score);
+            }
+        } catch (Exception ex) {
+            System.err.println("Error saving user risk score: " + ex.getMessage());
         }
     }
 
