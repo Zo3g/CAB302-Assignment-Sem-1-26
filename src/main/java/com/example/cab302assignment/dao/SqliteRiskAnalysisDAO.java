@@ -21,12 +21,13 @@ public class SqliteRiskAnalysisDAO implements RiskAnalysisDAO {
     public void addAnalysis(RiskAnalysis a) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO risk_analyses (promptId, riskLevel, score, typeCountsJson) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO risk_analyses (promptId, riskLevel, score, summary, typeCountsJson) VALUES (?, ?, ?, ?, ?)"
             );
             stmt.setInt(1, a.getPromptId());
             stmt.setString(2, a.getRiskLevel().name());
-            stmt.setDouble(3, a.getRiskLevel().score());
-            stmt.setString(4, SqliteRedactionResultDAO.serialise(a.getTypeCounts()));
+            stmt.setDouble(3, a.getScore());
+            stmt.setString(4, a.getSummary());
+            stmt.setString(5, SqliteRedactionResultDAO.serialise(a.getTypeCounts()));
             stmt.execute();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) a.setAnalysisId(keys.getInt(1));
@@ -49,7 +50,7 @@ public class SqliteRiskAnalysisDAO implements RiskAnalysisDAO {
         List<RiskAnalysis> list = new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "SELECT ra.* FROM risk_analyses ra JOIN prompts p ON ra.promptId = p.promptId WHERE p.userId = ?"
+                    "SELECT ra.* FROM risk_analyses ra JOIN prompts p ON ra.promptId = p.promptId WHERE p.userId = ?"
             );
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
@@ -70,11 +71,14 @@ public class SqliteRiskAnalysisDAO implements RiskAnalysisDAO {
     private RiskAnalysis map(ResultSet rs) throws SQLException {
         String t = rs.getString("analysedAt");
         LocalDateTime analysedAt = t == null ? null : LocalDateTime.parse(t, DT);
+
         RiskAnalysis a = new RiskAnalysis(
-            rs.getInt("promptId"),
-            RiskLevel.valueOf(rs.getString("riskLevel")),
-            SqliteRedactionResultDAO.deserialise(rs.getString("typeCountsJson")),
-            analysedAt
+                rs.getInt("promptId"),
+                RiskLevel.valueOf(rs.getString("riskLevel")),
+                rs.getDouble("score"),
+                rs.getString("summary"),
+                SqliteRedactionResultDAO.deserialise(rs.getString("typeCountsJson")),
+                analysedAt
         );
         a.setAnalysisId(rs.getInt("analysisId"));
         return a;

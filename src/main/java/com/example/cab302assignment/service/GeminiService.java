@@ -68,7 +68,7 @@ public class GeminiService implements LLMService{
             Determine an overall risk level based on the context of the redacted items.
                 
             Constraints (You MUST adhere to this exact format):
-            Score: <must be exactly one of: NO_RISK, LOW_RISK, MEDIUM_RISK, HIGH_RISK, CRITICAL_RISK>
+            Score: <must be exactly one of: NO, LOW, MEDIUM, HIGH, CRITICAL>
             Risk: <short explanation in 3 bullet points>
             Effect: <effects of compliance violation in 3 bullet points>
             """.formatted(redactedText);

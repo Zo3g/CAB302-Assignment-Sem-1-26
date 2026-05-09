@@ -1,9 +1,11 @@
 package com.example.cab302assignment.controller;
 
 import com.example.cab302assignment.model.RedactionResult;
+import com.example.cab302assignment.model.RiskAnalysis;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import com.example.cab302assignment.service.PromptService;
+import com.example.cab302assignment.model.enums.RiskLevel;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -46,13 +48,7 @@ public class WorkspaceController {
 
     private Gauge riskGauge;
 
-    enum RiskLevel {
-        NO_RISK,
-        LOW_RISK,
-        MEDIUM_RISK,
-        HIGH_RISK,
-        CRITICAL_RISK
-    }
+
 
 
     private RedactionEngine redactionEngine = new RedactionEngine();
@@ -127,12 +123,25 @@ public class WorkspaceController {
         analysisTask.setOnSucceeded(workerStateEvent -> {
             String analysis = analysisTask.getValue();
 
-            // Parse text and get the contextual score from Gemini
+            // Get and parse gemini score
             RiskLevel contextualRisk = parseAndDisplayAnalysis(analysis);
 
-            // Update gauge
-            riskGauge.setValue(riskToDouble(contextualRisk));
-            riskCategory.setText(riskToString(contextualRisk));
+            RiskAnalysis riskAnalysis = new RiskAnalysis(
+                    redactionResult.getPromptId(),
+                    contextualRisk,
+                    contextualRisk.score(),
+                    analysis,
+                    redactionResult.getTypeCounts(),
+                    LocalDateTime.now()
+            );
+
+            // Save it to the database
+            promptService.saveRiskAnalysis(riskAnalysis);
+
+            // Update the gauge and reset UI
+            riskGauge.setValue(getGaugeValue(contextualRisk)); // Gets 10.0, 30.0, etc.
+            riskCategory.setText(contextualRisk.name());
+
             scanButton.setDisable(false);
             scanButton.setText("Scan");
             hideLoadingOverlay();
@@ -211,19 +220,15 @@ public class WorkspaceController {
      * Splits the AI response into Risk and Effect sections,
      * then renders each into the corresponding TextFlow column.
      */
-    /**
-     * Splits the AI response into Score, Risk, and Effect sections.
-     * Renders text to the UI and returns the extracted RiskLevel.
-     */
     private RiskLevel parseAndDisplayAnalysis(String analysis) {
         if (analysis == null || analysis.isBlank()) {
             setTextFlowContent(insightCol1, "No analysis available.");
             setTextFlowContent(insightCol2, "");
-            return RiskLevel.MEDIUM_RISK; // Fallback
+            return RiskLevel.MEDIUM; // Fallback
         }
 
         // Default fallback if parsing fails
-        RiskLevel parsedRisk = RiskLevel.MEDIUM_RISK;
+        RiskLevel parsedRisk = RiskLevel.MEDIUM;
 
         try {
             // Split the score line first
@@ -336,23 +341,24 @@ public class WorkspaceController {
         AnchorPane.setLeftAnchor(riskGauge, 0.0);
         AnchorPane.setRightAnchor(riskGauge, 0.0);
     }
-    private int riskToDouble(RiskLevel risk) {
+    // Score numbers for Gauge, not the ones that are stored.
+    private int getGaugeValue(RiskLevel risk) {
         return switch (risk) {
-            case NO_RISK -> 0;
-            case LOW_RISK -> 25;
-            case MEDIUM_RISK -> 50;
-            case HIGH_RISK -> 75;
-            case CRITICAL_RISK -> 100;
+            case NO -> 10;
+            case LOW -> 30;
+            case MEDIUM -> 50;
+            case HIGH -> 70;
+            case CRITICAL -> 100;
         };
     }
 
     private String riskToString(RiskLevel risk) {
         return switch (risk) {
-            case NO_RISK -> "No Risk";
-            case LOW_RISK -> "Low Risk";
-            case MEDIUM_RISK -> "Medium Risk";
-            case HIGH_RISK -> "High Risk";
-            case CRITICAL_RISK -> "Critical";
+            case NO -> "No Risk";
+            case LOW -> "Low Risk";
+            case MEDIUM -> "Medium Risk";
+            case HIGH -> "High Risk";
+            case CRITICAL -> "Critical";
         };
     }
 

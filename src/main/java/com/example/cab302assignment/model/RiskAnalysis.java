@@ -11,16 +11,20 @@ public class RiskAnalysis {
     private int analysisId;
     private int promptId;
     private RiskLevel riskLevel;
+    private double score;
+    private String summary;
     private Map<SensitiveDataType, Integer> typeCounts = new EnumMap<>(SensitiveDataType.class);
     private LocalDateTime analysedAt;
 
     public RiskAnalysis() {
     }
 
-    public RiskAnalysis(int promptId, RiskLevel riskLevel,
+    public RiskAnalysis(int promptId, RiskLevel riskLevel, double score, String summary,
                         Map<SensitiveDataType, Integer> typeCounts, LocalDateTime analysedAt) {
         this.promptId = promptId;
         this.riskLevel = riskLevel;
+        this.score = score;
+        this.summary = summary;
         if (typeCounts != null) this.typeCounts.putAll(typeCounts);
         this.analysedAt = analysedAt;
     }
@@ -41,4 +45,10 @@ public class RiskAnalysis {
 
     public LocalDateTime getAnalysedAt() { return analysedAt; }
     public void setAnalysedAt(LocalDateTime analysedAt) { this.analysedAt = analysedAt; }
+
+    public double getScore() { return score; }
+    public void setScore(double score) { this.score = score; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
 }
