@@ -7,8 +7,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.ProfileController">
     <padding>
@@ -46,10 +48,15 @@
       <VBox alignment="BOTTOM_CENTER" prefHeight="295.0" prefWidth="189.0" spacing="12" BorderPane.alignment="CENTER">
          <children>
             <Label text="User risk score:" />
-            <Circle fill="#d7e3ed" radius="52.0" stroke="WHITE" strokeType="INSIDE">
-               <VBox.margin>
-                  <Insets bottom="30.0" />
-               </VBox.margin></Circle>
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <Circle fill="#d7e3ed" radius="52.0" stroke="WHITE" strokeType="INSIDE" />
+                  <Label fx:id="userScore" style="-fx-font-weight: bold;" text="N/A">
+                     <font>
+                        <Font size="30.0" />
+                     </font></Label>
+               </children>
+            </StackPane>
          </children>
       </VBox>
    </right>
