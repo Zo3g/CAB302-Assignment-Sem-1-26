@@ -64,10 +64,12 @@ public class GeminiService implements LLMService{
             Analyze the categories of data represented by the placeholders and 
             explain the specific compliance violations that would occur 
             if all of those data were handled improperly (unredacted).
-            Your task is to explain the compliance violation for the user to understand.
+            
+            Determine an overall risk level based on the context of the redacted items.
                 
-            Constraints (Please only return in this format):
-            Risk: <short explanation in 3 bullet points >
+            Constraints (You MUST adhere to this exact format):
+            Score: <must be exactly one of: NO, LOW, MEDIUM, HIGH, CRITICAL>
+            Risk: <short explanation in 3 bullet points>
             Effect: <effects of compliance violation in 3 bullet points>
             """.formatted(redactedText);
     }
