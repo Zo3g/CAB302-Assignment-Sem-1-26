@@ -18,12 +18,13 @@ public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
     public void addScore(UserRiskScore s) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO user_risk_scores (userId, score, totalPromptsAnalysed) VALUES (?, ?, ?)"
+                "INSERT INTO user_risk_scores (userId, score, totalPromptsAnalysed, lastUpdated) VALUES (?, ?, ?, ?)"
             );
             stmt.setInt(1, s.getUserId());
             stmt.setDouble(2, s.getScore());
             stmt.setInt(3, s.getTotalPromptsAnalysed());
-            stmt.execute();
+            stmt.setString(4, s.getLastUpdated() != null ? s.getLastUpdated().format(DT) : LocalDateTime.now().format(DT));
+            stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) s.setScoreId(keys.getInt(1));
         } catch (SQLException ex) { System.err.println(ex); }
