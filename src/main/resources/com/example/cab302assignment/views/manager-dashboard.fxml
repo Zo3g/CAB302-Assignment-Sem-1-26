@@ -24,9 +24,9 @@
       <Label text="space for other dashboard components" style="-fx-text-fill: gray;"/>
    </VBox>
 
-   <TableView fx:id="employeeTable" GridPane.columnIndex="1" GridPane.rowIndex="0">
+   <TableView fx:id="memberTable" GridPane.columnIndex="1" GridPane.rowIndex="0">
       <columns>
-         <TableColumn fx:id="nameColumn" text="Employee Name" />
+         <TableColumn fx:id="nameColumn" text="Member Name" />
          <TableColumn fx:id="scoreColumn" text="Risk Score" />
       </columns>
 
@@ -35,7 +35,7 @@
       </columnResizePolicy>
 
       <placeholder>
-         <Label text="No employee data available."/>
+         <Label text="No member data available."/>
       </placeholder>
    </TableView>
 
