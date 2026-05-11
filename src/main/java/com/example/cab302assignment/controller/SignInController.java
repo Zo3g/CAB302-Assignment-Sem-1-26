@@ -45,6 +45,17 @@ public class SignInController {
             .or(passwordField.textProperty().isEmpty());
         signInButton.disableProperty().bind(anyFieldEmpty);
 
+        emailField.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case ENTER -> onSignIn();
+            }
+        });
+        passwordField.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case ENTER -> onSignIn();
+            }        
+        });
+
         if (SessionManager.consumeTimedOut()) {
             noticeLabel.setText("You've been signed out due to inactivity. Please sign in again.");
             noticeLabel.setVisible(true);
