@@ -39,6 +39,28 @@ public class MemberDrilldownController {
         riskColumn.setCellValueFactory(new PropertyValueFactory<>("riskLevel"));
         scoreColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
         detectionsColumn.setCellValueFactory(new PropertyValueFactory<>("totalDetections"));
+
+        // Custom cell factory to allow long prompts to wrap around
+        promptColumn.setCellFactory(tc -> {
+            javafx.scene.control.TableCell<PromptHistorySummary, String> cell = new javafx.scene.control.TableCell<>() {
+                private final javafx.scene.text.Text text = new javafx.scene.text.Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(promptColumn.widthProperty().subtract(10)); // 10px padding
+                        setGraphic(text);
+                    }
+                }
+            };
+
+            cell.setPrefHeight(javafx.scene.control.Control.USE_COMPUTED_SIZE);
+            return cell;
+        });
     }
 
     // Method for the dashboard to provide the specific user ID
@@ -64,7 +86,7 @@ public class MemberDrilldownController {
             // Format user risk score to 1 decimal place
             memberScoreLabel.setText(String.format("%.1f", riskScore.getScore()));
         } else {
-            memberScoreLabel.setText("0.0");
+            memberScoreLabel.setText("No Data");
         }
     }
 

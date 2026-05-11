@@ -9,7 +9,6 @@ import com.example.cab302assignment.model.enums.MemberRole;
 import com.example.cab302assignment.service.OrganisationManager;
 import com.example.cab302assignment.service.PasswordUtil;
 import com.example.cab302assignment.service.SessionManager;
-import com.example.cab302assignment.model.RiskAnalysis;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -61,38 +60,15 @@ public class ProfileController {
             leaveOrgButton.setVisible(m != null && m.isActive());
         }
     }
-
     private void displayUserRiskScore(int userId) {
-        List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(userId);
-
         UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(userId);
-        if (riskScore == null) {
-            riskScore = new UserRiskScore();
-            riskScore.setUserId(userId);
-        }
 
-        riskScore.recalculate(analyses);
-        saveUserRiskScore(riskScore);
-        
-        if (analyses == null || analyses.isEmpty()) {
-            if (userScore != null) userScore.setText("No data");
-            return;
-        }
-
-        if (userScore != null) {
-            userScore.setText(String.format("%.2f", riskScore.getScore()));
-        }
-    }
-
-    private void saveUserRiskScore(UserRiskScore score) {
-        try {
-            if (score.getScoreId() > 0) {
-                userRiskScoreDAO.updateScore(score);
-            } else {
-                userRiskScoreDAO.addScore(score);
+        if (riskScore != null && riskScore.getScore() > 0) {
+            if (userScore != null) {
+                userScore.setText(String.format("%.2f", riskScore.getScore()));
             }
-        } catch (Exception ex) {
-            System.err.println("Error saving user risk score: " + ex.getMessage());
+        } else {
+            if (userScore != null) userScore.setText("No data");
         }
     }
 
