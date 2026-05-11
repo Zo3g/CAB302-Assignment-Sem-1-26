@@ -1,11 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fitToWidth="true"
+            fx:controller="com.example.cab302assignment.controller.OrgDashboardController"
+            stylesheets="@../global.css"
+            hbarPolicy="NEVER">
+
+   <VBox spacing="10" alignment="CENTER">
+      <padding>
+         <Insets top="20" bottom="20" left="20" right="20"/>
+      </padding>
+
+      <Label text="Dashboard" styleClass="h1"/>
+      <!-- Risk Status -->
+      <VBox fx:id="orgRiskContainer"
+            alignment="CENTER"
+            styleClass="risk-label"
+            maxHeight="Infinity">
+
+         <Label text="Current Risk Level"
+                styleClass="p"
+                alignment="CENTER"/>
+
+         <Label fx:id="currentRiskCategory"
+                styleClass="h2"
+                wrapText="true"
+                alignment="CENTER"/>
+      </VBox>
+      <GridPane fx:id="root"
+                HBox.hgrow="ALWAYS"
+                maxWidth="Infinity">
+
+         <columnConstraints>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+         </columnConstraints>
+
+         <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+         </rowConstraints>
+
+         <!-- Top Left: Bar Chart -->
+         <VBox GridPane.rowIndex="0"
+               GridPane.columnIndex="0"
+               maxWidth="Infinity"
+               maxHeight="Infinity">
 
 
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Manager Dashboard" />
-   </children>
-</HBox>
+            <BarChart fx:id="promptsBarChart"
+                      title="Prompts (Last 7 Days)"
+                      maxWidth="Infinity"
+                      maxHeight="Infinity">
+
+               <xAxis>
+                  <CategoryAxis label="Day"/>
+               </xAxis>
+
+               <yAxis>
+                  <NumberAxis label="Prompts"/>
+               </yAxis>
+
+            </BarChart>
+         </VBox>
+
+         <!-- Top Right: Pie Chart -->
+         <PieChart fx:id="sensitiveDataPieChart"
+                   title="Data Detections"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="1"
+                   maxWidth="Infinity"/>
+
+         <!-- Bottom: User list/leaderboard -->
+         <VBox fx:id="rhs_container"
+               GridPane.rowIndex = "1"
+               GridPane.columnIndex="0"
+               GridPane.columnSpan="2"
+               styleClass="risk-card"
+               spacing="10">
+
+            <HBox styleClass="background-secondary">
+               <Label fx:id="orgName" styleClass="h5" wrapText="True"/>
+               <Region HBox.hgrow="ALWAYS"/>
+               <Label fx:id="totalUsersCount" styleClass="h5" wrapText="true"/>
+            </HBox>
+
+            <TableView fx:id="userTable"
+                       prefHeight="250"
+                       maxHeight="250">
+               <columns>
+                  <TableColumn fx:id="nameCol" text="Name"/>
+                  <TableColumn fx:id="emailCol" text="Email"/>
+                  <TableColumn fx:id="riskCol" text="Risk Score"/>
+               </columns>
+            </TableView>
+         </VBox>
+      </GridPane>
+
+
+   </VBox>
+</ScrollPane>
