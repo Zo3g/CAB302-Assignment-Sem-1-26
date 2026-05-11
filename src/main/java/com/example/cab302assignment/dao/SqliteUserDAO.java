@@ -1,6 +1,7 @@
 package com.example.cab302assignment.dao;
 
 import com.example.cab302assignment.db.DatabaseConnection;
+import com.example.cab302assignment.model.MemberRiskSummary;
 import com.example.cab302assignment.model.User;
 
 import java.sql.*;
@@ -105,6 +106,36 @@ public class SqliteUserDAO implements UserDAO {
         } catch (SQLException ex) {
             System.err.println(ex);
         }
+    }
+
+    @Override
+    public List<MemberRiskSummary> getMemberRiskSummary(int orgId) {
+        List<MemberRiskSummary> summaries = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("""
+            SELECT u.userId, u.name, COALESCE(urs.score, 0.0) AS riskScore
+            FROM users u
+            JOIN organisation_memberships om ON u.userId = om.userId
+            LEFT JOIN user_risk_scores urs ON u.userId = urs.userId
+            WHERE om.orgId = ? AND om.active = 1
+            ORDER BY riskScore DESC
+        """);
+            stmt.setInt(1, orgId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                summaries.add(new MemberRiskSummary(
+                        rs.getInt("userId"),
+                        rs.getString("name"),
+                        rs.getDouble("riskScore")
+                ));
+            }
+        } catch (SQLException ex) {
+            System.err.println(ex);
+        }
+
+        return summaries;
     }
 
     private User mapUser(ResultSet rs) throws SQLException {

@@ -1,5 +1,6 @@
 package com.example.cab302assignment.dao;
 
+import com.example.cab302assignment.model.MemberRiskSummary;
 import com.example.cab302assignment.model.User;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface UserDAO {
     List<User> getAllUsers();
     void updateUser(User user);
     void deleteUser(int id);
+    List<MemberRiskSummary> getMemberRiskSummary(int orgId);
 }
