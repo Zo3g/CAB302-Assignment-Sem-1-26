@@ -119,6 +119,7 @@ public class SqliteUserDAO implements UserDAO {
             JOIN organisation_memberships om ON u.userId = om.userId
             LEFT JOIN user_risk_scores urs ON u.userId = urs.userId
             WHERE om.orgId = ? AND om.active = 1
+            ORDER BY riskScore DESC
         """);
             stmt.setInt(1, orgId);
             ResultSet rs = stmt.executeQuery();
