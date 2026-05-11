@@ -1,5 +1,6 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.app.ViewManager;
 import com.example.cab302assignment.dao.SqliteUserDAO;
 import com.example.cab302assignment.model.MemberRiskSummary;
 import com.example.cab302assignment.service.SessionManager;
@@ -27,6 +28,19 @@ public class OrgRiskDashboardController {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         scoreColumn.setCellValueFactory(new PropertyValueFactory<>("riskScore"));
 
+        // Round the user score to one decimal place
+        scoreColumn.setCellFactory(column -> new javafx.scene.control.TableCell<MemberRiskSummary, Double>() {
+            @Override
+            protected void updateItem(Double score, boolean empty) {
+                super.updateItem(score, empty);
+                if (empty || score == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.1f", score));
+                }
+            }
+        });
+
         memberTable.setOnMouseClicked(this::handleRowClick);
 
         // Load data into the table
@@ -35,9 +49,8 @@ public class OrgRiskDashboardController {
 
     private void handleRowClick(MouseEvent event) {
         if (event.getClickCount() == 2 && memberTable.getSelectionModel().getSelectedItem() != null) {
-            MemberRiskSummary selectedEmployee = memberTable.getSelectionModel().getSelectedItem();
-
-
+            MemberRiskSummary selectedMember = memberTable.getSelectionModel().getSelectedItem();
+            ViewManager.switchToUserDrilldown(selectedMember.getUserId());
         }
     }
 

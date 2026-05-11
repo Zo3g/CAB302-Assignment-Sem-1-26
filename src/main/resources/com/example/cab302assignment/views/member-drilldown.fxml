@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.cab302assignment.controller.MemberDrilldownController"
+      spacing="20"
+      stylesheets="@../global.css">
+
+    <padding>
+        <Insets top="30" bottom="30" left="40" right="40"/>
+    </padding>
+
+    <GridPane hgap="20" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="70"/>
+            <ColumnConstraints percentWidth="30"/>
+        </columnConstraints>
+
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label fx:id="memberNameLabel" styleClass="h1" text="Loading Name..."/>
+            <Label fx:id="memberEmailLabel" text="Loading Email..." style="-fx-text-fill: gray;"/>
+        </VBox>
+
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" alignment="CENTER_RIGHT">
+            <Label text="Current Risk Score"/>
+            <Label fx:id="memberScoreLabel" styleClass="h1" text="--"/>
+        </VBox>
+    </GridPane>
+
+    <Separator />
+
+    <Label text="Prompt History" styleClass="h2"/>
+
+    <TableView fx:id="historyTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="dateColumn" text="Date (UTC)" prefWidth="150" />
+            <TableColumn fx:id="promptColumn" text="Scrubbed Prompt" prefWidth="325" />
+            <TableColumn fx:id="riskColumn" text="Risk Level" prefWidth="100" />
+            <TableColumn fx:id="scoreColumn" text="Score" prefWidth="75" />
+            <TableColumn fx:id="detectionsColumn" text="Detections" prefWidth="100" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+        <placeholder>
+            <Label text="No prompts analysed yet."/>
+        </placeholder>
+    </TableView>
+
+</VBox>

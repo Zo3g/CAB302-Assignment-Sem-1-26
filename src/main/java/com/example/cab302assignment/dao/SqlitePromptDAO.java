@@ -2,6 +2,7 @@ package com.example.cab302assignment.dao;
 
 import com.example.cab302assignment.db.DatabaseConnection;
 import com.example.cab302assignment.model.Prompt;
+import com.example.cab302assignment.model.PromptHistorySummary;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -59,6 +60,37 @@ public class SqlitePromptDAO implements PromptDAO {
             stmt.setInt(1, promptId);
             stmt.execute();
         } catch (SQLException ex) { System.err.println(ex); }
+    }
+
+    public List<PromptHistorySummary> getHistoryForUser(int userId) {
+        List<PromptHistorySummary> history = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("""
+            SELECT p.submittedAt, p.redactedText, 
+            COALESCE(ra.riskLevel, 'PENDING') AS riskLevel, 
+            COALESCE(ra.score, 0.0) AS score, 
+            COALESCE(rr.totalDetections, 0) AS totalDetections
+            FROM prompts p
+            LEFT JOIN risk_analyses ra ON p.promptId = ra.promptId
+            LEFT JOIN redaction_results rr ON p.promptId = rr.promptId
+            WHERE p.userId = ?
+            ORDER BY p.submittedAt DESC
+        """);
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                history.add(new PromptHistorySummary(
+                        rs.getString("submittedAt"),
+                        rs.getString("redactedText"),
+                        rs.getString("riskLevel"),
+                        rs.getDouble("score"),
+                        rs.getInt("totalDetections")
+                ));
+            }
+        } catch (SQLException ex) { System.err.println(ex);}
+        return history;
     }
 
     private List<Prompt> listBy(String column, int value) {
