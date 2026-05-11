@@ -115,3 +115,72 @@
     -fx-font-size: 13;
     -fx-text-fill: #27548A;
 }
+
+
+
+/*TABLE VIEW STYLING */
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #D7E3ED; /* Light blue border */
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 2;
+}
+
+.table-view:focused {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #D7E3ED;
+    -fx-background-radius: 5 5 0 0; /* Round the top corners only */
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 45; /* Make headers a bit taller and more breathable */
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: #27548A; /* Dark blue bottom line */
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #27548A;
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 10; /* Indent the text slightly */
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #D7E3ED; /* Very light blue line between rows */
+    -fx-cell-size: 40; /* Give the rows some breathing room */
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #F4F8FB; /* A microscopic tint of blue */
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #E8F0F6;
+}
+
+
+.table-row-cell:selected {
+    -fx-background-color: #FFCA76;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #27548A;
+}
+
+.table-cell {
+    -fx-text-fill: #000000;
+    -fx-font-size: 14;
+    -fx-padding: 0 0 0 10;
+    -fx-alignment: center-left;
+    -fx-border-width: 0; /* Remove vertical grid lines for a modern look */
+}
