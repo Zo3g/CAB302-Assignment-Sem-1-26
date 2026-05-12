@@ -1,6 +1,7 @@
 package com.example.cab302assignment.controller;
 
 import com.example.cab302assignment.dao.*;
+import com.example.cab302assignment.model.enums.RiskLevel;
 import com.example.cab302assignment.model.enums.SensitiveDataType;
 import com.example.cab302assignment.service.SessionManager;
 import javafx.collections.FXCollections;
@@ -75,22 +76,42 @@ public class OrgDashboardController {
         //riskCol.prefWidthProperty().bind(userTable.widthProperty().multiply(0.25));
 
 
-        // Placeholder for risk category
+        int orgId = SessionManager.getCurrentOrgId();
+
+        // Set risk category
+        List<UserRiskScore> scores = new ArrayList<>();
+
+        List<OrganisationMembership> memberships =
+                organisationMembershipDAO.getMembershipsForOrg(orgId);
+
+        for (OrganisationMembership membership : memberships) {
+
+            UserRiskScore riskScore =
+                    userRiskScoreDAO.getLatestForUser(membership.getUserId());
+
+            if (riskScore != null) {
+                scores.add(riskScore);
+            }
+        }
+
+        RiskLevel overallRisk = calculateAverageRiskLevel(scores);
+
         orgRiskContainer.getStyleClass().removeAll(
                 "risk-low",
                 "risk-medium",
                 "risk-high",
                 "risk-critical"
         );
-        switch (riskCategory) {
-            case "Low" -> orgRiskContainer.getStyleClass().add("risk-label-low");
-            case "Medium" -> orgRiskContainer.getStyleClass().add("risk-label-medium");
-            case "High" -> orgRiskContainer.getStyleClass().add("risk-label-high");
-            case "Critical" -> orgRiskContainer.getStyleClass().add("risk-label-critical");
-        }
-        currentRiskCategory.setText(riskCategory);
 
-        int orgId = SessionManager.getCurrentOrgId();
+        switch (overallRisk) {
+            case RiskLevel.NO -> orgRiskContainer.getStyleClass().add("risk-label-none");
+            case RiskLevel.LOW -> orgRiskContainer.getStyleClass().add("risk-label-low");
+            case RiskLevel.MEDIUM -> orgRiskContainer.getStyleClass().add("risk-label-medium");
+            case RiskLevel.HIGH -> orgRiskContainer.getStyleClass().add("risk-label-high");
+            case RiskLevel.CRITICAL -> orgRiskContainer.getStyleClass().add("risk-label-critical");
+        }
+
+        currentRiskCategory.setText(overallRisk.scoreString());
 
         // Placeholder for pie chart
         List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
@@ -124,9 +145,56 @@ public class OrgDashboardController {
             );
         });
         riskCol.setCellValueFactory(cellData -> {
+
+            int userId = cellData.getValue().getUserId();
+
+            UserRiskScore userRiskScore =
+                    userRiskScoreDAO.getLatestForUser(userId);
+
+            if (userRiskScore == null) {
+                return new javafx.beans.property.SimpleStringProperty("No Past Prompts");
+            }
+
+            RiskLevel riskLevel = userRiskScore.getRiskLevel();
+
             return new javafx.beans.property.SimpleStringProperty(
-                    "No Risk"
+                    riskLevel.scoreString()
             );
+        });
+        riskCol.setCellFactory(column -> new TableCell<>() {
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                    return;
+                }
+
+                Label badge = new Label(item);
+
+                badge.getStyleClass().add("risk-label");
+
+                String lower = item.toLowerCase();
+
+                if (lower.contains("critical")) {
+                    badge.getStyleClass().add("risk-label-critical");
+                } else if (lower.contains("high")) {
+                    badge.getStyleClass().add("risk-label-high");
+                } else if (lower.contains("medium")) {
+                    badge.getStyleClass().add("risk-label-medium");
+                } else if (lower.contains("low")) {
+                    badge.getStyleClass().add("risk-label-low");
+                } else {
+                    badge.getStyleClass().add("risk-label-none");
+                }
+
+                setGraphic(badge);
+                setText(null);
+            }
         });
 
         // Placeholder for user table
@@ -135,6 +203,30 @@ public class OrgDashboardController {
 
         orgName.setText(SessionManager.getCurrentOrgName());
 
+    }
+
+    private RiskLevel calculateAverageRiskLevel(List<UserRiskScore> riskScores) {
+
+        if (riskScores == null || riskScores.isEmpty()) {
+            return RiskLevel.NO;
+        }
+
+        double averageScore = riskScores.stream()
+                .mapToDouble(UserRiskScore::getScore)
+                .average()
+                .orElse(0.0);
+
+        if (averageScore >= RiskLevel.CRITICAL.scoreDouble()) {
+            return RiskLevel.CRITICAL;
+        } else if (averageScore >= RiskLevel.HIGH.scoreDouble()) {
+            return RiskLevel.HIGH;
+        } else if (averageScore >= RiskLevel.MEDIUM.scoreDouble()) {
+            return RiskLevel.MEDIUM;
+        } else if (averageScore >= RiskLevel.LOW.scoreDouble()) {
+            return RiskLevel.LOW;
+        }
+
+        return RiskLevel.NO;
     }
 
     private void loadPieChart(List<RedactionResult> results) {

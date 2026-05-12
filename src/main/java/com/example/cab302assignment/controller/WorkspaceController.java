@@ -129,7 +129,7 @@ public class WorkspaceController {
             RiskAnalysis riskAnalysis = new RiskAnalysis(
                     redactionResult.getPromptId(),
                     contextualRisk,
-                    contextualRisk.score(),
+                    contextualRisk.scoreDouble(),
                     analysis,
                     redactionResult.getTypeCounts(),
                     LocalDateTime.now()

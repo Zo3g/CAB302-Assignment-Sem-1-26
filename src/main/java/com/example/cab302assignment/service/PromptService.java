@@ -37,12 +37,16 @@ public class PromptService {
 
         redactionResult.setPromptId(prompt.getPromptId());
         redactionResultDAO.addResult(redactionResult);
+
+        System.out.println("Prompt saved!");
     }
 
     public void saveRiskAnalysis(RiskAnalysis riskAnalysis) {
         if (riskAnalysis != null) {
             riskAnalysisDAO.addAnalysis(riskAnalysis);
         }
+
+        System.out.println("Risk Analyses saved!");
     }
 
     public RiskAnalysisDAO getRiskAnalysisDAO() {
