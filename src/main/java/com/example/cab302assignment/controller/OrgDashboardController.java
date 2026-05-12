@@ -1,6 +1,8 @@
 package com.example.cab302assignment.controller;
 
 import com.example.cab302assignment.dao.*;
+import com.example.cab302assignment.model.enums.SensitiveDataType;
+import com.example.cab302assignment.service.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -43,7 +45,6 @@ public class OrgDashboardController {
     @FXML private TableColumn<OrganisationMembership, String> riskCol;
 
     private String riskCategory = "Medium";
-
 
     private final RedactionResultDAO redactionResultDAO;
     private final PromptDAO promptDAO;
@@ -89,14 +90,23 @@ public class OrgDashboardController {
         }
         currentRiskCategory.setText(riskCategory);
 
+        int orgId = SessionManager.getCurrentOrgId();
+
         // Placeholder for pie chart
-        int promptID = 1;
-        RedactionResult result = redactionResultDAO.getByPromptId(promptID);
-        loadPieChart(result);
+        List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
+        List<RedactionResult> results = new ArrayList<>();
+
+        for (Prompt p : prompts) {
+            RedactionResult r = redactionResultDAO.getByPromptId(p.getPromptId());
+            if (r != null) {
+                results.add(r);
+            }
+        }
+        loadPieChart(results);
 
         // Placeholder for bar chart
-        int orgID = 1;
-        loadBarChart(orgID);
+
+        loadBarChart(orgId);
 
         // Initialise user list columns
         nameCol.setCellValueFactory(cellData -> {
@@ -120,15 +130,23 @@ public class OrgDashboardController {
         });
 
         // Placeholder for user table
-        int usersCount = loadUsers(orgID);
+        int usersCount = loadUsers(orgId);
         totalUsersCount.setText("Total Users: " + usersCount);
 
-        orgName.setText("Placeholder Pty Ltd");
+        orgName.setText(SessionManager.getCurrentOrgName());
 
     }
 
-    private void loadPieChart(RedactionResult result) {
-        PieChart.Data[] data = result.getTypeCounts().entrySet().stream()
+    private void loadPieChart(List<RedactionResult> results) {
+        Map<SensitiveDataType, Integer> aggregated = new EnumMap<>(SensitiveDataType.class);
+
+        for (RedactionResult result : results) {
+            result.getTypeCounts().forEach((type, count) ->
+                    aggregated.merge(type, count, Integer::sum)
+            );
+        }
+
+        PieChart.Data[] data = aggregated.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .map(entry -> {
                     String label = entry.getKey().name().replace("_", " ");

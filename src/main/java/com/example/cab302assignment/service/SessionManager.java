@@ -8,6 +8,7 @@ public class SessionManager {
     private static User currentUser = null;
     private static int currentUserId = 0;
     private static int currentOrgId = 0;
+    private static String currentOrgName = "";
     private static long lastActivityAt = 0L;
     private static long inactivityTimeoutMs = DEFAULT_INACTIVITY_TIMEOUT_MS;
     private static boolean timedOut = false;
@@ -36,6 +37,11 @@ public class SessionManager {
     }
 
     public static int getCurrentOrgId() { return currentOrgId; }
+    public static void setCurrentOrgName(String orgName) {
+        currentOrgName = orgName;
+    }
+
+    public static String getCurrentOrgName() { return currentOrgName; }
 
     public static void logout() {
         currentUser = null;
