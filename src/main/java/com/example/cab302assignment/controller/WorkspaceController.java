@@ -1,10 +1,15 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.dao.SqliteRiskAnalysisDAO;
+import com.example.cab302assignment.dao.SqliteUserRiskScoreDAO;
 import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.model.RiskAnalysis;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import com.example.cab302assignment.service.PromptService;
+import com.example.cab302assignment.service.SessionManager;
 import com.example.cab302assignment.model.enums.RiskLevel;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -47,6 +52,7 @@ public class WorkspaceController {
     @FXML private Label loadingOverlayMessage;
 
     private Gauge riskGauge;
+    private final SqliteRiskAnalysisDAO riskAnalysisDAO = new SqliteRiskAnalysisDAO();
 
 
 
@@ -145,6 +151,27 @@ public class WorkspaceController {
             scanButton.setDisable(false);
             scanButton.setText("Scan");
             hideLoadingOverlay();
+
+            //Update the user score prompt
+
+            User currentUser = SessionManager.getCurrentUser();
+                List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(currentUser.getUserId());
+
+                SqliteUserRiskScoreDAO userRiskScoreDAO = new SqliteUserRiskScoreDAO();
+                UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(currentUser.getUserId());
+
+                if (riskScore == null) {
+                    riskScore = new UserRiskScore();
+                    riskScore.setUserId(currentUser.getUserId());
+                }
+
+                riskScore.recalculate(analyses);
+
+                if (riskScore.getScoreId() > 0) {
+                    userRiskScoreDAO.updateScore(riskScore);
+                } else {
+                    userRiskScoreDAO.addScore(riskScore);
+                }
         });
 
         analysisTask.setOnFailed(workerStateEvent -> {
@@ -161,7 +188,6 @@ public class WorkspaceController {
         Thread thread = new Thread(analysisTask);
         thread.setDaemon(true);
         thread.start();
-
     }
 
     @FXML

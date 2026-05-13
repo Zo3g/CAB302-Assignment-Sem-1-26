@@ -23,4 +23,20 @@ public enum RiskLevel {
     public String scoreString() {
         return scoreString;
     }
+
+    public static RiskLevel fromCalculatedScore(double calculatedScore) {
+        if (calculatedScore < 12.5) {
+            return NO;
+        }
+        if (calculatedScore < 37.5) {
+            return LOW;
+        }
+        if (calculatedScore < 62.5) {
+            return MEDIUM;
+        }
+        if (calculatedScore < 87.5) {
+            return HIGH;
+        }
+        return CRITICAL;
+    }
 }

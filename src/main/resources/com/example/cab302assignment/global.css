@@ -170,3 +170,12 @@
 .table-view .filler {
     -fx-border-color: transparent;
 }
+
+.table-row-cell:hover {
+    -fx-background-color: #E8F0F6;
+}
+
+
+.table-row-cell:selected {
+    -fx-background-color: #FFCA76;
+}
