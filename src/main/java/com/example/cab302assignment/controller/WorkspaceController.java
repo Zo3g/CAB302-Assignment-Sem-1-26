@@ -59,7 +59,7 @@ public class WorkspaceController {
     @FXML
     public void initialize() {
         promptContainer.minHeightProperty().bind(root.heightProperty().multiply(0.5));
-        resultContainer.maxHeightProperty().bind(root.heightProperty().multiply(0.3));
+        resultContainer.minHeightProperty().bind(root.heightProperty().multiply(0.3));
         gaugePane.maxWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
         insightCol1.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
         insightCol2.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
@@ -140,7 +140,7 @@ public class WorkspaceController {
 
             // Update the gauge and reset UI
             riskGauge.setValue(getGaugeValue(contextualRisk)); // Gets 10.0, 30.0, etc.
-            riskCategory.setText(contextualRisk.name());
+            riskCategory.setText(contextualRisk.scoreString());
 
             scanButton.setDisable(false);
             scanButton.setText("Scan");
@@ -323,14 +323,13 @@ public class WorkspaceController {
                 .title("Risk Score")
                 .animated(true)
                 .animationDuration(1600)
-                .skinType(Gauge.SkinType.DASHBOARD)
-                .valueVisible(true)
+                .skinType(Gauge.SkinType.INDICATOR)
                 .sections(
-                        new Section(0, 20, Color.LIMEGREEN),
-                        new Section(20, 40, Color.GREENYELLOW),
-                        new Section(40, 60, Color.GOLD),
-                        new Section(60, 80, Color.ORANGE),
-                        new Section(80, 100, Color.RED)
+                        new Section(0, 20, "one", Color.LIMEGREEN),        // No Risk
+                        new Section(20, 40, "two",  Color.GREEN),          // Low Risk
+                        new Section(40, 60, "three", Color.YELLOW),        // Medium Risk
+                        new Section(60, 80, "four",  Color.ORANGE),        // High Risk
+                        new Section(80, 100, "five", Color.RED)           // Critical
                 )
                 .sectionsVisible(true)
                 .build();
