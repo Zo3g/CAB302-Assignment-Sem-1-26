@@ -61,13 +61,28 @@ public class GeminiService implements LLMService{
             %s
             ---
             Objective:
-            Analyze the categories of data represented by the placeholders and 
-            explain the specific compliance violations that would occur 
-            if all of those data were handled improperly (unredacted).
-            Your task is to explain the compliance violation for the user to understand.
+            1. Analyze the categories of data represented by the placeholders and explain the specific compliance violations
+            that would occur if all of those data were handled improperly (unredacted).
+            2. Your task is to explain the compliance violation for the user to understand in simple words.
+            3. Assess compliance risk only when context suggests actual handling of sensitive data, not mere mention.
+            
+            Important Rules:
+            If sensitive data appears without operational context (e.g., isolated phone number, email, identifier):
+            -> classify as: “Informational presence – no compliance breach inferred.”
+            In this case:
+                Do NOT infer processing, exposure, sharing, or misuse
+                Do NOT mention any legal, regulatory, or compliance violations
+                Do NOT include spam, phishing, fraud, or harm scenarios
+                Effect must be strictly neutral, such as:
+                   - No impact on systems or users can be determined from context
+                   - No compliance or regulatory implications can be inferred
+                   - Data presence alone does not indicate processing or exposure
+            
+            Determine an overall risk level based on the context of the redacted items.
                 
-            Constraints (Please only return in this format):
-            Risk: <short explanation in 3 bullet points >
+            Constraints (You MUST adhere to this exact format):
+            Score: <must be exactly one of: NO, LOW, MEDIUM, HIGH, CRITICAL>
+            Risk: <short explanation in 3 bullet points>
             Effect: <effects of compliance violation in 3 bullet points>
             """.formatted(redactedText);
     }

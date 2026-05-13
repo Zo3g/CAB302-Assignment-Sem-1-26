@@ -115,3 +115,71 @@
     -fx-font-size: 13;
     -fx-text-fill: #27548A;
 }
+
+.risk-card {
+    -fx-border-color: #27548A;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+}
+
+.risk-label {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 5;
+    -fx-background-color: transparent;
+}
+
+.risk-label-none {
+    -fx-background-color: #32CD32;
+}
+
+.risk-label-low {
+    -fx-background-color: #ADFF2F;
+}
+
+.risk-label-medium {
+    -fx-background-color: #FFD700;
+}
+
+.risk-label-high {
+    -fx-background-color: #FFA500;
+}
+
+.risk-label-critical {
+    -fx-background-color: #FF0000;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 5;
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.table-view .column-header,
+.table-view .column-header .label {
+    -fx-background-color: #D7E3ED;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-border-color: transparent;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #E8F0F6;
+}
+
+
+.table-row-cell:selected {
+    -fx-background-color: #FFCA76;
+}

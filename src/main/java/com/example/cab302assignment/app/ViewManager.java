@@ -1,8 +1,10 @@
 package com.example.cab302assignment.app;
 
 import com.example.cab302assignment.service.InactivityMonitor;
+import com.example.cab302assignment.controller.MemberDrilldownController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -60,6 +62,27 @@ public class ViewManager {
             InactivityMonitor.start(scene, () -> switchView("sign-in-view.fxml", "Sign In"));
         } catch (IOException e) {
             System.err.println("Failed to load workspace");
+            e.printStackTrace();
+        }
+    }
+    public static void switchToUserDrilldown(int userId) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    ViewManager.class.getResource("/com/example/cab302assignment/views/member-drilldown.fxml")
+            );
+
+            javafx.scene.Node drilldownView = loader.load();
+
+            MemberDrilldownController controller = loader.getController();
+            controller.initData(userId);
+
+            javafx.scene.Parent currentRoot = primaryStage.getScene().getRoot();
+
+            BorderPane borderPane = (BorderPane) currentRoot;
+            borderPane.setCenter(drilldownView);
+
+        } catch (IOException e) {
+            System.err.println("Failed to load member drilldown view");
             e.printStackTrace();
         }
     }

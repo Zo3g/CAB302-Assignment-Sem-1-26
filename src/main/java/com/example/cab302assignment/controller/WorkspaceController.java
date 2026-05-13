@@ -1,9 +1,16 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.dao.SqliteRiskAnalysisDAO;
+import com.example.cab302assignment.dao.SqliteUserRiskScoreDAO;
 import com.example.cab302assignment.model.RedactionResult;
+import com.example.cab302assignment.model.RiskAnalysis;
+import com.example.cab302assignment.model.User;
+import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.service.GeminiService;
 import com.example.cab302assignment.service.RedactionEngine;
 import com.example.cab302assignment.service.PromptService;
+import com.example.cab302assignment.service.SessionManager;
+import com.example.cab302assignment.model.enums.RiskLevel;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -45,14 +52,9 @@ public class WorkspaceController {
     @FXML private Label loadingOverlayMessage;
 
     private Gauge riskGauge;
+    private final SqliteRiskAnalysisDAO riskAnalysisDAO = new SqliteRiskAnalysisDAO();
 
-    enum RiskLevel {
-        NO_RISK,
-        LOW_RISK,
-        MEDIUM_RISK,
-        HIGH_RISK,
-        CRITICAL_RISK
-    }
+
 
 
     private RedactionEngine redactionEngine = new RedactionEngine();
@@ -63,7 +65,7 @@ public class WorkspaceController {
     @FXML
     public void initialize() {
         promptContainer.minHeightProperty().bind(root.heightProperty().multiply(0.5));
-        resultContainer.maxHeightProperty().bind(root.heightProperty().multiply(0.3));
+        resultContainer.minHeightProperty().bind(root.heightProperty().multiply(0.3));
         gaugePane.maxWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
         insightCol1.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
         insightCol2.prefWidthProperty().bind(resultContainer.widthProperty().multiply(0.3));
@@ -126,10 +128,50 @@ public class WorkspaceController {
 
         analysisTask.setOnSucceeded(workerStateEvent -> {
             String analysis = analysisTask.getValue();
-            parseAndDisplayAnalysis(analysis);
+
+            // Get and parse gemini score
+            RiskLevel contextualRisk = parseAndDisplayAnalysis(analysis);
+
+            RiskAnalysis riskAnalysis = new RiskAnalysis(
+                    redactionResult.getPromptId(),
+                    contextualRisk,
+                    contextualRisk.scoreDouble(),
+                    analysis,
+                    redactionResult.getTypeCounts(),
+                    LocalDateTime.now()
+            );
+
+            // Save it to the database
+            promptService.saveRiskAnalysis(riskAnalysis);
+
+            // Update the gauge and reset UI
+            riskGauge.setValue(getGaugeValue(contextualRisk)); // Gets 10.0, 30.0, etc.
+            riskCategory.setText(contextualRisk.scoreString());
+
             scanButton.setDisable(false);
             scanButton.setText("Scan");
             hideLoadingOverlay();
+
+            //Update the user score prompt
+
+            User currentUser = SessionManager.getCurrentUser();
+                List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(currentUser.getUserId());
+
+                SqliteUserRiskScoreDAO userRiskScoreDAO = new SqliteUserRiskScoreDAO();
+                UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(currentUser.getUserId());
+
+                if (riskScore == null) {
+                    riskScore = new UserRiskScore();
+                    riskScore.setUserId(currentUser.getUserId());
+                }
+
+                riskScore.recalculate(analyses);
+
+                if (riskScore.getScoreId() > 0) {
+                    userRiskScoreDAO.updateScore(riskScore);
+                } else {
+                    userRiskScoreDAO.addScore(riskScore);
+                }
         });
 
         analysisTask.setOnFailed(workerStateEvent -> {
@@ -146,10 +188,6 @@ public class WorkspaceController {
         Thread thread = new Thread(analysisTask);
         thread.setDaemon(true);
         thread.start();
-
-        RiskLevel risk = calculateRisk(promptSanitized);
-        riskGauge.setValue(riskToDouble(risk));
-        riskCategory.setText(riskToString(risk));
     }
 
     @FXML
@@ -208,24 +246,39 @@ public class WorkspaceController {
      * Splits the AI response into Risk and Effect sections,
      * then renders each into the corresponding TextFlow column.
      */
-    private void parseAndDisplayAnalysis(String analysis) {
+    private RiskLevel parseAndDisplayAnalysis(String analysis) {
         if (analysis == null || analysis.isBlank()) {
             setTextFlowContent(insightCol1, "No analysis available.");
             setTextFlowContent(insightCol2, "");
-            return;
+            return RiskLevel.MEDIUM; // Fallback
         }
 
-        // Split on "Effect:" (case-insensitive) to separate the two sections
-        String[] parts = analysis.split("(?i)Effect:", 2);
+        // Default fallback if parsing fails
+        RiskLevel parsedRisk = RiskLevel.MEDIUM;
 
-        String riskSection = parts[0].trim();
-        String effectSection = parts.length > 1 ? parts[1].trim() : "";
+        try {
+            // Split the score line first
+            String[] firstSplit = analysis.split("(?i)Risk:", 2);
+            String scoreLine = firstSplit[0].replaceFirst("(?i)^Score:\\s*", "").trim();
 
-        // Remove the leading "Risk:" header if present
-        riskSection = riskSection.replaceFirst("(?i)^Risk:\\s*", "").trim();
+            parsedRisk = RiskLevel.valueOf(scoreLine.toUpperCase());
 
-        renderMarkdownBold(insightCol1, "Risk", riskSection);
-        renderMarkdownBold(insightCol2, "Effect", effectSection);
+            // Split the remaining text into Risk and Effect
+            if (firstSplit.length > 1) {
+                String[] secondSplit = firstSplit[1].split("(?i)Effect:", 2);
+                String riskSection = secondSplit[0].trim();
+                String effectSection = secondSplit.length > 1 ? secondSplit[1].trim() : "";
+
+                renderMarkdownBold(insightCol1, "Risk", riskSection);
+                renderMarkdownBold(insightCol2, "Effect", effectSection);
+            }
+        } catch (IllegalArgumentException e) {
+            System.err.println("AI returned an invalid risk enum: " + e.getMessage());
+            // Text rendering fallback if AI breaks the format
+            renderMarkdownBold(insightCol1, "Analysis", analysis);
+        }
+
+        return parsedRisk;
     }
 
     /**
@@ -288,10 +341,6 @@ public class WorkspaceController {
         textFlow.getChildren().add(text);
     }
 
-    private RiskLevel calculateRisk(String prompt) {
-        RiskLevel risk = RiskLevel.MEDIUM_RISK;
-        return risk;
-    }
 
     private void buildRiskGauge() {
         riskGauge = GaugeBuilder.create()
@@ -300,14 +349,13 @@ public class WorkspaceController {
                 .title("Risk Score")
                 .animated(true)
                 .animationDuration(1600)
-                .skinType(Gauge.SkinType.DASHBOARD)
-                .valueVisible(true)
+                .skinType(Gauge.SkinType.INDICATOR)
                 .sections(
-                        new Section(0, 20, Color.LIMEGREEN),
-                        new Section(20, 40, Color.GREENYELLOW),
-                        new Section(40, 60, Color.GOLD),
-                        new Section(60, 80, Color.ORANGE),
-                        new Section(80, 100, Color.RED)
+                        new Section(0, 20, "one", Color.LIMEGREEN),        // No Risk
+                        new Section(20, 40, "two",  Color.GREEN),          // Low Risk
+                        new Section(40, 60, "three", Color.YELLOW),        // Medium Risk
+                        new Section(60, 80, "four",  Color.ORANGE),        // High Risk
+                        new Section(80, 100, "five", Color.RED)           // Critical
                 )
                 .sectionsVisible(true)
                 .build();
@@ -318,23 +366,24 @@ public class WorkspaceController {
         AnchorPane.setLeftAnchor(riskGauge, 0.0);
         AnchorPane.setRightAnchor(riskGauge, 0.0);
     }
-    private int riskToDouble(RiskLevel risk) {
+    // Score numbers for Gauge, not the ones that are stored.
+    private int getGaugeValue(RiskLevel risk) {
         return switch (risk) {
-            case NO_RISK -> 10;
-            case LOW_RISK -> 30;
-            case MEDIUM_RISK -> 50;
-            case HIGH_RISK -> 70;
-            case CRITICAL_RISK -> 100;
+            case NO -> 10;
+            case LOW -> 30;
+            case MEDIUM -> 50;
+            case HIGH -> 70;
+            case CRITICAL -> 100;
         };
     }
 
     private String riskToString(RiskLevel risk) {
         return switch (risk) {
-            case NO_RISK -> "No Risk";
-            case LOW_RISK -> "Low Risk";
-            case MEDIUM_RISK -> "Medium Risk";
-            case HIGH_RISK -> "High Risk";
-            case CRITICAL_RISK -> "Critical";
+            case NO -> "No Risk";
+            case LOW -> "Low Risk";
+            case MEDIUM -> "Medium Risk";
+            case HIGH -> "High Risk";
+            case CRITICAL -> "Critical";
         };
     }
 
