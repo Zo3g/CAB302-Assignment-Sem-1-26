@@ -131,6 +131,10 @@
     -fx-background-color: transparent;
 }
 
+.risk-label-none {
+    -fx-background-color: #32CD32;
+}
+
 .risk-label-low {
     -fx-background-color: #ADFF2F;
 }

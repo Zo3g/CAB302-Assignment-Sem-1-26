@@ -1,5 +1,6 @@
 package com.example.cab302assignment.controller;
 
+import com.example.cab302assignment.app.ViewManager;
 import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.enums.RiskLevel;
 import com.example.cab302assignment.model.enums.SensitiveDataType;
@@ -11,6 +12,7 @@ import com.example.cab302assignment.model.RedactionResult;
 import com.example.cab302assignment.model.Prompt;
 import com.example.cab302assignment.model.*;
 import javafx.scene.chart.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import com.example.cab302assignment.dao.SqliteRedactionResultDAO;
 import com.example.cab302assignment.dao.RedactionResultDAO;
@@ -45,8 +47,6 @@ public class OrgDashboardController {
     @FXML private TableColumn<OrganisationMembership, String> emailCol;
     @FXML private TableColumn<OrganisationMembership, String> riskCol;
 
-    private String riskCategory = "Medium";
-
     private final RedactionResultDAO redactionResultDAO;
     private final PromptDAO promptDAO;
     private final UserDAO userDAO;
@@ -64,37 +64,17 @@ public class OrgDashboardController {
 
     @FXML
     public void initialize() {
-        //lhs_container.prefWidthProperty().bind(root.widthProperty().multiply(0.6));
-        //rhs_container.prefWidthProperty().bind(root.widthProperty().multiply(0.4));
-        //orgRiskContainer.maxHeightProperty().bind(orgRiskContainer.widthProperty());
-        //orgRiskContainer.minHeightProperty().bind(orgRiskContainer.widthProperty());
-        //orgRiskContainer.prefHeightProperty().bind(orgRiskContainer.widthProperty());
-        //sensitiveDataPieChart.prefHeightProperty().bind(root.widthProperty().multiply(0.4));
         userTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        //emailCol.prefWidthProperty().bind(userTable.widthProperty().multiply(0.5));
-        //nameCol.prefWidthProperty().bind(userTable.widthProperty().multiply(0.25));
-        //riskCol.prefWidthProperty().bind(userTable.widthProperty().multiply(0.25));
 
 
         int orgId = SessionManager.getCurrentOrgId();
 
-        // Set risk category
-        List<UserRiskScore> scores = new ArrayList<>();
-
+        // Set risk banner
         List<OrganisationMembership> memberships =
                 organisationMembershipDAO.getMembershipsForOrg(orgId);
 
-        for (OrganisationMembership membership : memberships) {
+        RiskLevel overallRisk = calculateAverageRiskLevel(memberships);
 
-            UserRiskScore riskScore =
-                    userRiskScoreDAO.getLatestForUser(membership.getUserId());
-
-            if (riskScore != null) {
-                scores.add(riskScore);
-            }
-        }
-
-        RiskLevel overallRisk = calculateAverageRiskLevel(scores);
 
         orgRiskContainer.getStyleClass().removeAll(
                 "risk-low",
@@ -113,105 +93,44 @@ public class OrgDashboardController {
 
         currentRiskCategory.setText(overallRisk.scoreString());
 
-        // Placeholder for pie chart
-        List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
-        List<RedactionResult> results = new ArrayList<>();
+        // Load data detections pie chart
+        loadPieChart(orgId);
 
-        for (Prompt p : prompts) {
-            RedactionResult r = redactionResultDAO.getByPromptId(p.getPromptId());
-            if (r != null) {
-                results.add(r);
-            }
-        }
-        loadPieChart(results);
-
-        // Placeholder for bar chart
-
+        // Load prompts bar chart
         loadBarChart(orgId);
 
-        // Initialise user list columns
-        nameCol.setCellValueFactory(cellData -> {
-            int userId = cellData.getValue().getUserId();
-            User user = userDAO.getUserById(userId);
-            return new javafx.beans.property.SimpleStringProperty(
-                    user != null ? user.getName() : "Unknown"
-            );
-        });
-        emailCol.setCellValueFactory(cellData -> {
-            int userId = cellData.getValue().getUserId();
-            User user = userDAO.getUserById(userId);
-            return new javafx.beans.property.SimpleStringProperty(
-                    user != null ? user.getEmail() : "Unknown"
-            );
-        });
-        riskCol.setCellValueFactory(cellData -> {
+        // Set org name
+        orgName.setText(SessionManager.getCurrentOrgName());
 
-            int userId = cellData.getValue().getUserId();
-
-            UserRiskScore userRiskScore =
-                    userRiskScoreDAO.getLatestForUser(userId);
-
-            if (userRiskScore == null) {
-                return new javafx.beans.property.SimpleStringProperty("No Past Prompts");
-            }
-
-            RiskLevel riskLevel = userRiskScore.getRiskLevel();
-
-            return new javafx.beans.property.SimpleStringProperty(
-                    riskLevel.scoreString()
-            );
-        });
-        riskCol.setCellFactory(column -> new TableCell<>() {
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    setStyle("");
-                    return;
-                }
-
-                Label badge = new Label(item);
-
-                badge.getStyleClass().add("risk-label");
-
-                String lower = item.toLowerCase();
-
-                if (lower.contains("critical")) {
-                    badge.getStyleClass().add("risk-label-critical");
-                } else if (lower.contains("high")) {
-                    badge.getStyleClass().add("risk-label-high");
-                } else if (lower.contains("medium")) {
-                    badge.getStyleClass().add("risk-label-medium");
-                } else if (lower.contains("low")) {
-                    badge.getStyleClass().add("risk-label-low");
-                } else {
-                    badge.getStyleClass().add("risk-label-none");
-                }
-
-                setGraphic(badge);
-                setText(null);
-            }
-        });
-
-        // Placeholder for user table
+        // Initialise user table
+        initialiseUserTableCols();
         int usersCount = loadUsers(orgId);
+        userTable.setOnMouseClicked(this::handleRowClick);
         totalUsersCount.setText("Total Users: " + usersCount);
 
-        orgName.setText(SessionManager.getCurrentOrgName());
+
 
     }
 
-    private RiskLevel calculateAverageRiskLevel(List<UserRiskScore> riskScores) {
+    private RiskLevel calculateAverageRiskLevel(List<OrganisationMembership> memberships) {
 
-        if (riskScores == null || riskScores.isEmpty()) {
+        List<UserRiskScore> scores = new ArrayList<>();
+
+        for (OrganisationMembership membership : memberships) {
+
+            UserRiskScore riskScore =
+                    userRiskScoreDAO.getLatestForUser(membership.getUserId());
+
+            if (riskScore != null) {
+                scores.add(riskScore);
+            }
+        }
+
+        if (scores == null || scores.isEmpty()) {
             return RiskLevel.NO;
         }
 
-        double averageScore = riskScores.stream()
+        double averageScore = scores.stream()
                 .mapToDouble(UserRiskScore::getScore)
                 .average()
                 .orElse(0.0);
@@ -229,7 +148,17 @@ public class OrgDashboardController {
         return RiskLevel.NO;
     }
 
-    private void loadPieChart(List<RedactionResult> results) {
+    private void loadPieChart(int orgId) {
+        List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
+        List<RedactionResult> results = new ArrayList<>();
+
+        for (Prompt p : prompts) {
+            RedactionResult r = redactionResultDAO.getByPromptId(p.getPromptId());
+            if (r != null) {
+                results.add(r);
+            }
+        }
+
         Map<SensitiveDataType, Integer> aggregated = new EnumMap<>(SensitiveDataType.class);
 
         for (RedactionResult result : results) {
@@ -309,11 +238,87 @@ public class OrgDashboardController {
         }));
 
         userTable.setItems(FXCollections.observableArrayList(memberships));
-        userTable.setSelectionModel(null);
 
         // return total users
         return memberships.size();
     }
+
+    private void handleRowClick(MouseEvent event) {
+        if (event.getClickCount() == 2 && userTable.getSelectionModel().getSelectedItem() != null) {
+            OrganisationMembership selectedMember = userTable.getSelectionModel().getSelectedItem();
+            ViewManager.switchToUserDrilldown(selectedMember.getUserId());
+        }
+    }
+
+    private void initialiseUserTableCols() {
+        nameCol.setCellValueFactory(cellData -> {
+            int userId = cellData.getValue().getUserId();
+            User user = userDAO.getUserById(userId);
+            return new javafx.beans.property.SimpleStringProperty(
+                    user != null ? user.getName() : "Unknown"
+            );
+        });
+        emailCol.setCellValueFactory(cellData -> {
+            int userId = cellData.getValue().getUserId();
+            User user = userDAO.getUserById(userId);
+            return new javafx.beans.property.SimpleStringProperty(
+                    user != null ? user.getEmail() : "Unknown"
+            );
+        });
+        riskCol.setCellValueFactory(cellData -> {
+
+            int userId = cellData.getValue().getUserId();
+
+            UserRiskScore userRiskScore =
+                    userRiskScoreDAO.getLatestForUser(userId);
+
+            if (userRiskScore == null) {
+                return new javafx.beans.property.SimpleStringProperty("No Past Prompts");
+            }
+
+            RiskLevel riskLevel = userRiskScore.getRiskLevel();
+
+            return new javafx.beans.property.SimpleStringProperty(
+                    riskLevel.scoreString()
+            );
+        });
+        riskCol.setCellFactory(column -> new TableCell<>() {
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                    return;
+                }
+
+                Label badge = new Label(item);
+
+                badge.getStyleClass().add("risk-label");
+
+                String lower = item.toLowerCase();
+
+                if (lower.contains("critical")) {
+                    badge.getStyleClass().add("risk-label-critical");
+                } else if (lower.contains("high")) {
+                    badge.getStyleClass().add("risk-label-high");
+                } else if (lower.contains("medium")) {
+                    badge.getStyleClass().add("risk-label-medium");
+                } else if (lower.contains("low")) {
+                    badge.getStyleClass().add("risk-label-low");
+                } else {
+                    badge.getStyleClass().add("risk-label-none");
+                }
+
+                setGraphic(badge);
+                setText(null);
+            }
+        });
+    }
+
 }
 
 
