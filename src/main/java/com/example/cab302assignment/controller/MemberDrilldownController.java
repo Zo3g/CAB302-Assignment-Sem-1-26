@@ -6,6 +6,7 @@ import com.example.cab302assignment.dao.SqliteUserRiskScoreDAO;
 import com.example.cab302assignment.dao.SqlitePromptDAO;
 import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.model.UserRiskScore;
+import com.example.cab302assignment.model.enums.RiskLevel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,7 +27,6 @@ public class MemberDrilldownController {
     @FXML private TableColumn<PromptHistorySummary, String> dateColumn;
     @FXML private TableColumn<PromptHistorySummary, String> promptColumn;
     @FXML private TableColumn<PromptHistorySummary, String> riskColumn;
-    @FXML private TableColumn<PromptHistorySummary, Double> scoreColumn;
     @FXML private TableColumn<PromptHistorySummary, Integer> detectionsColumn;
 
     private int currentUserId;
@@ -37,7 +37,6 @@ public class MemberDrilldownController {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         promptColumn.setCellValueFactory(new PropertyValueFactory<>("redactedText"));
         riskColumn.setCellValueFactory(new PropertyValueFactory<>("riskLevel"));
-        scoreColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
         detectionsColumn.setCellValueFactory(new PropertyValueFactory<>("totalDetections"));
 
         // Custom cell factory to allow long prompts to wrap around
@@ -84,7 +83,7 @@ public class MemberDrilldownController {
         UserRiskScore riskScore = scoreDAO.getLatestForUser(currentUserId);
         if (riskScore != null) {
             // Format user risk score to 1 decimal place
-            memberScoreLabel.setText(String.format("%.1f", riskScore.getScore()));
+            memberScoreLabel.setText(String.format(riskScore.getRiskLevel().scoreString()));
         } else {
             memberScoreLabel.setText("No Data");
         }

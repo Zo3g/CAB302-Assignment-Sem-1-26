@@ -9,6 +9,7 @@ public class UserRiskScore {
     private int scoreId;
     private int userId;
     private double score;
+    private RiskLevel riskLevel;
     private int totalPromptsAnalysed;
     private LocalDateTime lastUpdated;
 
@@ -17,7 +18,7 @@ public class UserRiskScore {
 
     public UserRiskScore(int userId, double score, int totalPromptsAnalysed, LocalDateTime lastUpdated) {
         this.userId = userId;
-        this.score = score;
+        setScore(score);
         this.totalPromptsAnalysed = totalPromptsAnalysed;
         this.lastUpdated = lastUpdated;
     }
@@ -29,7 +30,24 @@ public class UserRiskScore {
     public void setUserId(int userId) { this.userId = userId; }
 
     public double getScore() { return score; }
-    public void setScore(double score) { this.score = score; }
+    public void setScore(double score) {
+        this.score = score;
+
+        if (score >= RiskLevel.CRITICAL.scoreDouble()) {
+            setRiskLevel(RiskLevel.CRITICAL);
+        } else if (score >= RiskLevel.HIGH.scoreDouble()) {
+            setRiskLevel(RiskLevel.HIGH);
+        } else if (score >= RiskLevel.MEDIUM.scoreDouble()) {
+            setRiskLevel(RiskLevel.MEDIUM);
+        } else if (score >= RiskLevel.LOW.scoreDouble()) {
+            setRiskLevel(RiskLevel.LOW);
+        } else {
+            setRiskLevel(RiskLevel.NO);
+        }
+    }
+
+    public RiskLevel getRiskLevel() { return riskLevel; }
+    public void setRiskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; }
 
     public int getTotalPromptsAnalysed() { return totalPromptsAnalysed; }
     public void setTotalPromptsAnalysed(int totalPromptsAnalysed) { this.totalPromptsAnalysed = totalPromptsAnalysed; }
@@ -47,7 +65,7 @@ public class UserRiskScore {
         double total = 0.0;
         for (RiskAnalysis analysis : history) {
             RiskLevel level = analysis.getRiskLevel();
-            total += level == null ? 0.0 : level.score();
+            total += level == null ? 0.0 : level.scoreDouble();
         }
         this.score = total / history.size();
         this.totalPromptsAnalysed = history.size();

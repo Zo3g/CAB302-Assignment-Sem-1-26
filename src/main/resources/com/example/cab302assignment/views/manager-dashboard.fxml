@@ -3,40 +3,106 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
 
-<GridPane xmlns="http://javafx.com/javafx/21.0.1"
-          xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="com.example.cab302assignment.controller.OrgRiskDashboardController"
-          hgap="20" vgap="20"
-          stylesheets="@../global.css">
+<ScrollPane xmlns="http://javafx.com/javafx/21.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fitToWidth="true"
+            fx:controller="com.example.cab302assignment.controller.OrgDashboardController"
+            stylesheets="@../global.css"
+            hbarPolicy="NEVER">
 
-   <padding>
-      <Insets top="30" bottom="30" left="40" right="40"/>
-   </padding>
+   <VBox spacing="10" alignment="CENTER">
+      <padding>
+         <Insets top="20" bottom="20" left="20" right="20"/>
+      </padding>
 
-   <columnConstraints>
-      <ColumnConstraints percentWidth="50" /> <ColumnConstraints percentWidth="50" /> </columnConstraints>
-   <rowConstraints>
-      <RowConstraints percentHeight="50" /> <RowConstraints percentHeight="50" /> </rowConstraints>
+      <Label text="Dashboard" styleClass="h1"/>
+      <!-- Risk Status -->
+      <VBox fx:id="orgRiskContainer"
+            alignment="CENTER"
+            styleClass="risk-label"
+            maxHeight="Infinity">
 
-   <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="TOP_LEFT" spacing="10">
-      <Label text="Organisation Risk Dashboard" styleClass="h1"/>
-      <Label text="space for other dashboard components" style="-fx-text-fill: gray;"/>
+         <Label text="Current Risk Level"
+                styleClass="p"
+                alignment="CENTER"/>
+
+         <Label fx:id="currentRiskCategory"
+                styleClass="h2"
+                wrapText="true"
+                alignment="CENTER"/>
+      </VBox>
+      <GridPane fx:id="root"
+                HBox.hgrow="ALWAYS"
+                maxWidth="Infinity">
+
+         <columnConstraints>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+         </columnConstraints>
+
+         <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+            <RowConstraints vgrow="NEVER"/>
+         </rowConstraints>
+
+         <!-- Top Left: Bar Chart -->
+         <VBox GridPane.rowIndex="0"
+               GridPane.columnIndex="0"
+               maxWidth="Infinity"
+               maxHeight="Infinity">
+
+
+            <BarChart fx:id="promptsBarChart"
+                      title="Prompts (Last 7 Days)"
+                      maxWidth="Infinity"
+                      maxHeight="Infinity">
+
+               <xAxis>
+                  <CategoryAxis label="Day"/>
+               </xAxis>
+
+               <yAxis>
+                  <NumberAxis label="Prompts"/>
+               </yAxis>
+
+            </BarChart>
+         </VBox>
+
+         <!-- Top Right: Pie Chart -->
+         <PieChart fx:id="sensitiveDataPieChart"
+                   title="Data Detections"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="1"
+                   maxWidth="Infinity"/>
+
+         <!-- Bottom: User list/leaderboard -->
+         <VBox fx:id="rhs_container"
+               GridPane.rowIndex = "1"
+               GridPane.columnIndex="0"
+               GridPane.columnSpan="2"
+               styleClass="risk-card"
+               spacing="10">
+
+            <HBox styleClass="background-secondary">
+               <Label fx:id="orgName" styleClass="h5" wrapText="True"/>
+               <Region HBox.hgrow="ALWAYS"/>
+               <Label fx:id="totalUsersCount" styleClass="h5" wrapText="true"/>
+            </HBox>
+
+            <TableView fx:id="userTable"
+                       prefHeight="250"
+                       maxHeight="250">
+               <columns>
+                  <TableColumn fx:id="nameCol" text="Name"/>
+                  <TableColumn fx:id="emailCol" text="Email"/>
+                  <TableColumn fx:id="riskCol" text="Risk Score"/>
+               </columns>
+            </TableView>
+         </VBox>
+      </GridPane>
+
+
    </VBox>
-
-   <TableView fx:id="memberTable" GridPane.columnIndex="1" GridPane.rowIndex="0">
-      <columns>
-         <TableColumn fx:id="nameColumn" text="Member Name" />
-         <TableColumn fx:id="scoreColumn" text="Risk Score" />
-      </columns>
-
-      <columnResizePolicy>
-         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-      </columnResizePolicy>
-
-      <placeholder>
-         <Label text="No member data available."/>
-      </placeholder>
-   </TableView>
-
-</GridPane>
+</ScrollPane>

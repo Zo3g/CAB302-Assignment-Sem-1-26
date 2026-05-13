@@ -56,7 +56,6 @@
             <TableColumn fx:id="dateColumn" text="Date (UTC)" prefWidth="150" />
             <TableColumn fx:id="promptColumn" text="Scrubbed Prompt" prefWidth="400" />
             <TableColumn fx:id="riskColumn" text="Risk Level" prefWidth="100" />
-            <TableColumn fx:id="scoreColumn" text="Score" prefWidth="100" />
             <TableColumn fx:id="detectionsColumn" text="Detections" prefWidth="100" />
         </columns>
         <columnResizePolicy>
