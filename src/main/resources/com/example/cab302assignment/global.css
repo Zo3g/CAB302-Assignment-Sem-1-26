@@ -116,7 +116,18 @@
     -fx-text-fill: #27548A;
 }
 
+.risk-score-title {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 14;
+    -fx-text-fill: #27548A;
+}
 
+.risk-score-value {
+    -fx-font-family: "Istok Web", "Segoe UI", sans-serif;
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-text-fill: #27548A;
+}
 
 /*TABLE VIEW STYLING */
 

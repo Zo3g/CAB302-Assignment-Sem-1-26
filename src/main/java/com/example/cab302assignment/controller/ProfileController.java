@@ -3,9 +3,11 @@ package com.example.cab302assignment.controller;
 import com.example.cab302assignment.app.ViewManager;
 import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.OrganisationMembership;
+import com.example.cab302assignment.model.RiskAnalysis;
 import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.model.enums.MemberRole;
+import com.example.cab302assignment.model.enums.RiskLevel;
 import com.example.cab302assignment.service.OrganisationManager;
 import com.example.cab302assignment.service.PasswordUtil;
 import com.example.cab302assignment.service.SessionManager;
@@ -61,14 +63,37 @@ public class ProfileController {
         }
     }
     private void displayUserRiskScore(int userId) {
-        UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(userId);
+        List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(userId);
 
-        if (riskScore != null && riskScore.getScore() > 0) {
-            if (userScore != null) {
-                userScore.setText(String.format("%.2f", riskScore.getScore()));
+        UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(userId);
+        if (riskScore == null) {
+            riskScore = new UserRiskScore();
+            riskScore.setUserId(userId);
+        }
+
+        riskScore.recalculate(analyses);
+        saveUserRiskScore(riskScore);
+
+        if (analyses == null || analyses.isEmpty()) {
+            if (userScore != null) userScore.setText("No history");
+            return;
+        }
+
+        if (userScore != null) {
+            RiskLevel category = RiskLevel.fromCalculatedScore(riskScore.getScore());
+            userScore.setText(category.name());
+        }
+    }
+
+    private void saveUserRiskScore(UserRiskScore score) {
+        try {
+            if (score.getScoreId() > 0) {
+                userRiskScoreDAO.updateScore(score);
+            } else {
+                userRiskScoreDAO.addScore(score);
             }
-        } else {
-            if (userScore != null) userScore.setText("No data");
+        } catch (Exception ex) {
+            System.err.println("Error saving user risk score: " + ex.getMessage());
         }
     }
 
