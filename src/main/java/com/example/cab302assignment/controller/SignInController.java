@@ -86,8 +86,15 @@ public class SignInController {
 
         SessionManager.setCurrentUser(user);
         SessionManager.setCurrentUserId(user.getUserId());
-        SessionManager.setCurrentOrgId(orgId);
-        SessionManager.setCurrentOrgName(org.getName());
+
+        if (org != null) {
+            SessionManager.setCurrentOrgId(orgId);
+            SessionManager.setCurrentOrgName(org.getName());
+        } else {
+            SessionManager.setCurrentOrgId(0);
+            SessionManager.setCurrentOrgName("No Organisation");
+        }
+
         ViewManager.switchToWorkspace();
     }
 

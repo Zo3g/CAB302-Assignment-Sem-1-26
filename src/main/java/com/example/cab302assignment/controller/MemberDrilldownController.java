@@ -82,7 +82,6 @@ public class MemberDrilldownController {
 
         UserRiskScore riskScore = scoreDAO.getLatestForUser(currentUserId);
         if (riskScore != null) {
-            // Format user risk score to 1 decimal place
             memberScoreLabel.setText(String.format(riskScore.getRiskLevel().scoreString()));
         } else {
             memberScoreLabel.setText("No Data");

@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
+<?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cab302assignment.controller.ProfileController">
     <padding>
         <Insets bottom="24" left="24" right="24" top="24" />
@@ -38,13 +39,17 @@
         </VBox>
     </center>
    <right>
-      <VBox alignment="BOTTOM_CENTER" prefHeight="295.0" prefWidth="189.0" spacing="12" BorderPane.alignment="CENTER">
+       <VBox fx:id="scoreBox" alignment="BOTTOM_CENTER" prefHeight="295.0" prefWidth="189.0" spacing="12" BorderPane.alignment="CENTER">
          <children>
             <Label styleClass="risk-score-title" text="User risk level" />
             <StackPane prefHeight="140.0" prefWidth="185.0">
                <children>
                   <Circle fill="#d7e3ed" radius="58.0" stroke="WHITE" strokeType="INSIDE" />
-                  <Label fx:id="userScore" styleClass="risk-score-value" text="No history" />
+                  <Label fx:id="userScore" styleClass="risk-score-value" text="No history">
+                   <font>
+                       <Font size="26.0" />
+                   </font>
+                  </Label>
                </children>
             </StackPane>
          </children>
