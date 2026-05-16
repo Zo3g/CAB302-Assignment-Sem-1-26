@@ -1,0 +1,7 @@
+com.example.cab302assignment.app
+com.example.cab302assignment.controller
+com.example.cab302assignment.dao
+com.example.cab302assignment.db
+com.example.cab302assignment.model
+com.example.cab302assignment.model.enums
+com.example.cab302assignment.service
