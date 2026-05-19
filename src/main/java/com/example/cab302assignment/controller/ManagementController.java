@@ -10,11 +10,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class ManagementController {
     @FXML private TextField searchTextField;
+    @FXML private GridPane userInfoGrid;
     @FXML private Text userIdText;
     @FXML private Text nameText;
     @FXML private Text emailText;
@@ -108,6 +110,8 @@ public class ManagementController {
     }
 
     private void clearOutput() {
+        userInfoGrid.setVisible(false);
+        userInfoGrid.setManaged(false);
         userIdText.setText("");
         nameText.setText("");
         emailText.setText("");
@@ -123,6 +127,9 @@ public class ManagementController {
     }
 
     private void displayMemberInfo(MemberInfo memberInfo) {
+        userInfoGrid.setVisible(true);
+        userInfoGrid.setManaged(true);
+
         userIdText.setText(String.valueOf(memberInfo.getUserId()));
         nameText.setText(memberInfo.getName());
         emailText.setText(memberInfo.getEmail());

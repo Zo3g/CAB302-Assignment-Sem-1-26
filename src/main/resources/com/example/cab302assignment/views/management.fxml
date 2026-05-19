@@ -61,7 +61,7 @@
                         </VBox>
 
                         <!-- User info grid -->
-                        <GridPane alignment="CENTER" hgap="16" vgap="14">
+                        <GridPane fx:id="userInfoGrid" alignment="CENTER" hgap="16" vgap="14">
                            <columnConstraints>
                               <ColumnConstraints minWidth="100.0" percentWidth="38.0" />
                               <ColumnConstraints minWidth="120.0" percentWidth="62.0" />
