@@ -3,12 +3,12 @@ package com.example.cab302assignment.model;
 import com.example.cab302assignment.model.enums.MemberStatus;
 
 /**
- * A simple data transfer object (DTO) that represents a member's basic information
- * within an organisation.
+ * Data Transfer Object (DTO) representing a member's basic information
+ * within an organisation context.
  *
- * <p>This class is typically used to pass member data between the data layer,
- * business logic, and UI components. It contains identifying and display
- * information such as user ID, name, email, and current membership status.</p>
+ * <p>This class is primarily used to pass member-related data between
+ * the backend and UI layers, such as displaying search results in the
+ * management view.</p>
  */
 public class MemberInfo {
 
