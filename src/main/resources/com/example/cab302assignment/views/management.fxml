@@ -28,13 +28,13 @@
             <!-- Outer padding wrapper -->
             <VBox alignment="TOP_CENTER" spacing="0">
                <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
-                  <Label prefWidth="1170" styleClass="h1" text="Organisation Management" />
+                  <Label prefWidth="1170" alignment="CENTER" styleClass="h1" text="Organisation Management" />
 
                   <!-- Body -->
                   <HBox alignment="CENTER" maxWidth="1170" prefWidth="1170" spacing="20">
                      <VBox.margin><Insets top="10" /></VBox.margin>
 
-                     <!-- Left - Membership management card -->
+                     <!-- Membership management card -->
                      <VBox prefHeight="690.0" prefWidth="670" spacing="40.0" HBox.hgrow="NEVER"
                            style="-fx-background-color: white; -fx-background-radius: 25;
                            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 5, 5);" >
@@ -43,13 +43,18 @@
                         <!-- Search section -->
                         <VBox spacing="8">
                            <Label styleClass="h4" text="Add or remove user from Organisation:" />
-                           <TextField fx:id="searchTextField" onAction="#onSearch"
-                                      prefHeight="55.0" prefWidth="450.0"
-                                      promptText="Please enter user's email:"
-                                      style="-fx-background-color: #d7e3ed; -fx-background-radius: 15;
-                                      -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);
-                                      -fx-font-size: 22px; -fx-padding: 0 0 0 20;">
-                           </TextField>
+                           <HBox spacing="10" alignment="CENTER_LEFT">
+                              <TextField fx:id="searchTextField" onAction="#onSearch"
+                                         prefHeight="50.0" prefWidth="400.0"
+                                         promptText="Please enter user's email:"
+                                         style="-fx-background-color: #d7e3ed; -fx-background-radius: 15;
+                                         -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);
+                                         -fx-font-size: 22px; -fx-padding: 0 0 0 20;">
+                              </TextField>
+                              <Button text="Search" onAction="#onSearch" prefHeight="50.0"
+                                      style="-fx-background-color: #FFCA76; -fx-text-fill: #27548A; -fx-padding: 6 20 6 20;
+                                      -fx-background-radius: 12; -fx-cursor: hand; -fx-font-size: 18px;"/>
+                           </HBox>
                         <padding>
                            <Insets left="20.0" right="20.0" />
                         </padding>
@@ -124,12 +129,12 @@
                      </VBox>
 
                      <!-- Right panel -->
-                     <VBox prefHeight="690.0" prefWidth="480" spacing="20"
-                           style="-fx-background-color: #d7e3ed; -fx-background-radius: 25;" HBox.hgrow="NEVER">
-                        <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
+<!--                     <VBox prefHeight="690.0" prefWidth="480" spacing="20"-->
+<!--                           style="-fx-background-color: #d7e3ed; -fx-background-radius: 25;" HBox.hgrow="NEVER">-->
+<!--                        <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>-->
 
-                        <Region VBox.vgrow="ALWAYS" />
-                     </VBox>
+<!--                        <Region VBox.vgrow="ALWAYS" />-->
+<!--                     </VBox>-->
                   </HBox>
             </VBox>
          </content>
