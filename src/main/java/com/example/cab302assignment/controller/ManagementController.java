@@ -146,14 +146,45 @@ public class ManagementController {
     @FXML
     private void onRemove() {
         if (searchedUserInfo == null) return;
-        organisationManager.removeMember(getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId());
-        syncUser();
+        try {
+            organisationManager.removeMember(
+                getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId()
+            );
+            syncUser(); // update latest statusText
+            hideActionControls(); // hide opposite action button
+            showMessage("Membership has been deactivated successfully.");
+        } catch (RuntimeException ex) {
+            showMessage("Failed to deactivate membership: " + ex.getMessage());
+        }
     }
 
     @FXML
     private void onAdd() {
         if (searchedUserInfo == null) return;
-        organisationManager.addMember(getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId());
-        syncUser();
+        try {
+            organisationManager.addMember(getCurrentUserId(), searchedUserInfo.getUserId(), getCurrentOrgId());
+            syncUser();
+            hideActionControls();
+            showMessage("Membership has been activated successfully.");
+        } catch (RuntimeException ex) {
+            showMessage("Failed to activate membership: " + ex.getMessage());
+        }
+    }
+
+    private void hideActionControls() {
+        confirmCheckBox.setSelected(false);
+        removeButton.setDisable(true);
+
+        removeGroup.setVisible(false);
+        removeGroup.setManaged(false);
+
+        addButton.setVisible(false);
+        addButton.setManaged(false);
+    }
+
+    private void showMessage(String message) {
+        warningText.setText(message);
+        warningText.setVisible(true);
+        warningText.setManaged(true);
     }
 }
