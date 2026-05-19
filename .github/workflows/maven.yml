@@ -10,7 +10,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "integration", "fix/javadoc-maven-dependency-conflict" ]
+    branches: [ "integration" ]
   pull_request:
     branches: [ "integration" ]
 
