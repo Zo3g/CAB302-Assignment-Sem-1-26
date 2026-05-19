@@ -35,36 +35,37 @@
                      <VBox.margin><Insets top="10" /></VBox.margin>
 
                      <!-- Membership management card -->
-                     <VBox prefHeight="690.0" prefWidth="670" spacing="40.0" HBox.hgrow="NEVER"
+                     <VBox prefHeight="690.0" prefWidth="650" spacing="40.0" HBox.hgrow="NEVER"
                            style="-fx-background-color: white; -fx-background-radius: 25;
                            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 5, 5);" >
                         <padding><Insets bottom="28.0" left="60.0" right="60.0" top="80.0" /></padding>
 
                         <!-- Search section -->
                         <VBox spacing="8">
-                           <Label styleClass="h4" text="Add or remove user from Organisation:" />
+                           <Label styleClass="h4" wrapText="true" maxWidth="430" alignment="CENTER_LEFT"
+                                  text="Add or remove organisation members:" />
                            <HBox spacing="10" alignment="CENTER_LEFT">
                               <TextField fx:id="searchTextField" onAction="#onSearch"
-                                         prefHeight="50.0" prefWidth="400.0"
-                                         promptText="Please enter user's email:"
+                                         prefHeight="50.0" prefWidth="380.0"
+                                         promptText="Enter user's exact email:"
                                          style="-fx-background-color: #d7e3ed; -fx-background-radius: 15;
                                          -fx-border-radius: 15; -fx-text-fill: rgba(0,0,0,0.6);
-                                         -fx-font-size: 22px; -fx-padding: 0 0 0 20;">
+                                         -fx-font-size: 22px; ">
                               </TextField>
                               <Button text="Search" onAction="#onSearch" prefHeight="50.0"
                                       style="-fx-background-color: #FFCA76; -fx-text-fill: #27548A; -fx-padding: 6 20 6 20;
                                       -fx-background-radius: 12; -fx-cursor: hand; -fx-font-size: 18px;"/>
                            </HBox>
-                        <padding>
-                           <Insets left="20.0" right="20.0" />
-                        </padding>
+                           <padding>
+                              <Insets left="20.0" right="20.0" />
+                           </padding>
                         </VBox>
 
                         <!-- User info grid -->
-                        <GridPane fx:id="userInfoGrid" alignment="CENTER" hgap="16" vgap="14">
+                        <GridPane fx:id="userInfoGrid" alignment="CENTER" hgap="18" vgap="14">
                            <columnConstraints>
                               <ColumnConstraints minWidth="100.0" percentWidth="38.0" />
-                              <ColumnConstraints minWidth="120.0" percentWidth="62.0" />
+                              <ColumnConstraints minWidth="120.0" percentWidth="62.0"/>
                            </columnConstraints>
                            <rowConstraints>
                               <RowConstraints minHeight="36" />
@@ -73,20 +74,20 @@
                               <RowConstraints minHeight="36" />
                            </rowConstraints>
 
-                           <Label styleClass="h4" text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                           <Text fx:id="userIdText" fill="#183b4ecc" styleClass="h4"
+                           <Label styleClass="h4" text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 22px;" />
+                           <Text fx:id="userIdText" fill="#183b4ecc" styleClass="h4" style="-fx-font-size: 22px;"
                                  text="12345678" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                           <Label styleClass="h4" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                           <Text fx:id="nameText" fill="#183b4ecc" styleClass="h4"
+                           <Label styleClass="h4" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-size: 22px;" />
+                           <Text fx:id="nameText" fill="#183b4ecc" styleClass="h4" style="-fx-font-size: 22px;"
                                  text="First Last" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                           <Label styleClass="h4" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                           <Text fx:id="emailText" fill="#183b4ecc" styleClass="h4"
+                           <Label styleClass="h4" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-size: 22px;" />
+                           <Text fx:id="emailText" fill="#183b4ecc" styleClass="h4" style="-fx-font-size: 22px;"
                                  text="MyEmail@example.com" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                           <Label styleClass="h4" text="Member status:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                           <Text fx:id="statusText" fill="#183b4ecc" styleClass="h4"
+                           <Label styleClass="h4" text="Member status:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-size: 22px;" />
+                           <Text fx:id="statusText" fill="#183b4ecc" styleClass="h4" style="-fx-font-size: 22px;"
                                  text="Active" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <padding>
                            <Insets bottom="20.0" left="40.0" right="10.0" top="0.0" />
@@ -104,22 +105,22 @@
                                         textFill="#00000099" wrapText="true" style="-fx-font-size: 16px; -fx-padding: 0 0 0 15;">
                               </CheckBox>
                               <Button fx:id="removeButton" disable="true" onAction="#onRemove"
-                                      prefHeight="57.0" prefWidth="408.0"
-                                      style="-fx-background-color: #FF928A; -fx-font-size: 26px;
+                                      prefHeight="50.0" prefWidth="408.0"
+                                      style="-fx-background-color: #FF928A; -fx-font-size: 22px;
                                       -fx-background-radius: 15; -fx-border-radius: 15;"
                                       text="Remove user from Organisation" textFill="#183b4e" wrapText="true">
                               </Button>
                            </VBox>
                            <Button fx:id="addButton" managed="false" onAction="#onAdd"
-                                   prefHeight="57.0" prefWidth="300.0"
-                                   style="-fx-background-color: #FFCA76; -fx-font-size: 26px;
+                                   prefHeight="50.0" prefWidth="300.0"
+                                   style="-fx-background-color: #FFCA76; -fx-font-size: 22px;
                                    -fx-background-radius: 15; -fx-border-radius: 15;"
                                    text="Add / Activate user" textFill="#183b4e" visible="false"
                                    wrapText="true" StackPane.alignment="BOTTOM_CENTER">
                            </Button>
                            <Text fx:id="warningText" fill="#ff948c" managed="false"
                                  text="You cannot modify your own membership."
-                                 style="-fx-font-size: 27px;"
+                                 style="-fx-font-size: 24px;"
                                  visible="false" StackPane.alignment="CENTER">
                            </Text>
                         </StackPane>
