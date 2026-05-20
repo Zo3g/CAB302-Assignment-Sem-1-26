@@ -30,17 +30,24 @@ import java.util.*;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Controller for the organisation dashboard view.
+ *
+ * Handles loading and displaying organisation-wide analytics such as:
+ * - Overall risk level across users
+ * - Sensitive data breakdown (pie chart)
+ * - Prompt activity over time (bar chart)
+ * - User membership table with risk indicators
+ *
+ * Also manages navigation to user drill-down views.
+ */
 public class OrgDashboardController {
     @FXML private Label currentRiskCategory;
     @FXML private Label totalUsersCount;
     @FXML private Label orgName;
     @FXML private PieChart sensitiveDataPieChart;
     @FXML private GridPane root;
-    @FXML private GridPane lhs_container;
-    @FXML private VBox rhs_container;
-    @FXML private HBox lhsTop_container;
     @FXML private VBox orgRiskContainer;
-    @FXML private AnchorPane pieChartContainer;
     @FXML private BarChart<String, Number> promptsBarChart;
     @FXML private TableView<OrganisationMembership> userTable;
     @FXML private TableColumn<OrganisationMembership, String> nameCol;
@@ -53,6 +60,11 @@ public class OrgDashboardController {
     private final UserRiskScoreDAO userRiskScoreDAO;
     private final OrganisationMembershipDAO organisationMembershipDAO;
 
+
+    /**
+     * Initialises DAO dependencies for retrieving users, prompts,
+     * redaction results, and risk scores from the database.
+     */
     public OrgDashboardController() {
 
         redactionResultDAO = new SqliteRedactionResultDAO();
@@ -62,6 +74,17 @@ public class OrgDashboardController {
         organisationMembershipDAO = new SqliteOrganisationMembershipDAO();
     }
 
+    /**
+     * Initialises the dashboard UI after FXML loading.
+     *
+     * Loads organisation data including:
+     * - Overall organisation risk level
+     * - Sensitive data distribution pie chart
+     * - Prompt activity bar chart (last 7 days)
+     * - User membership table
+     *
+     * Also sets up table interactions and UI labels.
+     */
     @FXML
     public void initialize() {
         userTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -77,10 +100,11 @@ public class OrgDashboardController {
 
 
         orgRiskContainer.getStyleClass().removeAll(
-                "risk-low",
-                "risk-medium",
-                "risk-high",
-                "risk-critical"
+                "risk-label-none",
+                "risk-label-low",
+                "risk-label-medium",
+                "risk-label-high",
+                "risk-label-critical"
         );
 
         switch (overallRisk) {
@@ -112,6 +136,17 @@ public class OrgDashboardController {
 
     }
 
+    /**
+     * Calculates the average risk level across all users in the organisation.
+     *
+     * Retrieves the latest risk score for each user and computes an average,
+     * then maps it back to a RiskLevel category.
+     *
+     * If no valid scores exist, returns NO risk.
+     *
+     * @param memberships list of organisation memberships
+     * @return overall organisation risk level
+     */
     private RiskLevel calculateAverageRiskLevel(List<OrganisationMembership> memberships) {
 
         List<UserRiskScore> scores = new ArrayList<>();
@@ -148,6 +183,14 @@ public class OrgDashboardController {
         return RiskLevel.NO;
     }
 
+    /**
+     * Loads and aggregates sensitive data detection results into a pie chart.
+     *
+     * Groups redaction results across all prompts in the organisation and
+     * sums occurrences of each SensitiveDataType.
+     *
+     * @param orgId organisation ID
+     */
     private void loadPieChart(int orgId) {
         List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
         List<RedactionResult> results = new ArrayList<>();
@@ -185,6 +228,14 @@ public class OrgDashboardController {
         sensitiveDataPieChart.setLegendVisible(false);
     }
 
+    /**
+     * Loads prompt submission activity for the last 7 days into a bar chart.
+     *
+     * Counts how many prompts were submitted per day and displays them
+     * using abbreviated weekday labels.
+     *
+     * @param orgId organisation ID
+     */
     private void loadBarChart(int orgId) {
 
         List<Prompt> prompts = promptDAO.getPromptsByOrg(orgId);
@@ -226,6 +277,15 @@ public class OrgDashboardController {
         promptsBarChart.getData().add(series);
     }
 
+    /**
+     * Loads all users in the organisation into the table view.
+     *
+     * Users are sorted alphabetically by name and displayed with
+     * email and risk level information.
+     *
+     * @param orgId organisation ID
+     * @return total number of users loaded
+     */
     public int loadUsers(int orgId) {
 
         List<OrganisationMembership> memberships =
@@ -243,6 +303,13 @@ public class OrgDashboardController {
         return memberships.size();
     }
 
+    /**
+     * Handles double-click events on the user table.
+     *
+     * Opens the user drill-down view for the selected user.
+     *
+     * @param event mouse click event
+     */
     private void handleRowClick(MouseEvent event) {
         if (event.getClickCount() == 2 && userTable.getSelectionModel().getSelectedItem() != null) {
             OrganisationMembership selectedMember = userTable.getSelectionModel().getSelectedItem();
@@ -250,6 +317,14 @@ public class OrgDashboardController {
         }
     }
 
+    /**
+     * Configures the user table columns including:
+     * - Name
+     * - Email
+     * - Risk level (with styled badges)
+     *
+     * Fetches related user and risk data from DAOs.
+     */
     private void initialiseUserTableCols() {
         nameCol.setCellValueFactory(cellData -> {
             int userId = cellData.getValue().getUserId();

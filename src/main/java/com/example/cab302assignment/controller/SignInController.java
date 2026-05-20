@@ -19,6 +19,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+/**
+ * Controller for the Sign-In view.
+ *
+ * Handles user authentication, session initialisation,
+ * and navigation into the main workspace.
+ *
+ * Responsibilities include:
+ * - Validating user credentials
+ * - Verifying password hashes
+ * - Resolving the user's active organisation
+ * - Initialising session state
+ * - Redirecting to sign-up or workspace views
+ */
 public class SignInController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
@@ -30,20 +43,42 @@ public class SignInController {
     private final OrganisationDAO organisationDAO;
     private final OrganisationMembershipDAO membershipDAO;
 
+    /**
+     * Default constructor using SQLite DAO implementations.
+     */
     public SignInController() {
         this(new SqliteUserDAO(), new SqliteOrganisationDAO(), new SqliteOrganisationMembershipDAO());
     }
 
+    /**
+     * Constructor allowing custom UserDAO injection.
+     *
+     * Uses default SQLite implementations for organisation
+     * and membership data.
+     */
     public SignInController(UserDAO userDAO) {
         this(userDAO, new SqliteOrganisationDAO(), new SqliteOrganisationMembershipDAO());
     }
 
+    /**
+     * Full dependency injection constructor.
+     *
+     * Allows all DAOs to be provided externally
+     */
     public SignInController(UserDAO userDAO, OrganisationDAO organisationDAO, OrganisationMembershipDAO membershipDAO) {
         this.userDAO = userDAO;
         this.organisationDAO = organisationDAO;
         this.membershipDAO = membershipDAO;
     }
 
+    /**
+     * Initialises the sign-in form UI.
+     *
+     * Sets up:
+     * - Button disable binding for empty fields
+     * - ENTER key handling for quick login submission
+     * - Optional session timeout notification message
+     */
     @FXML
     public void initialize() {
         BooleanBinding anyFieldEmpty = emailField.textProperty().isEmpty()
@@ -68,6 +103,18 @@ public class SignInController {
         }
     }
 
+    /**
+     * Handles user sign-in authentication.
+     *
+     * Process:
+     * 1. Retrieves user by email
+     * 2. Verifies password against stored hash
+     * 3. Resolves user's active organisation
+     * 4. Initialises session state (user + organisation)
+     * 5. Navigates to workspace on success
+     *
+     * Displays an error message if authentication fails.
+     */
     @FXML
     protected void onSignIn() {
         errorLabel.setText("");
@@ -98,6 +145,15 @@ public class SignInController {
         ViewManager.switchToWorkspace();
     }
 
+    /**
+     * Finds the active organisation for a user.
+     *
+     * Iterates through all memberships and returns the organisation
+     * marked as active.
+     *
+     * @param userId ID of the user
+     * @return active organisation ID, or 0 if none found
+     */
     private int resolveActiveOrgId(int userId) {
         for (OrganisationMembership m : membershipDAO.getMembershipsForUser(userId)) {
             if (m.isActive()) return m.getOrgId();
@@ -105,6 +161,9 @@ public class SignInController {
         return 0;
     }
 
+    /**
+     * Navigates the user to the Sign-Up view.
+     */
     @FXML
     protected void onGoToSignUp() {
         ViewManager.switchView("sign-up-view.fxml", "Sign Up");

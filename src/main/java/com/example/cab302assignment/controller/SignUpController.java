@@ -12,6 +12,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+/**
+ * Controller for the Sign-Up view.
+ *
+ * Handles creation of new user accounts including:
+ * - Input validation (name, email, password rules)
+ * - Duplicate email checking
+ * - Password hashing
+ * - User creation and persistence
+ * - Navigation back to sign-in after successful registration
+ */
 public class SignUpController {
     @FXML private TextField nameField;
     @FXML private TextField emailField;
@@ -23,14 +33,26 @@ public class SignUpController {
 
     private final UserDAO userDAO;
 
+    /**
+     * Default constructor using SQLite implementation of UserDAO.
+     */
     public SignUpController() {
         this.userDAO = new SqliteUserDAO();
     }
 
+    /**
+     * Constructor allowing injection of a custom UserDAO.
+     */
     public SignUpController(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
+
+    /**
+     * Initialises the sign-up form UI.
+     *
+     * Disables the sign-up button until all required fields are filled.
+     */
     @FXML
     public void initialize() {
         BooleanBinding anyFieldEmpty = nameField.textProperty().isEmpty()
@@ -40,6 +62,19 @@ public class SignUpController {
         signUpButton.disableProperty().bind(anyFieldEmpty);
     }
 
+    /**
+     * Handles user registration.
+     *
+     * Process:
+     * 1. Clears previous messages
+     * 2. Validates user input (name, email, password rules)
+     * 3. Checks for existing account with same email
+     * 4. Hashes password and creates new user
+     * 5. Saves user to database
+     * 6. Shows success message and redirects to sign-in screen
+     *
+     * Redirect includes a short delay for user feedback.
+     */
     @FXML
     protected void onSignUp() {
         errorLabel.setText("");
@@ -78,11 +113,33 @@ public class SignUpController {
         }).start();
     }
 
+    /**
+     * Navigates directly to the Sign-In view.
+     */
     @FXML
     protected void onGoToSignIn() {
         ViewManager.switchView("sign-in-view.fxml", "Sign In");
     }
 
+    /**
+     * Validates user registration input fields.
+     *
+     * Checks:
+     * - Name is not empty
+     * - Email format is valid
+     * - Password meets security requirements:
+     *   - Minimum 8 characters
+     *   - At least one uppercase letter
+     *   - At least one lowercase letter
+     *   - At least one digit
+     * - Password and confirmation match
+     *
+     * @param name user full name
+     * @param email user email address
+     * @param password chosen password
+     * @param confirmPassword repeated password entry
+     * @return error message if validation fails, or null if valid
+     */
     public static String validate(String name, String email, String password, String confirmPassword) {
         if (name.isEmpty()) {
             return "Name is required.";

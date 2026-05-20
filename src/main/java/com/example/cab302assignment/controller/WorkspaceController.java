@@ -19,7 +19,6 @@ import javafx.scene.control.*;
 import javafx.scene.text.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +30,22 @@ import eu.hansolo.medusa.Section;
 import javafx.scene.paint.Color;
 
 
-
+/**
+ * Controller for the Workspace view.
+ *
+ * This screen allows users to:
+ * - Enter prompts for sensitive data scanning
+ * - View redacted (sanitised) output
+ * - Trigger AI-based risk analysis of prompts
+ * - Visualise risk results using a gauge and insight panels
+ *
+ * Core responsibilities include:
+ * - Running redaction on user input
+ * - Calling external AI services asynchronously
+ * - Parsing AI responses into structured risk insights
+ * - Updating user and organisation risk scores
+ * - Managing UI state during processing (loading, errors, etc.)
+ */
 public class WorkspaceController {
     @FXML private TextArea inputArea;
     @FXML private TextArea outputArea;
@@ -62,6 +76,17 @@ public class WorkspaceController {
     private GeminiService geminiService;
     private PromptService promptService;
 
+    /**
+     * Initialises the workspace UI after FXML loading.
+     *
+     * Sets up:
+     * - Layout bindings for responsive resizing
+     * - Default insight text placeholders
+     * - Risk gauge visualisation
+     * - External services (Gemini AI + prompt persistence service)
+     *
+     * Also handles fallback behaviour if external services are unavailable.
+     */
     @FXML
     public void initialize() {
         promptContainer.minHeightProperty().bind(root.heightProperty().multiply(0.5));
@@ -90,6 +115,21 @@ public class WorkspaceController {
         }
     }
 
+    /**
+     * Handles the scan action when a user submits a prompt.
+     *
+     * Workflow:
+     * 1. Validates user input
+     * 2. Runs redaction engine on prompt
+     * 3. Displays sanitised output
+     * 4. Saves prompt + redaction result
+     * 5. Calls AI service asynchronously for risk analysis
+     * 6. Parses AI response into structured risk data
+     * 7. Updates UI (gauge, insights, labels)
+     * 8. Updates user risk score in database
+     *
+     * Runs AI analysis on a background thread to keep UI responsive.
+     */
     @FXML
     private void onScan() {
         String promptInput = inputArea.getText();
@@ -190,6 +230,11 @@ public class WorkspaceController {
         thread.start();
     }
 
+    /**
+     * Copies the sanitised prompt output to the system clipboard.
+     *
+     * Also updates button state to provide user feedback.
+     */
     @FXML
     private void onCopy() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -199,11 +244,19 @@ public class WorkspaceController {
         copyButton.setText("Copied");
     }
 
+    /**
+     * Clears the prompt input field.
+     */
     @FXML
     private void onClear() {
         inputArea.setText("");
     }
 
+    /**
+     * Displays the loading overlay during AI processing.
+     *
+     * @param message message shown to the user while analysis runs
+     */
     private void showLoadingOverlay(String message) {
         if (loadingOverlay == null) return;
         Platform.runLater(() -> {
@@ -215,6 +268,9 @@ public class WorkspaceController {
         });
     }
 
+    /**
+     * Hides the loading overlay after AI processing completes.
+     */
     private void hideLoadingOverlay() {
         if (loadingOverlay == null) return;
         Platform.runLater(() -> {
@@ -223,6 +279,18 @@ public class WorkspaceController {
         });
     }
 
+    /**
+     * Validates the user prompt before processing.
+     *
+     * Checks:
+     * - Prompt is not null or empty
+     * - Prompt does not exceed maximum length (10,000 chars)
+     *
+     * Displays error messages directly in the UI if invalid.
+     *
+     * @param prompt user input text
+     * @return true if prompt is valid, false otherwise
+     */
     private boolean validatePrompt(String prompt) {
         if (prompt == null || prompt.trim().isEmpty()) {
             errorMessage.setText("Prompt cannot be empty. Please enter a valid prompt.");
@@ -238,13 +306,34 @@ public class WorkspaceController {
         return true;
     }
 
+    /**
+     * Runs the redaction engine to remove or mask sensitive data
+     * from the input prompt.
+     *
+     * @param prompt raw user input
+     * @return redacted result containing sanitised text and metadata
+     */
     private RedactionResult sanitizePrompt(String prompt) {
         return redactionEngine.redact(prompt);
     }
 
     /**
-     * Splits the AI response into Risk and Effect sections,
-     * then renders each into the corresponding TextFlow column.
+     * Parses the AI-generated analysis response and splits it into:
+     * - Risk score (mapped to RiskLevel enum)
+     * - Risk explanation text
+     * - Effect/impact explanation text
+     *
+     * Also renders formatted output into the UI text columns.
+     *
+     * Expected AI format:
+     * Score: <RISK_LEVEL>
+     * Risk: ...
+     * Effect: ...
+     *
+     * If parsing fails, falls back to MEDIUM risk and raw display.
+     *
+     * @param analysis raw AI response string
+     * @return parsed RiskLevel (defaults to MEDIUM if invalid)
      */
     private RiskLevel parseAndDisplayAnalysis(String analysis) {
         if (analysis == null || analysis.isBlank()) {
@@ -282,8 +371,16 @@ public class WorkspaceController {
     }
 
     /**
-     * Renders text with **bold** markdown markers into a TextFlow.
-     * Adds a bold title header, then parses **...**  segments as bold Text nodes.
+     * Renders markdown-style text into a JavaFX TextFlow.
+     *
+     * Supports:
+     * - **bold** text formatting
+     * - bullet point conversion (* → •)
+     * - structured title header
+     *
+     * @param textFlow target UI container
+     * @param title section title label
+     * @param content markdown-style content string
      */
     private void renderMarkdownBold(TextFlow textFlow, String title, String content) {
         textFlow.getChildren().clear();
@@ -332,7 +429,10 @@ public class WorkspaceController {
     }
 
     /**
-     * Simple helper to set plain text content on a TextFlow.
+     * Sets plain text content into a TextFlow, replacing existing content.
+     *
+     * @param textFlow target UI container
+     * @param content text to display
      */
     private void setTextFlowContent(TextFlow textFlow, String content) {
         textFlow.getChildren().clear();
@@ -342,6 +442,18 @@ public class WorkspaceController {
     }
 
 
+    /**
+     * Builds and configures the risk gauge visualisation.
+     *
+     * The gauge displays risk from 0–100 and is divided into sections:
+     * - No risk (green)
+     * - Low risk
+     * - Medium risk
+     * - High risk
+     * - Critical risk (red)
+     *
+     * The gauge is inserted into the UI AnchorPane and set to resize dynamically.
+     */
     private void buildRiskGauge() {
         riskGauge = GaugeBuilder.create()
                 .minValue(0)
@@ -366,7 +478,13 @@ public class WorkspaceController {
         AnchorPane.setLeftAnchor(riskGauge, 0.0);
         AnchorPane.setRightAnchor(riskGauge, 0.0);
     }
-    // Score numbers for Gauge, not the ones that are stored.
+
+    /**
+     * Converts a RiskLevel enum into a numeric gauge value.
+     *
+     * @param risk risk level enum
+     * @return numeric value between 10 and 100 for UI display
+     */
     private int getGaugeValue(RiskLevel risk) {
         return switch (risk) {
             case NO -> 10;
@@ -377,6 +495,12 @@ public class WorkspaceController {
         };
     }
 
+    /**
+     * Converts a RiskLevel enum into a human-readable string.
+     *
+     * @param risk risk level enum
+     * @return formatted display string
+     */
     private String riskToString(RiskLevel risk) {
         return switch (risk) {
             case NO -> "No Risk";
