@@ -9,6 +9,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.util.Duration;
 
+/**
+ * Global inactivity monitoring utility for tracking user session activity.
+ *
+ * Listens for user input events (mouse, keyboard, scroll) and periodically
+ * checks whether the session has exceeded the configured inactivity timeout.
+ *
+ * If a timeout occurs, the monitor:
+ * - Stops event tracking
+ * - Logs the user out via SessionManager
+ * - Triggers an optional expiry callback (e.g. UI redirect)
+ *
+ * This class is static-only and cannot be instantiated.
+ */
 public final class InactivityMonitor {
     private static final long ACTIVITY_LOG_THROTTLE_MS = 1000L;
 
@@ -23,6 +36,19 @@ public final class InactivityMonitor {
 
     private InactivityMonitor() {}
 
+    /**
+     * Starts inactivity monitoring on the provided JavaFX scene.
+     *
+     * Registers input listeners for:
+     * - Mouse movement and clicks
+     * - Keyboard input
+     * - Scroll events
+     *
+     * Also starts a periodic timer that checks for session expiry.
+     *
+     * @param scene the JavaFX scene to attach activity listeners to
+     * @param expiryCallback callback executed when the session expires
+     */
     public static void start(Scene scene, Runnable expiryCallback) {
         stop();
         if (scene == null) {
@@ -43,6 +69,11 @@ public final class InactivityMonitor {
         checker.play();
     }
 
+    /**
+     * Stops inactivity monitoring and removes all registered event listeners.
+     *
+     * Also stops the internal expiry timer and clears session state references.
+     */
     public static void stop() {
         if (checker != null) {
             checker.stop();
@@ -60,6 +91,13 @@ public final class InactivityMonitor {
         lastLoggedActivityAt = 0L;
     }
 
+    /**
+     * Records user activity and resets the session inactivity timer.
+     *
+     * Throttles logging to avoid excessive console output.
+     *
+     * @param eventType type of input event that triggered activity reset
+     */
     private static void registerActivity(String eventType) {
         SessionManager.recordActivity();
         long now = System.currentTimeMillis();
@@ -69,6 +107,16 @@ public final class InactivityMonitor {
         }
     }
 
+    /**
+     * Periodically checks whether the session has expired due to inactivity.
+     *
+     * If expired:
+     * - Logs timeout duration
+     * - Stops monitoring
+     * - Logs the user out
+     * - Flags session as timed out
+     * - Executes expiry callback if provided
+     */
     private static void checkExpiry() {
         if (SessionManager.isExpired()) {
             long idleMs = System.currentTimeMillis() - SessionManager.getLastActivityAt();
