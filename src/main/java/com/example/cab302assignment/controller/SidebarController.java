@@ -248,12 +248,11 @@ public class SidebarController {
      */
     private boolean isCurrentUserManagerForOrg(){
         User user = SessionManager.getCurrentUser();
-        int userId = user.getUserId();
-
-        int orgId = SessionManager.getCurrentOrgId();
-        if(orgId < 0){
+        if (user == null) {
             return false;
         }
+        int userId = user.getUserId();
+        int orgId = SessionManager.getCurrentOrgId();
 
         // Check for membership
         OrganisationMembership membership = membershipDAO.getMembership(userId, orgId);

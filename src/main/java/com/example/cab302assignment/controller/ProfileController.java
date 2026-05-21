@@ -3,7 +3,6 @@ package com.example.cab302assignment.controller;
 import com.example.cab302assignment.app.ViewManager;
 import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.OrganisationMembership;
-import com.example.cab302assignment.model.RiskAnalysis;
 import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.model.enums.MemberRole;
@@ -18,8 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -42,11 +41,11 @@ public class ProfileController {
     @FXML private Label statusLabel;
     @FXML private Button leaveOrgButton;
     @FXML private Label userScore;
+    @FXML private VBox scoreBox;
 
     private final OrganisationDAO organisationDAO = new SqliteOrganisationDAO();
     private final OrganisationMembershipDAO membershipDAO = new SqliteOrganisationMembershipDAO();
     private final UserDAO userDAO = new SqliteUserDAO();
-    private final RiskAnalysisDAO riskAnalysisDAO = new SqliteRiskAnalysisDAO();
     private final UserRiskScoreDAO userRiskScoreDAO = new SqliteUserRiskScoreDAO();
     private final OrganisationManager organisationManager;
 
@@ -76,17 +75,19 @@ public class ProfileController {
             if (nameField != null) nameField.setText(user.getName());
             if (emailField != null) emailField.setText(user.getEmail());
 
-            // Fetch and display user risk score
-            displayUserRiskScore(user.getUserId());
-
             int currentOrgId = SessionManager.getCurrentOrgId();
+            // If not in an organisation, hide org related elements and score
             if (currentOrgId <= 0) {
                 leaveOrgButton.setVisible(false);
-                return;
+                if (scoreBox != null) {
+                    scoreBox.setVisible(false);
+                    scoreBox.setManaged(false);
+                }
+            } else {
+                OrganisationMembership m = membershipDAO.getMembership(user.getUserId(), currentOrgId);
+                leaveOrgButton.setVisible(m != null && m.isActive());
+                displayUserRiskScore(user.getUserId());
             }
-            OrganisationMembership m = membershipDAO.getMembership(user.getUserId(), currentOrgId);
-
-            leaveOrgButton.setVisible(m != null && m.isActive());
         }
     }
     /**
@@ -102,47 +103,13 @@ public class ProfileController {
      *               recalculated and displayed
      */
     private void displayUserRiskScore(int userId) {
-        List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(userId);
-
         UserRiskScore riskScore = userRiskScoreDAO.getLatestForUser(userId);
-        if (riskScore == null) {
-            riskScore = new UserRiskScore();
-            riskScore.setUserId(userId);
-        }
 
-        riskScore.recalculate(analyses);
-        saveUserRiskScore(riskScore);
-
-        if (analyses == null || analyses.isEmpty()) {
-            if (userScore != null) userScore.setText("No history");
-            return;
-        }
-
-        if (userScore != null) {
+        if (riskScore != null && riskScore.getScore() >= 0) {
             RiskLevel category = RiskLevel.fromCalculatedScore(riskScore.getScore());
-            userScore.setText(category.name());
-        }
-    }
-
-    /**
-     * Persists the supplied {@link UserRiskScore}.
-     *
-     * <p>If the score already has a database identifier ({@code scoreId > 0})
-     * it is updated in place; otherwise a new record is inserted. Any
-     * persistence errors are caught and logged to {@code System.err} so they
-     * do not interrupt the profile view from loading.</p>
-     *
-     * @param score the user risk score to insert or update
-     */
-    private void saveUserRiskScore(UserRiskScore score) {
-        try {
-            if (score.getScoreId() > 0) {
-                userRiskScoreDAO.updateScore(score);
-            } else {
-                userRiskScoreDAO.addScore(score);
-            }
-        } catch (Exception ex) {
-            System.err.println("Error saving user risk score: " + ex.getMessage());
+            if (userScore != null) userScore.setText(String.format(riskScore.getRiskLevel().scoreString()));
+        } else {
+            if (userScore != null) userScore.setText("No history");
         }
     }
 

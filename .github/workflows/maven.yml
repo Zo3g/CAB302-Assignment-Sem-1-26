@@ -14,6 +14,9 @@ on:
   pull_request:
     branches: [ "integration" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
@@ -29,3 +32,25 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
+    - name: Generate Javadoc (with temporary rename)
+      run: |
+        ls -R src/main/java
+        if [ -f src/main/java/module-info.java ]; then
+        mv src/main/java/module-info.java src/main/java/module-info.java.bak
+        echo "Module-info backed up."
+        fi
+        mvn javadoc:javadoc \
+        -Dsourcepath="src/main/java" \
+        -Dsubpackages="com.example" \
+        -DdetectOfflineLinks=false \
+        -B
+        if [ -f src/main/java/module-info.java.bak ]; then
+          mv src/main/java/module-info.java.bak src/main/java/module-info.java
+        echo "Module-info restored."
+        fi
+
+    - name: Publish Javadoc
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: target/docs/javadoc
