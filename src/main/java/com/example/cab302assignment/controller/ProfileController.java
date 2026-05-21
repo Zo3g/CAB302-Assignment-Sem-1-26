@@ -22,6 +22,18 @@ import javafx.scene.control.Button;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller for the user profile view.
+ *
+ * <p>Handles displaying and updating the currently signed-in user's profile
+ * details (name, email, password), surfacing their latest risk score, and
+ * providing the ability to leave the current organisation or delete the
+ * account entirely.</p>
+ *
+ * <p>The controller relies on {@link SessionManager} to determine the active
+ * user and organisation, and delegates persistence to a set of DAOs and the
+ * {@link OrganisationManager} service.</p>
+ */
 public class ProfileController {
     @FXML private TextField nameField;
     @FXML private TextField emailField;
@@ -38,10 +50,25 @@ public class ProfileController {
     private final UserRiskScoreDAO userRiskScoreDAO = new SqliteUserRiskScoreDAO();
     private final OrganisationManager organisationManager;
 
+    /**
+     * Constructs a new {@code ProfileController} and wires up the
+     * {@link OrganisationManager} service with the DAOs required to manage
+     * organisation memberships from the profile view.
+     */
     public ProfileController() {
         this.organisationManager = new OrganisationManager(this.organisationDAO, this.membershipDAO, this.userDAO);
     }
 
+    /**
+     * Initialises the profile view after FXML injection has completed.
+     *
+     * <p>Populates the name and email fields from the currently signed-in
+     * user, refreshes and displays the user's risk score, and decides whether
+     * the {@code leaveOrgButton} should be visible based on whether the user
+     * has an active membership in the current organisation.</p>
+     *
+     * <p>If no user is signed in, no fields are populated.</p>
+     */
     @FXML
     public void initialize() {
         User user = SessionManager.getCurrentUser();
@@ -62,6 +89,18 @@ public class ProfileController {
             leaveOrgButton.setVisible(m != null && m.isActive());
         }
     }
+    /**
+     * Recalculates and displays the risk score for the given user.
+     *
+     * <p>Fetches the user's historical {@link RiskAnalysis} entries, loads
+     * (or creates) their {@link UserRiskScore}, recalculates the aggregate
+     * score, and persists the result. The corresponding {@link RiskLevel}
+     * category is then rendered in the {@code userScore} label. If the user
+     * has no analysis history, the label is set to {@code "No history"}.</p>
+     *
+     * @param userId the identifier of the user whose risk score should be
+     *               recalculated and displayed
+     */
     private void displayUserRiskScore(int userId) {
         List<RiskAnalysis> analyses = riskAnalysisDAO.getByUserId(userId);
 
@@ -85,6 +124,16 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Persists the supplied {@link UserRiskScore}.
+     *
+     * <p>If the score already has a database identifier ({@code scoreId > 0})
+     * it is updated in place; otherwise a new record is inserted. Any
+     * persistence errors are caught and logged to {@code System.err} so they
+     * do not interrupt the profile view from loading.</p>
+     *
+     * @param score the user risk score to insert or update
+     */
     private void saveUserRiskScore(UserRiskScore score) {
         try {
             if (score.getScoreId() > 0) {
@@ -97,6 +146,20 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Handles the "Update Profile" action (CRUD update).
+     *
+     * <p>Validates the name, email, and (optionally) new password supplied in
+     * the form, then writes the changes to the underlying {@link User} record
+     * via {@link UserDAO#updateUser(User)} and refreshes the current session.
+     * Validation failures and persistence errors are surfaced through the
+     * status label rather than thrown.</p>
+     *
+     * <p>The password is only changed when a non-empty value is entered in
+     * {@code newPasswordField}; in that case it must be at least 8 characters
+     * long, contain upper- and lower-case letters and a digit, and match the
+     * value in {@code confirmPasswordField}.</p>
+     */
     @FXML
     protected void onUpdateProfile() {
         //CRUD UPDATE
@@ -153,6 +216,15 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Handles the "Delete Account" action (CRUD delete).
+     *
+     * <p>Prompts the user with a confirmation dialog before permanently
+     * removing the currently signed-in {@link User} from the database. On
+     * success, the session is cleared via {@link SessionManager#logout()} and
+     * the application is returned to the sign-in view. If no user is signed
+     * in, or the user cancels the confirmation, the action is a no-op.</p>
+     */
     @FXML
     protected void onDeleteAccount() {
         //CRUD DELETE
@@ -180,12 +252,35 @@ public class ProfileController {
         }
     }
 
+    /**
+     * Updates the status label with the given message, if the label is
+     * available.
+     *
+     * <p>Used to provide validation feedback and confirmation messages to the
+     * user without throwing exceptions when {@code statusLabel} has not been
+     * injected (e.g. in unit tests).</p>
+     *
+     * @param message the message to display in the status label
+     */
     private void setStatus(String message) {
         if (statusLabel != null) {
             statusLabel.setText(message);
         }
     }
 
+    /**
+     * Handles the "Leave Organisation" action.
+     *
+     * <p>Verifies that the signed-in user has an active membership in the
+     * current organisation and is not acting as a {@link MemberRole#MANAGER}
+     * (managers must transfer ownership before leaving). After confirmation,
+     * delegates to {@link OrganisationManager#leaveOrganisation(OrganisationMembership)}
+     * to perform the deactivation and hides the leave button on success.</p>
+     *
+     * <p>All failure modes (no signed-in user, no current organisation, no
+     * active membership, manager role, persistence error) are reported via
+     * the status label.</p>
+     */
     @FXML
     protected void onLeaveOrganisation() {
         User user = SessionManager.getCurrentUser();
