@@ -33,22 +33,22 @@ class SignUpValidationTest {
 
     @Test
     void testPasswordTooShort() {
-        assertEquals("Password must be at least 8 characters.", SignUpController.validate("Alice","a@b.com", "Pass1", "Pass1"));
+        assertEquals("Please ensure all password requirements are met.", SignUpController.validate("Alice","a@b.com", "Pass1", "Pass1"));
     }
 
     @Test
     void testPasswordNoUppercase() {
-        assertEquals("Password must contain at least one uppercase letter.", SignUpController.validate("Alice","a@b.com", "password1", "password1"));
+        assertEquals("Please ensure all password requirements are met.", SignUpController.validate("Alice","a@b.com", "password1", "password1"));
     }
 
     @Test
     void testPasswordNoLowercase() {
-        assertEquals("Password must contain at least one lowercase letter.", SignUpController.validate("Alice","a@b.com", "PASSWORD1", "PASSWORD1"));
+        assertEquals("Please ensure all password requirements are met.", SignUpController.validate("Alice","a@b.com", "PASSWORD1", "PASSWORD1"));
     }
 
     @Test
     void testPasswordNoDigit() {
-        assertEquals("Password must contain at least one digit.", SignUpController.validate("Alice","a@b.com", "Password", "Password"));
+        assertEquals("Please ensure all password requirements are met.", SignUpController.validate("Alice","a@b.com", "Password", "Password"));
     }
 
     @Test
