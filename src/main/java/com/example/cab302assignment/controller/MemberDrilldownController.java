@@ -17,6 +17,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
 
+/**
+ * Controller responsible for managing the Member Drilldown view.
+ * This view displays a specific user's current categorical risk score,
+ * and a detailed table of their prompt analysis history.
+ */
 public class MemberDrilldownController {
 
     @FXML private Label memberNameLabel;
@@ -29,8 +34,16 @@ public class MemberDrilldownController {
     @FXML private TableColumn<PromptHistorySummary, String> riskColumn;
     @FXML private TableColumn<PromptHistorySummary, Integer> detectionsColumn;
 
+    /**
+     * The ID of the user currently being viewed in the drilldown.
+     */
     private int currentUserId;
 
+    /**
+     * Initializes the controller class. This method is automatically called
+     * after the FXML file has been loaded. It sets up the table column
+     * factories and custom text wrapping for long prompts.
+     */
     @FXML
     public void initialize() {
         // Table columns that align with PromptHistorySummary
@@ -62,7 +75,13 @@ public class MemberDrilldownController {
         });
     }
 
-    // Method for the dashboard to provide the specific user ID
+    /**
+     * Initializes the view with a specific user's data.
+     * This must be called immediately after the FXML is loaded but before
+     * it is displayed to the user to ensure the correct data is fetched.
+     *
+     * @param userId The unique database ID of the user to display.
+     */
     public void initData(int userId) {
         this.currentUserId = userId;
 
@@ -70,6 +89,10 @@ public class MemberDrilldownController {
         loadUserHistory();
     }
 
+    /**
+     * Fetches the user's core profile details and their latest calculated
+     * risk score from the database, then updates the corresponding UI labels.
+     */
     private void loadUserProfile() {
         SqliteUserDAO userDAO = new SqliteUserDAO();
         SqliteUserRiskScoreDAO scoreDAO = new SqliteUserRiskScoreDAO();
@@ -88,6 +111,10 @@ public class MemberDrilldownController {
         }
     }
 
+    /**
+     * Fetches the user's historical prompt submissions and their corresponding
+     * AI risk analyses from the database, then populates the history table.
+     */
     private void loadUserHistory() {
         SqlitePromptDAO promptDAO = new SqlitePromptDAO();
 
@@ -98,5 +125,4 @@ public class MemberDrilldownController {
         ObservableList<PromptHistorySummary> tableData = FXCollections.observableArrayList(historyData);
         historyTable.setItems(tableData);
     }
-
 }

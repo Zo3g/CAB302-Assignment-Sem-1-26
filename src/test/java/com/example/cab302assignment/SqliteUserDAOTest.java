@@ -2,7 +2,6 @@ package com.example.cab302assignment;
 
 import com.example.cab302assignment.dao.SqliteUserDAO;
 import com.example.cab302assignment.db.DatabaseInitialiser;
-import com.example.cab302assignment.model.MemberRiskSummary;
 import com.example.cab302assignment.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,26 +120,5 @@ class SqliteUserDAOTest {
             // Add a risk score ONLY for User 1
             stmt.execute("INSERT INTO user_risk_scores (userId, score) VALUES (1, 75.5)");
         }
-
-        //Fetch the dashboard data for Org 1
-        List<MemberRiskSummary> dashboardData = userDAO.getMemberRiskSummary(1);
-
-        // TESTS
-
-        // Tests that inactive users and users from another organisation are not included in the summary for Org 1
-        assertEquals(2, dashboardData.size());
-
-        // Tests that its the correct users, and that they are in the correct order (ordered by risk scores)
-        assertEquals("John", dashboardData.get(0).getName());
-        assertEquals("Sarah", dashboardData.get(1).getName());
-
-        MemberRiskSummary john = dashboardData.get(0);
-        MemberRiskSummary sarah = dashboardData.get(1);
-
-        // Tests that the LEFT JOIN for risk scores works
-        assertEquals(75.5, john.getRiskScore());
-
-        // Tests that the COALESCE for missing data works
-        assertEquals(0.0, sarah.getRiskScore());
     }
 }

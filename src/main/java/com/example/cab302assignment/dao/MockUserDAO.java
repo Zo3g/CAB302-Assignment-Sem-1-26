@@ -1,6 +1,5 @@
 package com.example.cab302assignment.dao;
 
-import com.example.cab302assignment.model.MemberRiskSummary;
 import com.example.cab302assignment.model.User;
 
 import java.util.ArrayList;
@@ -49,16 +48,5 @@ public class MockUserDAO implements UserDAO {
     @Override
     public void deleteUser(int id) {
         users.removeIf(user -> user.getUserId() == id);
-    }
-
-    @Override
-    public List<MemberRiskSummary> getMemberRiskSummary(int orgId) {
-        List<MemberRiskSummary> mockSummaries = new ArrayList<>();
-
-        // Return dummy data so the UI still populates during mock testing
-        mockSummaries.add(new MemberRiskSummary(1, "Mock Alice", 12.5));
-        mockSummaries.add(new MemberRiskSummary(2, "Mock Bob", 0.0));
-
-        return mockSummaries;
     }
 }
