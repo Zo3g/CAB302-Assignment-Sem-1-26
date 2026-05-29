@@ -9,26 +9,61 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+/**
+ * The core service responsible for scanning and sanitizing text.
+ * The engine applies a configured {@link Ruleset} to an input string, utilizing regular expressions
+ * to find, count, and redact sensitive information before it can be sent to an external LLM.
+ */
 public class RedactionEngine {
+
     private Ruleset activeRuleset;
 
+    /**
+     * Constructs a new RedactionEngine initialized with the default, hardcoded ruleset.
+     */
     public RedactionEngine() {
         this.activeRuleset = defaultRuleset();
     }
 
+    /**
+     * Constructs a new RedactionEngine with a specific custom ruleset.
+     *(Planned functionality for custom rulesets)
+     * @param ruleset The ruleset to apply during redaction.
+     */
     public RedactionEngine(Ruleset ruleset) {
         this.activeRuleset = ruleset;
     }
 
+    /**
+     * Gets the currently active ruleset being used by the engine.
+     * (Planned functionality for custom rulesets)
+     * @return The active {@link Ruleset}.
+     */
     public Ruleset getActiveRuleset() {
         return activeRuleset;
     }
+
+    /**
+     * Sets or updates the active ruleset for the engine.
+     * (Planned functionality for custom rulesets)
+     * @param ruleset The new {@link Ruleset} to use for subsequent redactions.
+     */
     public void setActiveRuleset(Ruleset ruleset) {
         this.activeRuleset = ruleset;
     }
 
+    /**
+     * Processes an input string, identifying and masking any sensitive data defined by the active ruleset.
+     * This method also tallies the total number of detections and categorizes them by type.
+     *
+     * @param promptText The raw, unsanitized input string provided by the user.
+     * @return A detailed {@link RedactionResult} containing the safe text, total hit count,
+     * and a map of specific sensitive data types found.
+     */
     public RedactionResult redact(String promptText) {
         Map<SensitiveDataType, Integer> typeCounts = new EnumMap<>(SensitiveDataType.class);
+
+        // Return immediately if the input is blank or no ruleset is loaded
         if (promptText == null || promptText.trim().isEmpty() || activeRuleset == null) {
             return new RedactionResult(promptText, 0, typeCounts);
         }
@@ -36,16 +71,20 @@ public class RedactionEngine {
         String safeText = promptText;
         int totalCaught = 0;
 
+        // Iterate through every rule in the active ruleset
         for (RedactionRule rule : activeRuleset.getRules()) {
             if (!rule.isEnabled()) continue;
 
             Matcher matcher = rule.getCompiledPattern().matcher(safeText);
             int typeCount = 0;
+
+            // Count how many times this specific rule matches the text
             while (matcher.find()) {
                 typeCount++;
                 totalCaught++;
             }
 
+            // If we found matches, replace them with the rule's secure placeholder
             if (typeCount > 0) {
                 safeText = matcher.reset().replaceAll(Matcher.quoteReplacement(rule.getPlaceholder(0)));
                 typeCounts.merge(rule.getDataType(), typeCount, Integer::sum);
@@ -55,10 +94,24 @@ public class RedactionEngine {
         return new RedactionResult(safeText, totalCaught, typeCounts);
     }
 
+    /**
+     * A convenience wrapper for the redact method that only returns the sanitised string.
+     * Useful when the detailed counts and metrics are not needed.
+     *
+     * @param input The raw, unsanitized input string.
+     * @return The sanitized text with sensitive data replaced by placeholders.
+     */
     public String redactPrompt(String input) {
         return redact(input).getRedactedText();
     }
 
+    /**
+     * Generates the default, comprehensive ruleset used by the application.
+     * This ruleset contains hardcoded regular expressions designed to catch standard personal,
+     * financial, and developer-related sensitive data formats (e.g., Medicare, TFN, API Keys).
+     *
+     * @return A fully populated {@link Ruleset} containing all default active rules.
+     */
     public static Ruleset defaultRuleset() {
         Ruleset rs = new Ruleset(0);
 

@@ -61,7 +61,8 @@ public class SqlitePromptDAO implements PromptDAO {
             stmt.execute();
         } catch (SQLException ex) { System.err.println(ex); }
     }
-
+    //Prompt history for the dashboard table
+    @Override
     public List<PromptHistorySummary> getHistoryForUser(int userId) {
         List<PromptHistorySummary> history = new ArrayList<>();
 
