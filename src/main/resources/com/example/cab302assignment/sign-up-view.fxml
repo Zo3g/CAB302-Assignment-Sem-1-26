@@ -43,6 +43,13 @@
             <tooltip><Tooltip text="At least 8 characters, with uppercase, lowercase and a digit"/></tooltip>
         </PasswordField>
 
+        <VBox spacing="2">
+            <Label fx:id="lengthReqLabel" text="✖ Minimum 8 characters" style="-fx-text-fill: red;"/>
+            <Label fx:id="upperReqLabel" text="✖ At least one uppercase letter" style="-fx-text-fill: red;"/>
+            <Label fx:id="lowerReqLabel" text="✖ At least one lowercase letter" style="-fx-text-fill: red;"/>
+            <Label fx:id="digitReqLabel" text="✖ At least one digit" style="-fx-text-fill: red;"/>
+        </VBox>
+
         <Label text="Confirm Password" styleClass="form-label"/>
         <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password">
             <tooltip><Tooltip text="Must match the password above"/></tooltip>

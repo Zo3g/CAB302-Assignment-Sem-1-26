@@ -23,13 +23,28 @@ import javafx.scene.control.TextField;
  * - Navigation back to sign-in after successful registration
  */
 public class SignUpController {
-    @FXML private TextField nameField;
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private PasswordField confirmPasswordField;
-    @FXML private Label errorLabel;
-    @FXML private Label successLabel;
-    @FXML private Button signUpButton;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private Label successLabel;
+    @FXML
+    private Button signUpButton;
+    @FXML
+    private Label lengthReqLabel;
+    @FXML
+    private Label upperReqLabel;
+    @FXML
+    private Label lowerReqLabel;
+    @FXML
+    private Label digitReqLabel;
 
     private final UserDAO userDAO;
 
@@ -52,6 +67,9 @@ public class SignUpController {
      * Initialises the sign-up form UI.
      *
      * Disables the sign-up button until all required fields are filled.
+     *
+     * Creates labels for password requirement that actively check if its being fulfilled.
+     *
      */
     @FXML
     public void initialize() {
@@ -60,6 +78,15 @@ public class SignUpController {
             .or(passwordField.textProperty().isEmpty())
             .or(confirmPasswordField.textProperty().isEmpty());
         signUpButton.disableProperty().bind(anyFieldEmpty);
+
+        if (passwordField != null) {
+            passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+                updateRequirementUI(lengthReqLabel, newValue.length() >= 8, "Minimum 8 characters");
+                updateRequirementUI(upperReqLabel, newValue.matches(".*[A-Z].*"), "At least one uppercase letter");
+                updateRequirementUI(lowerReqLabel, newValue.matches(".*[a-z].*"), "At least one lowercase letter");
+                updateRequirementUI(digitReqLabel, newValue.matches(".*\\d.*"), "At least one digit");
+            });
+        }
     }
 
     /**
@@ -122,6 +149,27 @@ public class SignUpController {
     }
 
     /**
+     * Updates the visual state of a specific password requirement label.
+     * Changes the text to include a checkmark or a cross, and updates the text color
+     * to green (met) or red (unmet).
+     *
+     * @param label   The JavaFX Label associated with the specific password requirement.
+     * @param isMet   A boolean indicating whether the user's input currently satisfies the rule.
+     * @param reqText The descriptive text of the requirement (e.g., "Minimum 8 characters").
+     */
+    private void updateRequirementUI(Label label, boolean isMet, String reqText) {
+        if (label == null) return;
+
+        if (isMet) {
+            label.setText("✔ " + reqText);
+            label.setStyle("-fx-text-fill: green;");
+        } else {
+            label.setText("✖ " + reqText);
+            label.setStyle("-fx-text-fill: red;");
+        }
+    }
+
+    /**
      * Validates user registration input fields.
      *
      * Checks:
@@ -150,18 +198,14 @@ public class SignUpController {
         if (!email.matches("^[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
             return "Please enter a valid email address.";
         }
-        if (password.length() < 8) {
-            return "Password must be at least 8 characters.";
+
+        if (password.length() < 8 ||
+                !password.matches(".*[A-Z].*") ||
+                !password.matches(".*[a-z].*") ||
+                !password.matches(".*\\d.*")) {
+            return "Please ensure all password requirements are met.";
         }
-        if (!password.matches(".*[A-Z].*")) {
-            return "Password must contain at least one uppercase letter.";
-        }
-        if (!password.matches(".*[a-z].*")) {
-            return "Password must contain at least one lowercase letter.";
-        }
-        if (!password.matches(".*\\d.*")) {
-            return "Password must contain at least one digit.";
-        }
+
         if (!password.equals(confirmPassword)) {
             return "Passwords do not match.";
         }
