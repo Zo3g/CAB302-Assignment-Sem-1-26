@@ -8,12 +8,32 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The real {@link RedactionRuleDAO} backed by SQLite.
+ *
+ * <p>Handles the redaction_rules table. Each rule has its data type stored as
+ * text (the enum's name) and its enabled flag stored as 1 or 0, since SQLite
+ * doesn't have a proper boolean type.</p>
+ */
 public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
+    /** The database connection used for all queries. */
     private final Connection connection;
 
+    /** Default constructor - uses the shared singleton connection. */
     public SqliteRedactionRuleDAO() { this.connection = DatabaseConnection.getInstance(); }
+
+    /**
+     * Constructor for passing in your own connection (used in tests).
+     *
+     * @param connection the connection to use
+     */
     public SqliteRedactionRuleDAO(Connection connection) { this.connection = connection; }
 
+    /**
+     * Inserts a new rule and reads back its auto-generated ID.
+     *
+     * @param r the rule to add
+     */
     @Override
     public void addRule(RedactionRule r) {
         try {
@@ -33,6 +53,12 @@ public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Finds a single rule by its ID.
+     *
+     * @param ruleId the rule's ID
+     * @return the rule, or null if not found
+     */
     @Override
     public RedactionRule getRuleById(int ruleId) {
         try {
@@ -44,6 +70,12 @@ public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
         return null;
     }
 
+    /**
+     * Gets all the rules that belong to a given ruleset.
+     *
+     * @param rulesetId the ruleset's ID
+     * @return a list of rules in that ruleset
+     */
     @Override
     public List<RedactionRule> getRulesByRuleset(int rulesetId) {
         List<RedactionRule> list = new ArrayList<>();
@@ -56,6 +88,11 @@ public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
         return list;
     }
 
+    /**
+     * Updates an existing rule's details, matched by ID.
+     *
+     * @param r the rule with the updated info
+     */
     @Override
     public void updateRule(RedactionRule r) {
         try {
@@ -72,6 +109,11 @@ public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Deletes a rule by its ID.
+     *
+     * @param ruleId the ID of the rule to delete
+     */
     @Override
     public void deleteRule(int ruleId) {
         try {
@@ -81,6 +123,14 @@ public class SqliteRedactionRuleDAO implements RedactionRuleDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Helper that builds a RedactionRule from a result set row, converting the
+     * data type text back into the enum and the enabled int back into a boolean.
+     *
+     * @param rs the result set positioned on the row to read
+     * @return a RedactionRule built from that row
+     * @throws SQLException if a column can't be read
+     */
     private RedactionRule map(ResultSet rs) throws SQLException {
         return new RedactionRule(
             rs.getInt("ruleId"),

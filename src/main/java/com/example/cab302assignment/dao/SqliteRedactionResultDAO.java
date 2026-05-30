@@ -8,12 +8,36 @@ import java.sql.*;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * The real {@link RedactionResultDAO} backed by SQLite.
+ *
+ * <p>Handles the redaction_results table. The tricky bit here is the map of
+ * "how many of each sensitive data type were found" - SQLite can't store a
+ * Map directly, so we squash it into a single text string when saving and
+ * unpack it again when loading. The serialise/deserialise helpers do that, and
+ * they're package-private so other DAOs (like the risk analysis one) can reuse
+ * the same format.</p>
+ */
 public class SqliteRedactionResultDAO implements RedactionResultDAO {
+    /** The database connection used for all queries. */
     private final Connection connection;
 
+    /** Default constructor - uses the shared singleton connection. */
     public SqliteRedactionResultDAO() { this.connection = DatabaseConnection.getInstance(); }
+
+    /**
+     * Constructor for passing in your own connection (used in tests).
+     *
+     * @param connection the connection to use
+     */
     public SqliteRedactionResultDAO(Connection connection) { this.connection = connection; }
 
+    /**
+     * Inserts a redaction result, serialising the type counts map into text
+     * first, then reads back the generated result ID.
+     *
+     * @param r the result to add
+     */
     @Override
     public void addResult(RedactionResult r) {
         try {
@@ -30,6 +54,13 @@ public class SqliteRedactionResultDAO implements RedactionResultDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Gets the redaction result for a given prompt, unpacking the type counts
+     * text back into a map as it builds the object.
+     *
+     * @param promptId the ID of the prompt
+     * @return the result for that prompt, or null if there isn't one
+     */
     @Override
     public RedactionResult getByPromptId(int promptId) {
         try {
@@ -46,6 +77,11 @@ public class SqliteRedactionResultDAO implements RedactionResultDAO {
         return null;
     }
 
+    /**
+     * Deletes the redaction result tied to a prompt.
+     *
+     * @param promptId the ID of the prompt whose result we want removed
+     */
     @Override
     public void deleteByPromptId(int promptId) {
         try {
@@ -55,6 +91,14 @@ public class SqliteRedactionResultDAO implements RedactionResultDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Turns a map of data-type counts into a single string we can store in one
+     * column. The format is "TYPE=count" pairs separated by semicolons, e.g.
+     * "EMAIL=2;PHONE=1". An empty or null map just becomes an empty string.
+     *
+     * @param counts the map of how many of each type were detected
+     * @return the serialised string version of that map
+     */
     static String serialise(Map<SensitiveDataType, Integer> counts) {
         if (counts == null || counts.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -67,6 +111,14 @@ public class SqliteRedactionResultDAO implements RedactionResultDAO {
         return sb.toString();
     }
 
+    /**
+     * The opposite of {@link #serialise} - takes the stored string and rebuilds
+     * the map. It splits on semicolons, then on '=', and quietly ignores
+     * anything that doesn't parse properly so one bad entry won't break the lot.
+     *
+     * @param s the serialised string (may be null or empty)
+     * @return the rebuilt map of data-type counts (empty if there was nothing)
+     */
     static Map<SensitiveDataType, Integer> deserialise(String s) {
         Map<SensitiveDataType, Integer> out = new EnumMap<>(SensitiveDataType.class);
         if (s == null || s.isEmpty()) return out;

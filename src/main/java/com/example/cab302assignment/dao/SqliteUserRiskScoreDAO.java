@@ -7,13 +7,39 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * The real {@link UserRiskScoreDAO} backed by SQLite.
+ *
+ * <p>Handles the user_risk_scores table, which keeps each user's overall risk
+ * score. When adding a score we set lastUpdated ourselves (falling back to
+ * "now" if it wasn't given), and when updating we let SQLite set it with
+ * CURRENT_TIMESTAMP. The getLatestForUser method orders by lastUpdated so we
+ * always get the freshest one.</p>
+ */
 public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
+    /** The timestamp format SQLite uses, for formatting and parsing lastUpdated. */
     private static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /** The database connection used for all queries. */
     private final Connection connection;
 
+    /** Default constructor - uses the shared singleton connection. */
     public SqliteUserRiskScoreDAO() { this.connection = DatabaseConnection.getInstance(); }
+
+    /**
+     * Constructor for passing in your own connection (used in tests).
+     *
+     * @param connection the connection to use
+     */
     public SqliteUserRiskScoreDAO(Connection connection) { this.connection = connection; }
 
+    /**
+     * Inserts a new risk score. If the score doesn't already have a
+     * lastUpdated time we just use the current time instead. Reads back the
+     * generated score ID afterwards.
+     *
+     * @param s the score to add
+     */
     @Override
     public void addScore(UserRiskScore s) {
         try {
@@ -30,6 +56,13 @@ public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Gets a user's most recent risk score by ordering on lastUpdated and only
+     * keeping the top row.
+     *
+     * @param userId the user's ID
+     * @return their latest score, or null if they don't have one yet
+     */
     @Override
     public UserRiskScore getLatestForUser(int userId) {
         try {
@@ -43,6 +76,12 @@ public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
         return null;
     }
 
+    /**
+     * Updates an existing score's value and prompt count, and bumps
+     * lastUpdated to now using CURRENT_TIMESTAMP. Matched by score ID.
+     *
+     * @param s the score with the updated values
+     */
     @Override
     public void updateScore(UserRiskScore s) {
         try {
@@ -56,6 +95,11 @@ public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Deletes a risk score by its ID.
+     *
+     * @param scoreId the ID of the score to delete
+     */
     @Override
     public void deleteScore(int scoreId) {
         try {
@@ -65,6 +109,14 @@ public class SqliteUserRiskScoreDAO implements UserRiskScoreDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Helper that builds a UserRiskScore from a result set row, handling a
+     * possibly-null lastUpdated and setting the score ID afterwards.
+     *
+     * @param rs the result set positioned on the row to read
+     * @return a UserRiskScore built from that row
+     * @throws SQLException if a column can't be read
+     */
     private UserRiskScore map(ResultSet rs) throws SQLException {
         String t = rs.getString("lastUpdated");
         LocalDateTime lastUpdated = t == null ? null : LocalDateTime.parse(t, DT);
