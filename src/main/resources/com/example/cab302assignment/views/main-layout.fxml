@@ -66,6 +66,21 @@
             </Button>
             <Separator prefWidth="200.0" />
             <Region prefHeight="122.0" prefWidth="184.0" VBox.vgrow="ALWAYS" />
+            <VBox alignment="CENTER" spacing="6.0" style="-fx-background-color: rgba(0,0,0,0.04); -fx-background-radius: 8;">
+               <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets bottom="16.0" left="12.0" right="12.0" top="10.0" />
+               </VBox.margin>
+               <FontIcon iconLiteral="fth-shield" iconSize="20" iconColor="#4A5568" />
+               <Label text="Privacy First" style="-fx-font-weight: bold; -fx-text-fill: #2D3748;">
+                  <font>
+                     <Font size="13.0" />
+                  </font>
+               </Label>
+               <Label text="Guardia redacts your data locally. The LLM that provides insights only sees the safe, redacted prompt." textAlignment="CENTER" wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #4A5568; -fx-line-spacing: 2px;" />
+            </VBox>
             <Separator prefWidth="200.0" />
             <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar-account">
                <padding>
