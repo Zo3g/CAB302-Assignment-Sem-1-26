@@ -151,6 +151,15 @@
     -fx-background-color: #FF0000;
 }
 
+.custom-tooltip {
+    -fx-background-color: #2a5585;
+    -fx-text-fill: white;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 12px;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+}
+
 .table-view {
     -fx-background-color: transparent;
     -fx-table-cell-border-color: transparent;

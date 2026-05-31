@@ -5,6 +5,7 @@ import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.enums.RiskLevel;
 import com.example.cab302assignment.model.enums.SensitiveDataType;
 import com.example.cab302assignment.service.SessionManager;
+import com.example.cab302assignment.service.TableUIUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -24,6 +25,7 @@ import com.example.cab302assignment.dao.SqliteOrganisationMembershipDAO;
 import com.example.cab302assignment.dao.OrganisationMembershipDAO;
 
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -132,7 +134,24 @@ public class OrgDashboardController {
         userTable.setOnMouseClicked(this::handleRowClick);
         totalUsersCount.setText("Total Users: " + usersCount);
 
+        //Tooltip for drilldown on hover
+        userTable.setRowFactory(tv -> {
+            TableRow<OrganisationMembership> row = new TableRow<>();
+            Tooltip rowTooltip = new Tooltip("Double-click to view user prompt history");
+            rowTooltip.setShowDelay(Duration.millis(150));
 
+            rowTooltip.getStyleClass().add("custom-tooltip");
+
+            row.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    row.setTooltip(null);
+                } else {
+                    row.setTooltip(rowTooltip);
+                }
+            });
+
+            return row;
+        });
 
     }
 
@@ -323,9 +342,10 @@ public class OrgDashboardController {
      * Configures the user table columns including:
      * - Name
      * - Email
-     * - Risk level (with styled badges)
+     * - Risk level
      *
      * Fetches related user and risk data from DAOs.
+     * Utilises TableUIUtil to apply custom tooltips and risk level badges.
      */
     private void initialiseUserTableCols() {
         nameCol.setCellValueFactory(cellData -> {
@@ -359,43 +379,14 @@ public class OrgDashboardController {
                     riskLevel.scoreString()
             );
         });
-        riskCol.setCellFactory(column -> new TableCell<>() {
 
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
+        // Apply shared Table UI Tooltips and Badges for risk levels from TableUIUtil
+        TableUIUtil.setupRiskLevelColumn(riskCol);
 
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    setStyle("");
-                    return;
-                }
-
-                Label badge = new Label(item);
-
-                badge.getStyleClass().add("risk-label");
-
-                String lower = item.toLowerCase();
-
-                if (lower.contains("critical")) {
-                    badge.getStyleClass().add("risk-label-critical");
-                } else if (lower.contains("high")) {
-                    badge.getStyleClass().add("risk-label-high");
-                } else if (lower.contains("medium")) {
-                    badge.getStyleClass().add("risk-label-medium");
-                } else if (lower.contains("low")) {
-                    badge.getStyleClass().add("risk-label-low");
-                } else {
-                    badge.getStyleClass().add("risk-label-none");
-                }
-
-                setGraphic(badge);
-                setText(null);
-            }
-        });
+        TableUIUtil.addHeaderTooltip(nameCol, "Name");
+        TableUIUtil.addHeaderTooltip(emailCol, "Email");
+        TableUIUtil.addHeaderTooltip(riskCol, "Risk Level");
     }
-
 }
 
 

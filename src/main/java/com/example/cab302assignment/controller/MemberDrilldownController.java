@@ -7,13 +7,16 @@ import com.example.cab302assignment.dao.SqlitePromptDAO;
 import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.model.enums.RiskLevel;
+import com.example.cab302assignment.service.TableUIUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -43,14 +46,32 @@ public class MemberDrilldownController {
      * Initializes the controller class. This method is automatically called
      * after the FXML file has been loaded. It sets up the table column
      * factories and custom text wrapping for long prompts.
+     * Utilises TableUIUtil to apply custom tooltips and risk level badges.
      */
     @FXML
     public void initialize() {
         // Table columns that align with PromptHistorySummary
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         promptColumn.setCellValueFactory(new PropertyValueFactory<>("redactedText"));
-        riskColumn.setCellValueFactory(new PropertyValueFactory<>("riskLevel"));
+
+        //Change "No" risk ratings to display as "None"
+        riskColumn.setCellValueFactory(cellData -> {
+            String risk = cellData.getValue().getRiskLevel();
+            if (risk == null || risk.equalsIgnoreCase("No")) {
+                return new javafx.beans.property.SimpleStringProperty("None");
+            }
+            return new javafx.beans.property.SimpleStringProperty(risk);
+        });
+
         detectionsColumn.setCellValueFactory(new PropertyValueFactory<>("totalDetections"));
+
+        //Apply Custom tooltips for headers and badges for risk score from TableUIUtil
+        TableUIUtil.setupRiskLevelColumn(riskColumn);
+
+        TableUIUtil.addHeaderTooltip(dateColumn, "Date");
+        TableUIUtil.addHeaderTooltip(promptColumn, "Prompt");
+        TableUIUtil.addHeaderTooltip(riskColumn, "Risk Level");
+        TableUIUtil.addHeaderTooltip(detectionsColumn, "Detections");
 
         // Custom cell factory to allow long prompts to wrap around
         promptColumn.setCellFactory(tc -> {
@@ -125,4 +146,5 @@ public class MemberDrilldownController {
         ObservableList<PromptHistorySummary> tableData = FXCollections.observableArrayList(historyData);
         historyTable.setItems(tableData);
     }
+
 }
