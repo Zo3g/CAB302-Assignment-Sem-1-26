@@ -7,6 +7,7 @@ import com.example.cab302assignment.dao.SqlitePromptDAO;
 import com.example.cab302assignment.model.User;
 import com.example.cab302assignment.model.UserRiskScore;
 import com.example.cab302assignment.model.enums.RiskLevel;
+import com.example.cab302assignment.service.TableUIUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -45,20 +46,32 @@ public class MemberDrilldownController {
      * Initializes the controller class. This method is automatically called
      * after the FXML file has been loaded. It sets up the table column
      * factories and custom text wrapping for long prompts.
-     * States text that will be used in the header tooltips
+     * Utilises TableUIUtil to apply custom tooltips and risk level badges.
      */
     @FXML
     public void initialize() {
         // Table columns that align with PromptHistorySummary
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         promptColumn.setCellValueFactory(new PropertyValueFactory<>("redactedText"));
-        riskColumn.setCellValueFactory(new PropertyValueFactory<>("riskLevel"));
+
+        //Change "No" risk ratings to display as "None"
+        riskColumn.setCellValueFactory(cellData -> {
+            String risk = cellData.getValue().getRiskLevel();
+            if (risk == null || risk.equalsIgnoreCase("No")) {
+                return new javafx.beans.property.SimpleStringProperty("None");
+            }
+            return new javafx.beans.property.SimpleStringProperty(risk);
+        });
+
         detectionsColumn.setCellValueFactory(new PropertyValueFactory<>("totalDetections"));
 
-        addHeaderTooltip(dateColumn, "Date");
-        addHeaderTooltip(promptColumn, "Prompt");
-        addHeaderTooltip(riskColumn, "Risk Level");
-        addHeaderTooltip(detectionsColumn, "Detections");
+        //Apply Custom tooltips for headers and badges for risk score from TableUIUtil
+        TableUIUtil.setupRiskLevelColumn(riskColumn);
+
+        TableUIUtil.addHeaderTooltip(dateColumn, "Date");
+        TableUIUtil.addHeaderTooltip(promptColumn, "Prompt");
+        TableUIUtil.addHeaderTooltip(riskColumn, "Risk Level");
+        TableUIUtil.addHeaderTooltip(detectionsColumn, "Detections");
 
         // Custom cell factory to allow long prompts to wrap around
         promptColumn.setCellFactory(tc -> {
@@ -134,25 +147,4 @@ public class MemberDrilldownController {
         historyTable.setItems(tableData);
     }
 
-    /**
-     * Replaces the standard text of a TableColumn header with a custom Label containing a Tooltip.
-     * Because JavaFX TableColumns do not natively support tooltips on their headers, this method
-     * uses a graphic node workaround to provide a visual cue that the column is sortable.
-     *
-     * @param column     The JavaFX TableColumn to modify. Allows any generic type.
-     * @param headerText The text to display inside the new header label.
-     */
-
-    private void addHeaderTooltip(TableColumn<?, ?> column, String headerText) {
-        Label label = new Label(headerText);
-
-        Tooltip headerTooltip = new Tooltip("Click to sort by " + headerText);
-        headerTooltip.setShowDelay(javafx.util.Duration.millis(0));
-
-        headerTooltip.getStyleClass().add("custom-tooltip");
-
-        label.setTooltip(headerTooltip);
-        column.setGraphic(label);
-        column.setText("");
-    }
 }

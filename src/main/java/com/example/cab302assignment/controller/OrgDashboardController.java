@@ -5,6 +5,7 @@ import com.example.cab302assignment.dao.*;
 import com.example.cab302assignment.model.enums.RiskLevel;
 import com.example.cab302assignment.model.enums.SensitiveDataType;
 import com.example.cab302assignment.service.SessionManager;
+import com.example.cab302assignment.service.TableUIUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -133,7 +134,7 @@ public class OrgDashboardController {
         userTable.setOnMouseClicked(this::handleRowClick);
         totalUsersCount.setText("Total Users: " + usersCount);
 
-        //Tooltip on hover
+        //Tooltip for drilldown on hover
         userTable.setRowFactory(tv -> {
             TableRow<OrganisationMembership> row = new TableRow<>();
             Tooltip rowTooltip = new Tooltip("Double-click to view user prompt history");
@@ -339,10 +340,10 @@ public class OrgDashboardController {
      * Configures the user table columns including:
      * - Name
      * - Email
-     * - Risk level (with styled badges)
+     * - Risk level
      *
      * Fetches related user and risk data from DAOs.
-     * States text that will be used in the header tooltips
+     * Utilises TableUIUtil to apply custom tooltips and risk level badges.
      */
     private void initialiseUserTableCols() {
         nameCol.setCellValueFactory(cellData -> {
@@ -376,69 +377,14 @@ public class OrgDashboardController {
                     riskLevel.scoreString()
             );
         });
-        riskCol.setCellFactory(column -> new TableCell<>() {
 
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
+        // Apply shared Table UI Tooltips and Badges for risk levels from TableUIUtil
+        TableUIUtil.setupRiskLevelColumn(riskCol);
 
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    setStyle("");
-                    return;
-                }
-
-                Label badge = new Label(item);
-
-                badge.getStyleClass().add("risk-label");
-
-                String lower = item.toLowerCase();
-
-                if (lower.contains("critical")) {
-                    badge.getStyleClass().add("risk-label-critical");
-                } else if (lower.contains("high")) {
-                    badge.getStyleClass().add("risk-label-high");
-                } else if (lower.contains("medium")) {
-                    badge.getStyleClass().add("risk-label-medium");
-                } else if (lower.contains("low")) {
-                    badge.getStyleClass().add("risk-label-low");
-                } else {
-                    badge.getStyleClass().add("risk-label-none");
-                }
-
-                setGraphic(badge);
-                setText(null);
-            }
-        });
-
-        addHeaderTooltip(nameCol, "Name");
-        addHeaderTooltip(emailCol, "Email");
-        addHeaderTooltip(riskCol, "Risk Level");
+        TableUIUtil.addHeaderTooltip(nameCol, "Name");
+        TableUIUtil.addHeaderTooltip(emailCol, "Email");
+        TableUIUtil.addHeaderTooltip(riskCol, "Risk Level");
     }
-
-
-    /**
-     * Replaces the standard text of a TableColumn header with a custom Label containing a Tooltip.
-     * Because JavaFX TableColumns do not natively support tooltips on their headers, this method
-     * uses a graphic node workaround to provide a visual cue that the column is sortable.
-     *
-     * @param column     The JavaFX TableColumn to modify. Allows any generic type.
-     * @param headerText The text to display inside the new header label.
-     */
-    private void addHeaderTooltip(TableColumn<?, ?> column, String headerText) {
-        Label label = new Label(headerText);
-
-        Tooltip headerTooltip = new Tooltip("Click to sort by " + headerText);
-        headerTooltip.setShowDelay(javafx.util.Duration.millis(0));
-
-        headerTooltip.getStyleClass().add("custom-tooltip");
-
-        label.setTooltip(headerTooltip);
-        column.setGraphic(label);
-        column.setText("");
-    }
-
 }
 
 
