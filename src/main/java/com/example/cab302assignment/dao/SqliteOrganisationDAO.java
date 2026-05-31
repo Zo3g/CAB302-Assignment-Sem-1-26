@@ -9,13 +9,35 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The real {@link OrganisationDAO} that talks to the SQLite database.
+ *
+ * <p>Runs SQL against the organisations table using prepared statements. Like
+ * the other SQLite DAOs, any errors just get printed to System.err so one bad
+ * query doesn't take down the app.</p>
+ */
 public class SqliteOrganisationDAO implements OrganisationDAO {
+    /** The format SQLite uses for timestamps, used when parsing createdAt. */
     private static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /** The database connection used for all queries. */
     private final Connection connection;
 
+    /** Default constructor - uses the shared singleton connection. */
     public SqliteOrganisationDAO() { this.connection = DatabaseConnection.getInstance(); }
+
+    /**
+     * Constructor for passing in your own connection (used in tests).
+     *
+     * @param connection the connection to use
+     */
     public SqliteOrganisationDAO(Connection connection) { this.connection = connection; }
 
+    /**
+     * Inserts a new organisation and reads back its auto-generated ID.
+     *
+     * @param org the organisation to add
+     */
     @Override
     public void addOrganisation(Organisation org) {
         try {
@@ -27,6 +49,12 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Looks up an organisation by its ID.
+     *
+     * @param orgId the organisation's ID
+     * @return the organisation, or null if not found
+     */
     @Override
     public Organisation getOrganisationById(int orgId) {
         try {
@@ -38,6 +66,12 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         return null;
     }
 
+    /**
+     * Looks up an organisation by its name.
+     *
+     * @param name the name to search for
+     * @return the organisation, or null if not found
+     */
     @Override
     public Organisation getOrganisationByName(String name) {
         try {
@@ -49,6 +83,11 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         return null;
     }
 
+    /**
+     * Grabs every organisation in the table.
+     *
+     * @return a list of all organisations
+     */
     @Override
     public List<Organisation> getAllOrganisations() {
         List<Organisation> orgs = new ArrayList<>();
@@ -60,6 +99,11 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         return orgs;
     }
 
+    /**
+     * Updates an organisation's name, matched by ID.
+     *
+     * @param org the organisation with the updated details
+     */
     @Override
     public void updateOrganisation(Organisation org) {
         try {
@@ -70,6 +114,11 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Deletes the organisation with the given ID.
+     *
+     * @param orgId the ID of the organisation to delete
+     */
     @Override
     public void deleteOrganisation(int orgId) {
         try {
@@ -79,6 +128,14 @@ public class SqliteOrganisationDAO implements OrganisationDAO {
         } catch (SQLException ex) { System.err.println(ex); }
     }
 
+    /**
+     * Helper that builds an Organisation from a result set row. The createdAt
+     * column might be null so we handle that before parsing.
+     *
+     * @param rs the result set positioned on the row to read
+     * @return an Organisation built from that row
+     * @throws SQLException if a column can't be read
+     */
     private Organisation map(ResultSet rs) throws SQLException {
         String createdAtStr = rs.getString("createdAt");
         LocalDateTime createdAt = createdAtStr == null ? null : LocalDateTime.parse(createdAtStr, DT);
