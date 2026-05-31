@@ -100,6 +100,8 @@
                 <configuration>
                     <destDir>javadoc</destDir>
                     <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
+                    <doctitle>CAB302 Assignment Documentation</doctitle>
+                    <windowtitle>CAB302 Assignment Documentation</windowtitle>
                 </configuration>
             </plugin>
             <plugin>
