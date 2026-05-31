@@ -68,7 +68,7 @@ public class MemberDrilldownController {
         //Apply Custom tooltips for headers and badges for risk score from TableUIUtil
         TableUIUtil.setupRiskLevelColumn(riskColumn);
 
-        TableUIUtil.addHeaderTooltip(dateColumn, "Date");
+        TableUIUtil.addHeaderTooltip(dateColumn, "Date (UTC)");
         TableUIUtil.addHeaderTooltip(promptColumn, "Prompt");
         TableUIUtil.addHeaderTooltip(riskColumn, "Risk Level");
         TableUIUtil.addHeaderTooltip(detectionsColumn, "Detections");
