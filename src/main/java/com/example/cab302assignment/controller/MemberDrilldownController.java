@@ -13,7 +13,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class MemberDrilldownController {
      * Initializes the controller class. This method is automatically called
      * after the FXML file has been loaded. It sets up the table column
      * factories and custom text wrapping for long prompts.
+     * States text that will be used in the header tooltips
      */
     @FXML
     public void initialize() {
@@ -51,6 +54,11 @@ public class MemberDrilldownController {
         promptColumn.setCellValueFactory(new PropertyValueFactory<>("redactedText"));
         riskColumn.setCellValueFactory(new PropertyValueFactory<>("riskLevel"));
         detectionsColumn.setCellValueFactory(new PropertyValueFactory<>("totalDetections"));
+
+        addHeaderTooltip(dateColumn, "Date");
+        addHeaderTooltip(promptColumn, "Prompt");
+        addHeaderTooltip(riskColumn, "Risk Level");
+        addHeaderTooltip(detectionsColumn, "Detections");
 
         // Custom cell factory to allow long prompts to wrap around
         promptColumn.setCellFactory(tc -> {
@@ -124,5 +132,27 @@ public class MemberDrilldownController {
         // Push it to the UI
         ObservableList<PromptHistorySummary> tableData = FXCollections.observableArrayList(historyData);
         historyTable.setItems(tableData);
+    }
+
+    /**
+     * Replaces the standard text of a TableColumn header with a custom Label containing a Tooltip.
+     * Because JavaFX TableColumns do not natively support tooltips on their headers, this method
+     * uses a graphic node workaround to provide a visual cue that the column is sortable.
+     *
+     * @param column     The JavaFX TableColumn to modify. Allows any generic type.
+     * @param headerText The text to display inside the new header label.
+     */
+
+    private void addHeaderTooltip(TableColumn<?, ?> column, String headerText) {
+        Label label = new Label(headerText);
+
+        Tooltip headerTooltip = new Tooltip("Click to sort by " + headerText);
+        headerTooltip.setShowDelay(javafx.util.Duration.millis(0));
+
+        headerTooltip.getStyleClass().add("custom-tooltip");
+
+        label.setTooltip(headerTooltip);
+        column.setGraphic(label);
+        column.setText("");
     }
 }

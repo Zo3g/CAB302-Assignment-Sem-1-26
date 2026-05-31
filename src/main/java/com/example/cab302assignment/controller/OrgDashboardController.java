@@ -24,6 +24,7 @@ import com.example.cab302assignment.dao.SqliteOrganisationMembershipDAO;
 import com.example.cab302assignment.dao.OrganisationMembershipDAO;
 
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -132,7 +133,24 @@ public class OrgDashboardController {
         userTable.setOnMouseClicked(this::handleRowClick);
         totalUsersCount.setText("Total Users: " + usersCount);
 
+        //Tooltip on hover
+        userTable.setRowFactory(tv -> {
+            TableRow<OrganisationMembership> row = new TableRow<>();
+            Tooltip rowTooltip = new Tooltip("Double-click to view user prompt history");
+            rowTooltip.setShowDelay(Duration.millis(150));
 
+            rowTooltip.getStyleClass().add("custom-tooltip");
+
+            row.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    row.setTooltip(null);
+                } else {
+                    row.setTooltip(rowTooltip);
+                }
+            });
+
+            return row;
+        });
 
     }
 
@@ -324,6 +342,7 @@ public class OrgDashboardController {
      * - Risk level (with styled badges)
      *
      * Fetches related user and risk data from DAOs.
+     * States text that will be used in the header tooltips
      */
     private void initialiseUserTableCols() {
         nameCol.setCellValueFactory(cellData -> {
@@ -392,6 +411,32 @@ public class OrgDashboardController {
                 setText(null);
             }
         });
+
+        addHeaderTooltip(nameCol, "Name");
+        addHeaderTooltip(emailCol, "Email");
+        addHeaderTooltip(riskCol, "Risk Level");
+    }
+
+
+    /**
+     * Replaces the standard text of a TableColumn header with a custom Label containing a Tooltip.
+     * Because JavaFX TableColumns do not natively support tooltips on their headers, this method
+     * uses a graphic node workaround to provide a visual cue that the column is sortable.
+     *
+     * @param column     The JavaFX TableColumn to modify. Allows any generic type.
+     * @param headerText The text to display inside the new header label.
+     */
+    private void addHeaderTooltip(TableColumn<?, ?> column, String headerText) {
+        Label label = new Label(headerText);
+
+        Tooltip headerTooltip = new Tooltip("Click to sort by " + headerText);
+        headerTooltip.setShowDelay(javafx.util.Duration.millis(0));
+
+        headerTooltip.getStyleClass().add("custom-tooltip");
+
+        label.setTooltip(headerTooltip);
+        column.setGraphic(label);
+        column.setText("");
     }
 
 }
