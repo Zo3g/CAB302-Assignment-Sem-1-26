@@ -33,6 +33,11 @@ public class TableUIUtil {
     }
 
     /**
+     * Apllies a custom comparator to ensure that when a user clicks on the Risk Level header of the table, the rows
+     * are sorted by the risk levels' weights, not alphabetically.
+     *
+     * Formats text so that the first letter is capitalised.
+     *
      * Applies a custom cell factory to a TableColumn to render risk levels as styled badges.
      * The badge color dynamically updates based on the text content.
      *
@@ -40,6 +45,15 @@ public class TableUIUtil {
      * @param <T>    The type of the TableView data model.
      */
     public static <T> void setupRiskLevelColumn(TableColumn<T, String> column) {
+
+
+        //Compares numeric weights of risk so that they are sorted correctly, not alphabetically.
+        column.setComparator((risk1, risk2) -> {
+            int weight1 = getRiskSortWeight(risk1);
+            int weight2 = getRiskSortWeight(risk2);
+            return Integer.compare(weight1, weight2);
+        });
+
         column.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -52,10 +66,10 @@ public class TableUIUtil {
                     return;
                 }
 
-                Label badge = new Label(item);
-                badge.getStyleClass().add("risk-label");
-
                 String lower = item.toLowerCase();
+                String formattedText = lower.substring(0, 1).toUpperCase() + lower.substring(1);
+                Label badge = new Label(formattedText);
+                badge.getStyleClass().add("risk-label");
 
                 if (lower.contains("critical")) {
                     badge.getStyleClass().add("risk-label-critical");
@@ -73,5 +87,20 @@ public class TableUIUtil {
                 setText(null);
             }
         });
+    }
+    /**
+     * Helper method to assign a numeric weight to risk level strings for sorting.
+     */
+    private static int getRiskSortWeight(String risk) {
+        if (risk == null) return 0;
+
+        String lower = risk.toLowerCase();
+        if (lower.contains("critical")) return 5;
+        if (lower.contains("high")) return 4;
+        if (lower.contains("medium")) return 3;
+        if (lower.contains("low")) return 2;
+        if (lower.contains("none")) return 1;
+
+        return 0; // Covers "None", "No Past Prompts", or unknowns
     }
 }
