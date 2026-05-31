@@ -33,7 +33,7 @@ public class TableUIUtil {
     }
 
     /**
-     * Apllies a custom comparator to ensure that when a user clicks on the Risk Level header of the table, the rows
+     * Applies a custom comparator to ensure that when a user clicks on the Risk Level header of the table, the rows
      * are sorted by the risk levels' weights, not alphabetically.
      *
      * Formats text so that the first letter is capitalised.
@@ -41,8 +41,7 @@ public class TableUIUtil {
      * Applies a custom cell factory to a TableColumn to render risk levels as styled badges.
      * The badge color dynamically updates based on the text content.
      *
-     * @param column The TableColumn to style. The <T> allows it to work with any table data model.
-     * @param <T>    The type of the TableView data model.
+     * @param column The TableColumn to style. The {@code <T>} allows it to work with any table data model.
      */
     public static <T> void setupRiskLevelColumn(TableColumn<T, String> column) {
 
