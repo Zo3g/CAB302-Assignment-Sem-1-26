@@ -291,6 +291,8 @@ public class OrgDashboardController {
         List<OrganisationMembership> memberships =
                 organisationMembershipDAO.getMembershipsForOrg(orgId);
 
+        memberships.removeIf(m -> !m.isActive());
+
         // sort alphabetically by user name
         memberships.sort(Comparator.comparing(m -> {
             User u = userDAO.getUserById(m.getUserId());
