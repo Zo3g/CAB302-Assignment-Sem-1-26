@@ -1,3 +1,7 @@
+/**
+ * The main module that contains the Guardia JavaFX application,
+ * including the model, controller, service, DAO and data access classes.
+ */
 module com.example.cab302assignment {
     requires javafx.controls;
     requires javafx.fxml;
